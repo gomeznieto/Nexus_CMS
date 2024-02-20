@@ -1,0 +1,20 @@
+﻿@model Categoria
+
+@{
+	ViewData["Title"] = "Crear categoria";
+}
+
+<h1>Crear Categoria</h1>
+<h5>La categoria se refiere a la etiqueta con la que quiera vincular un proyecto o una entrada de blog.</h5>
+
+@* FORMULARIO *@
+<form asp-controller="Categorias" asp-action="Crear">
+	<div class="mb-3">
+		<div class="flex-column">
+			<label asp-for="name" class="form-label">Categoria</label>
+			<input type="text" asp-for="name" class="form-control"/>
+			<span asp-validation-for="name" class="text-danger"></span>
+		</div>
+		<button type="submit" class="btn btn-primary mt-3">Crear</button>
+	</div>
+</form>
