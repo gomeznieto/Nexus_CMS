@@ -1,7 +1,12 @@
+using Backend_portafolio.Sevices;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//Modelos
+builder.Services.AddTransient<IRepositoryCategorias, RepositoryCategorias>();
 
 var app = builder.Build();
 
