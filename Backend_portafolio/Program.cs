@@ -7,6 +7,7 @@ builder.Services.AddControllersWithViews();
 
 //Modelos
 builder.Services.AddTransient<IRepositoryCategorias, RepositoryCategorias>();
+builder.Services.AddTransient<IRepositoryFormat, RepositoryFormat>();
 
 var app = builder.Build();
 

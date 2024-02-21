@@ -1,0 +1,34 @@
+﻿using Backend_portafolio.Models;
+using Dapper;
+using Microsoft.Data.SqlClient;
+
+namespace Backend_portafolio.Sevices
+{
+	struct FORMAT
+	{
+		public const string TABLA = "format";
+		public const string ID = "id";
+		public const string NOMBRE = "name";
+	}
+
+	public interface IRepositoryFormat
+	{
+		Task<IEnumerable<Format>> Obtener();
+	}
+
+	public class RepositoryFormat : IRepositoryFormat
+	{
+		private readonly string _connectionString;
+
+		public RepositoryFormat(IConfiguration configuration)
+		{
+			_connectionString = configuration.GetConnectionString("DevConnection");
+		}
+
+		public async Task<IEnumerable<Format>> Obtener()
+		{
+			using var connection = new SqlConnection(_connectionString);
+			return await connection.QueryAsync<Format>($@"SELECT {FORMAT.ID}, {FORMAT.NOMBRE} FROM {FORMAT.TABLA}");
+		}
+	}
+}

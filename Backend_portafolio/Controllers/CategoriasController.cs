@@ -102,6 +102,11 @@ namespace Backend_portafolio.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Borrar(int id)
 		{
+			var categoria = await _repositoryCategorias.ObtenerPorId(id);
+
+			if (categoria == null)
+				return View("NoEncontrado", "Home");
+
 			await _repositoryCategorias.Borrar(id);
 
 			return RedirectToAction("Index");
