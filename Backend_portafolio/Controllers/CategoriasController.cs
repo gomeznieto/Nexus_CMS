@@ -1,8 +1,6 @@
 ﻿using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
-using Dapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 
 namespace Backend_portafolio.Controllers
 {
@@ -13,6 +11,14 @@ namespace Backend_portafolio.Controllers
 		public CategoriasController(IRepositoryCategorias repositoryCategorias)
         {
 			_repositoryCategorias = repositoryCategorias;
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> Index()
+		{
+			var categorias = await _repositoryCategorias.Obtener();
+			
+			return View(categorias.OrderBy(x => x.name).ToList());
 		}
 
         [HttpGet]
@@ -31,11 +37,11 @@ namespace Backend_portafolio.Controllers
 			}
 
 			//Validar que la categoria no exista en la base de datos
-			var existe = await _repositoryCategorias.Existe(categoria);
+			var existe = await _repositoryCategorias.Existe(categoria.name);
 
 			if(existe)
 			{
-				ModelState.AddModelError("", "La categoria ya existe");
+				ModelState.AddModelError(nameof(categoria.name), $"El nombre {categoria.name} ya existe!");
 				return View(categoria);
 			}
 
@@ -44,7 +50,61 @@ namespace Backend_portafolio.Controllers
 			//Crea la categoria
 			await _repositoryCategorias.Crear(categoria);
 
-			return View();
+			return RedirectToAction("Index");
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> VerificarExisteCategoria(string name)
+		{
+			var existeCategoria = await _repositoryCategorias.Existe(name);
+
+			if(existeCategoria)
+				return Json($"EL nombre {name} ya existe!");
+
+			return Json(true);
+
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> Editar(int id)
+		{
+			var categoriaCambiar = await _repositoryCategorias.ObtenerPorId(id);
+
+			if (categoriaCambiar == null)
+				return RedirectToAction("NoEncontrado", "Home");
+
+			return View(categoriaCambiar);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Editar(Categoria categoria)
+		{
+			//Validar errores del Model
+			if(!ModelState.IsValid)
+				return View(categoria);
+
+			//Validar que la categoria no exista en la base de datos
+			var existe = await _repositoryCategorias.Existe(categoria.name);
+
+			if (existe)
+			{
+				ModelState.AddModelError(nameof(categoria.name), $"El nombre {categoria.name} ya existe!");
+				return View(categoria);
+			}
+
+			categoria.name = categoria.name.Trim();
+
+			await _repositoryCategorias.Editar(categoria);
+
+			return RedirectToAction("Index");
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Borrar(int id)
+		{
+			await _repositoryCategorias.Borrar(id);
+
+			return RedirectToAction("Index");
 		}
 	}
 }
