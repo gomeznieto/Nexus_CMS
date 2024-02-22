@@ -9,7 +9,7 @@
 
 <form asp-action="Crear" method="post">
 	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+	<input type="hidden" asp-for="user_id" />
 	<div mb-3>
 		<label asp-for="title" class="form-label"></label>
 		<input asp-for="title" class="form-control"/>

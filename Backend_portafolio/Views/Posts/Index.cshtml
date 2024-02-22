@@ -1,0 +1,41 @@
+﻿@model IEnumerable<ListPostViewModel>
+@{
+	ViewData["Title"] = "Entradas";
+}
+
+<h1>Entradas</h1>
+<a asp-action="Crear" class="btn btn-primary">Crear</a>
+	@foreach (var format in Model)
+	{
+		<h3>@format.format</h3>
+		<table class="table">
+
+			<thead>
+				<tr>
+					<th>Titulo</th>
+					<th>Categoria</th>
+					<th>Formato</th>
+					<th>Creación</th>
+					<th>Acciones</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				@foreach (var post in format.posts)
+				{
+					<tr>
+						<td>@post.title</td>
+						<td>@post.categoryName</td>
+						<td>@post.formatName</td>
+						<td>@post.created_at.ToShortDateString()</td>
+						<td>
+							<a class="btn btn-primary">Editar</a>
+							<a class="btn btn-danger">Borrar</a>
+						</td>
+					</tr>
+				}
+			</tbody>
+
+		</table>
+	}
+

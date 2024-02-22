@@ -2,31 +2,57 @@
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.SqlServer.Server;
+using System.Reflection;
 
 namespace Backend_portafolio.Controllers
 {
 	public class PostsController : Controller
 	{
+		private readonly IUsersService _usersService;
 		private readonly IRepositoryCategorias _repositoryCategorias;
 		private readonly IRepositoryFormat _repositoryFormat;
+		private readonly IRepositoryPosts _repositoryPosts;
 
-		public PostsController(IRepositoryCategorias repositoryCategorias, IRepositoryFormat repositoryFormat)
+		public PostsController(
+			IUsersService usersService,
+			IRepositoryCategorias repositoryCategorias, 
+			IRepositoryFormat repositoryFormat,
+			IRepositoryPosts repositoryPosts)
         {
+			_usersService = usersService;
 			_repositoryCategorias = repositoryCategorias;
 			_repositoryFormat = repositoryFormat;
+			_repositoryPosts = repositoryPosts;
+		}
+
+		[HttpGet]
+
+		public async Task<IActionResult> Index()
+		{
+			var posts = await _repositoryPosts.Obtener();
+			var model = posts
+				.GroupBy(p => p.formatName)
+				.Select(p => new ListPostViewModel()
+				{
+					format = p.Key,
+					posts = p.AsEnumerable(),
+
+				}).ToList();
+
+			return View(model);
 		}
 
         [HttpGet]
         public async Task <IActionResult> Crear()
         {
-			var usuarioID = 1; //TODO: CAMBIAR EN SERVICIOS
-			var formats = await _repositoryFormat.Obtener();
-			var categories = await _repositoryCategorias.Obtener();
-
+			var usuarioID = _usersService.ObtenerUsuario();
+	
 			var model = new PostViewModel();
+
 			model.user_id = usuarioID;
-			model.categories = categories.Select(category => new SelectListItem(category.name, category.id.ToString()) );
-			model.formats = formats.Select(format => new SelectListItem(format.name, format.id.ToString()) );
+			model.categories = await ObtenerCategorias();
+			model.formats = await ObtenerFormatos();
 
 			return View(model);
         }
@@ -34,8 +60,69 @@ namespace Backend_portafolio.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Crear(PostViewModel viewModel)
 		{
+			//verificamos que el model state sea valido antes de continuar
+			if(!ModelState.IsValid)
+			{
+				viewModel.categories = await ObtenerCategorias();
+				viewModel.formats = await ObtenerCategorias();
+				return View(viewModel);
+			}
+
+			//Verificamos que la categoria que nos mandan exista
+			var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
+
+			if(categoria is null)
+			{
+				return RedirectToAction("NoEncontrado", "Home");
+			}
+
+			//Verificamos que el formato que nos mandan exista
+			var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
+
+			if (Formato is null)
+			{
+				return RedirectToAction("NoEncontrado", "Home");
+			}
+
+			//Colocamos fecha actual
+			viewModel.created_at = DateTime.Today;
+
+			await _repositoryPosts.Crear(viewModel);
 
 			return RedirectToAction("Index");
 		}
-    }
+
+		public async Task<IActionResult> Editar(int id)
+		{
+			var model = await _repositoryPosts.ObtenerPorId(id);
+
+			var modelView = new PostViewModel();
+
+			//TODO: Pasar model a modelView
+			modelView.title = model.title;
+			modelView.description = model.description;
+			modelView.cover = model.cover;
+			modelView.category_id = model.category_id;
+			modelView.format_id = model.format_id;
+			modelView.created_at = model.created_at	;
+
+			modelView.user_id = _usersService.ObtenerUsuario();
+			modelView.categories = await ObtenerCategorias();
+			modelView.formats = await ObtenerCategorias();
+
+			return View(modelView);
+		}
+
+		private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
+		{
+			var categories = await _repositoryCategorias.Obtener();
+			return categories.Select(category => new SelectListItem(category.name, category.id.ToString()));
+		}
+
+		private async Task<IEnumerable<SelectListItem>> ObtenerFormatos()
+		{
+			var formats = await _repositoryFormat.Obtener();
+			return formats.Select(format => new SelectListItem(format.name, format.id.ToString()));
+		}
+	}
 }

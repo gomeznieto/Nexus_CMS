@@ -14,6 +14,7 @@ namespace Backend_portafolio.Sevices
 	public interface IRepositoryFormat
 	{
 		Task<IEnumerable<Format>> Obtener();
+		Task<Format> ObtenerPorId(int id);
 	}
 
 	public class RepositoryFormat : IRepositoryFormat
@@ -29,6 +30,12 @@ namespace Backend_portafolio.Sevices
 		{
 			using var connection = new SqlConnection(_connectionString);
 			return await connection.QueryAsync<Format>($@"SELECT {FORMAT.ID}, {FORMAT.NOMBRE} FROM {FORMAT.TABLA}");
+		}
+
+		public async Task<Format> ObtenerPorId(int id)
+		{
+			using var connection = new SqlConnection(_connectionString);
+			return await connection.QueryFirstOrDefaultAsync<Format>($@"SELECT {FORMAT.ID}, {FORMAT.NOMBRE} FROM {FORMAT.TABLA} WHERE {FORMAT.ID} = @{FORMAT.ID}", new { id });
 		}
 	}
 }
