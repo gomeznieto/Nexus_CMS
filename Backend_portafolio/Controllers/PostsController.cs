@@ -2,8 +2,6 @@
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.SqlServer.Server;
-using System.Reflection;
 
 namespace Backend_portafolio.Controllers
 {
