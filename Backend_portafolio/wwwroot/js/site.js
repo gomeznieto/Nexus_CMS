@@ -13,3 +13,6 @@ function closeModal() {
 	modal.classList.add("closeModal");
 }
 
+$('.btn-expand-collapse').click(function (e) {
+	$('.navbar-primary').toggleClass('collapsed');
+});
