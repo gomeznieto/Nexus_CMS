@@ -2,6 +2,7 @@
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Reflection;
 
 namespace Backend_portafolio.Controllers
 {
@@ -90,6 +91,7 @@ namespace Backend_portafolio.Controllers
 			return RedirectToAction("Index");
 		}
 
+		[HttpGet]
 		public async Task<IActionResult> Editar(int id)
 		{
 			var model = await _repositoryPosts.ObtenerPorId(id);
@@ -106,9 +108,43 @@ namespace Backend_portafolio.Controllers
 
 			modelView.user_id = _usersService.ObtenerUsuario();
 			modelView.categories = await ObtenerCategorias();
-			modelView.formats = await ObtenerCategorias();
+			modelView.formats = await ObtenerFormatos();
 
 			return View(modelView);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult>Editar(PostViewModel viewModel)
+		{
+			if(!ModelState.IsValid)
+			{
+
+				//TODO: Pasar model a modelView
+				viewModel.categories = await ObtenerCategorias();
+				viewModel.formats = await ObtenerCategorias();
+				return View(viewModel);
+			}
+
+			//Verificamos que la categoria que nos mandan exista
+			var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
+
+			if (categoria is null)
+			{
+				return RedirectToAction("NoEncontrado", "Home");
+			}
+
+			//Verificamos que el formato que nos mandan exista
+			var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
+
+			if (Formato is null)
+			{
+				return RedirectToAction("NoEncontrado", "Home");
+			}
+
+			await _repositoryPosts.Editar(viewModel);
+
+			return RedirectToAction("Index");
+
 		}
 
 		private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()

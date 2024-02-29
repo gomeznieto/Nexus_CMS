@@ -25,6 +25,7 @@ namespace Backend_portafolio.Sevices
 	public interface IRepositoryPosts
 	{
 		Task Crear(Post post);
+		Task Editar(Post post);
 		Task<IEnumerable<Post>> Obtener();
 		Task<Post> ObtenerPorId(int id);
 	}
@@ -71,9 +72,23 @@ namespace Backend_portafolio.Sevices
 		{
 			using var connection = new SqlConnection(_connectionString);
 			return await connection.QueryFirstOrDefaultAsync<Post>($@"
-								SELECT ({POST.ID}, {POST.TITULO}, {POST.DESCRIPCION}, {POST.COVER}, {POST.CATEGORIA_ID}, {POST.USER_ID}, {POST.FORMAT_ID}, {POST.CREADO}) 
+								SELECT {POST.ID}, {POST.TITULO}, {POST.DESCRIPCION}, {POST.COVER}, {POST.CATEGORIA_ID}, {POST.USER_ID}, {POST.FORMAT_ID}, {POST.CREADO}
 								FROM {POST.TABLA}
 								WHERE {POST.ID} = @{POST.ID}", new { id });
+		}
+
+		public async Task Editar(Post post)
+		{
+			using var connection = new SqlConnection(_connectionString);
+			await connection.ExecuteAsync($@"UPDATE {POST.TABLA} 
+											SET {POST.TITULO} = @{POST.TITULO}, 
+											{POST.DESCRIPCION} = @{POST.DESCRIPCION}, 
+											{POST.COVER} = @{POST.COVER}, 
+											{POST.CATEGORIA_ID} = @{POST.CATEGORIA_ID}, 
+											{POST.USER_ID} = @{POST.USER_ID}, 
+											{POST.FORMAT_ID} = @{POST.FORMAT_ID} 
+											WHERE {POST.ID} = @{POST.ID}", post);
+
 		}
 	}
 }

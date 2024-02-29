@@ -29,7 +29,7 @@
 						<td>@post.formatName</td>
 						<td>@post.created_at.ToShortDateString()</td>
 						<td>
-							<a class="btn btn-primary">Editar</a>
+						<a class="btn btn-primary" asp-action="Editar" asp-route-id="@post.id">Editar</a>
 							<a class="btn btn-danger">Borrar</a>
 						</td>
 					</tr>
