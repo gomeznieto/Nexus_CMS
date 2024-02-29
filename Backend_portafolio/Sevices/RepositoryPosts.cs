@@ -24,6 +24,7 @@ namespace Backend_portafolio.Sevices
 
 	public interface IRepositoryPosts
 	{
+		Task Borrar(int id);
 		Task Crear(Post post);
 		Task Editar(Post post);
 		Task<IEnumerable<Post>> Obtener();
@@ -89,6 +90,12 @@ namespace Backend_portafolio.Sevices
 											{POST.FORMAT_ID} = @{POST.FORMAT_ID} 
 											WHERE {POST.ID} = @{POST.ID}", post);
 
+		}
+
+		public async Task Borrar(int id)
+		{
+			using var connection = new SqlConnection(_connectionString);
+			await connection.ExecuteAsync($@"DELETE {POST.TABLA} WHERE {POST.ID} = @{POST.ID}", new { id });
 		}
 	}
 }

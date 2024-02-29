@@ -1,11 +1,11 @@
 ﻿// MODAL
-function openModal(categoria) {
+function openModal(obj) {
 	const modal = document.getElementById("modal");
 	const inputModal = document.getElementsByName("id")[0];
 	modal.classList.remove("closeModal")
-	inputModal.value = categoria.id;
+	inputModal.value = obj.id;
 	const modalMsg = document.getElementById("modalMsg");
-	modalMsg.innerHTML = `¿Está seguro que quiere borrar la categoria ${categoria.name}?`;
+	modalMsg.innerHTML = `¿Está seguro que quiere borrar ${obj.name}?`;
 }
 
 function closeModal() {

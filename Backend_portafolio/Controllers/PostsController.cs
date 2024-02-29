@@ -147,6 +147,19 @@ namespace Backend_portafolio.Controllers
 
 		}
 
+		[HttpPost]
+		public async Task<IActionResult>Borrar(int id)
+		{
+			var post = await _repositoryPosts.ObtenerPorId(id);
+
+			if(post is null)
+				return View("NoEncontrado", "Home");
+
+			await _repositoryPosts.Borrar(id);
+
+			return RedirectToAction("Index");
+		}
+
 		private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
 		{
 			var categories = await _repositoryCategorias.Obtener();

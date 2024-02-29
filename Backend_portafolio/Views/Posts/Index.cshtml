@@ -30,7 +30,7 @@
 						<td>@post.created_at.ToShortDateString()</td>
 						<td>
 						<a class="btn btn-primary" asp-action="Editar" asp-route-id="@post.id">Editar</a>
-							<a class="btn btn-danger">Borrar</a>
+						<a class="btn btn-danger" onclick="openModal({id: '@post.id', name: '@post.title'})")>Borrar</a>
 						</td>
 					</tr>
 				}
@@ -39,3 +39,16 @@
 		</table>
 	}
 
+@*MODAL PARA BORRAR - PASAR A UN PARTIAL*@
+<div class="closeModal" id="modal">
+	<div class="bgModal" onclick="closeModal()">
+		<div class="modalBorrar modal-content p-4">
+			<h4 id="modalMsg" class="mb-4"></h4>
+			<form asp-controller="Posts" asp-action="Borrar" method="post">
+				<input type="hidden" name="id" />
+				<button type="submit" class="btn btn-danger">Borrar</button>
+				<a class="btn btn-primary" onclick="closeModal()">Cancelar</a>
+			</form>
+		</div>
+	</div>
+</div>
