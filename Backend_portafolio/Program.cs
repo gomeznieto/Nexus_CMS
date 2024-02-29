@@ -11,6 +11,9 @@ builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<IRepositoryFormat, RepositoryFormat>();
 builder.Services.AddTransient<IRepositoryPosts, RepositoryPosts>();
 
+//Auto Mapper
+builder.Services.AddAutoMapper(typeof(Program));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

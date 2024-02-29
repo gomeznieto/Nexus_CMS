@@ -1,4 +1,5 @@
-﻿using Backend_portafolio.Models;
+﻿using AutoMapper;
+using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,17 +13,20 @@ namespace Backend_portafolio.Controllers
 		private readonly IRepositoryCategorias _repositoryCategorias;
 		private readonly IRepositoryFormat _repositoryFormat;
 		private readonly IRepositoryPosts _repositoryPosts;
+		private readonly IMapper _mapper;
 
 		public PostsController(
 			IUsersService usersService,
 			IRepositoryCategorias repositoryCategorias, 
 			IRepositoryFormat repositoryFormat,
-			IRepositoryPosts repositoryPosts)
+			IRepositoryPosts repositoryPosts,
+			IMapper mapper)
         {
 			_usersService = usersService;
 			_repositoryCategorias = repositoryCategorias;
 			_repositoryFormat = repositoryFormat;
 			_repositoryPosts = repositoryPosts;
+			_mapper = mapper;
 		}
 
 		[HttpGet]
@@ -96,15 +100,8 @@ namespace Backend_portafolio.Controllers
 		{
 			var model = await _repositoryPosts.ObtenerPorId(id);
 
-			var modelView = new PostViewModel();
-
-			//TODO: Pasar model a modelView
-			modelView.title = model.title;
-			modelView.description = model.description;
-			modelView.cover = model.cover;
-			modelView.category_id = model.category_id;
-			modelView.format_id = model.format_id;
-			modelView.created_at = model.created_at	;
+			//Auto Mapper
+			var modelView = _mapper.Map<PostViewModel>(model);
 
 			modelView.user_id = _usersService.ObtenerUsuario();
 			modelView.categories = await ObtenerCategorias();
@@ -118,8 +115,6 @@ namespace Backend_portafolio.Controllers
 		{
 			if(!ModelState.IsValid)
 			{
-
-				//TODO: Pasar model a modelView
 				viewModel.categories = await ObtenerCategorias();
 				viewModel.formats = await ObtenerCategorias();
 				return View(viewModel);

@@ -7,42 +7,42 @@
 <h1>Crear Entrada</h1>
 <h3>En esta sección puede crear cualquier tipo de entrada, por ejemplo proyectos, blog, tutoriales, etc...</h3>
 
-<form asp-action="Crear" method="post">
-	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-	<input type="hidden" asp-for="user_id" />
-	<div mb-3>
-		<label asp-for="title" class="form-label"></label>
-		<input asp-for="title" class="form-control"/>
-		<span asp-validation-for="title" class="text-danger"></span>
-	</div>
+<form asp-action="Crear" method="post" class="container mt-5">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="user_id" />
 
-	<div mb-3>
-		<label asp-for="description" class="form-label"></label>
-		<textarea asp-for="description" class="form-text"></textarea>
-		<span asp-validation-for="description" class="text-danger"></span>
-	</div>
+    <div class="mb-3">
+        <label asp-for="title" class="form-label"></label>
+        <input asp-for="title" class="form-control" />
+        <span asp-validation-for="title" class="text-danger"></span>
+    </div>
 
-	<div mb-3>
-		<label asp-for="cover" class="form-label"></label>
-		<input asp-for="cover" class="form-control" />
-		<span asp-validation-for="cover" class="text-danger"></span>
-	</div>
+    <div class="mb-3">
+        <label asp-for="description" class="form-label"></label>
+        <textarea asp-for="description" class="form-control"></textarea>
+        <span asp-validation-for="description" class="text-danger"></span>
+    </div>
 
-	<div mb-3>
-		<label asp-for="format_id" class="form-label"></label>
-		<select asp-for="format_id" asp-items="Model.formats"></select>
-		<span asp-validation-for="format_id" class="text-danger"></span>
-	</div>
+    <div class="mb-3">
+        <label asp-for="cover" class="form-label"></label>
+        <input asp-for="cover" class="form-control" />
+        <span asp-validation-for="cover" class="text-danger"></span>
+    </div>
 
-	<div mb-3>
-		<label asp-for="category_id" class="form-label"></label>
-		<select asp-for="category_id" asp-items="Model.categories"></select>
-		<span asp-validation-for="category_id" class="text-danger"></span>
-	</div>
+    <div class="mb-3">
+        <label asp-for="format_id" class="form-label"></label>
+        <select asp-for="format_id" asp-items="Model.formats" class="form-select"></select>
+        <span asp-validation-for="format_id" class="text-danger"></span>
+    </div>
 
-	<button type="submit" class="btn btn-primary">Crear</button>
-	<a type="submit" asp-action="Index" class="btn btn-danger">Cancelar</a>
-	
+    <div class="mb-3">
+        <label asp-for="category_id" class="form-label"></label>
+        <select asp-for="category_id" asp-items="Model.categories" class="form-select"></select>
+        <span asp-validation-for="category_id" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear</button>
+    <a asp-action="Index" class="btn btn-danger">Cancelar</a>
 </form>
 
 
