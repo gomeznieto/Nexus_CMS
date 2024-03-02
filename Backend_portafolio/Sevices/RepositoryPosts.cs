@@ -16,8 +16,8 @@ namespace Backend_portafolio.Sevices
 		public const string USER_ID = "user_id";
 		public const string FORMAT_ID = "format_id";
 		public const string CREADO = "created_at";
-		public const string FORMAT = "formatName";
-		public const string CATEGORIA = "categoryName";
+		public const string FORMAT = "format";
+		public const string CATEGORIA = "category";
 		public const string USER = "userName";
 		public const string NOMBRE = "name";
 	}
@@ -45,7 +45,7 @@ namespace Backend_portafolio.Sevices
 		{
 			using var connection = new SqlConnection(_connectionString);
 			var id = await connection.QuerySingleAsync<int>($@"
-				INSERT INTO {POST.TABLA} ({POST.TITULO}, {POST.DESCRIPCION}, {POST.COVER}, {POST.CATEGORIA_ID}, {POST.USER_ID}, {POST.FORMAT_ID}, {POST.CREADO})
+				INSERT INTO {POST.TABLA} ({POST.TITULO}, {POST.DESCRIPCION}, {POST.COVER}, {POST.CATEGORIA_ID}, P.{POST.USER_ID}, P.{POST.FORMAT_ID}, P.{POST.CREADO})
 				VALUES (@{POST.TITULO}, @{POST.DESCRIPCION}, @{POST.COVER}, @{POST.CATEGORIA_ID}, @{POST.USER_ID}, @{POST.FORMAT_ID}, @{POST.CREADO});
 				SELECT SCOPE_IDENTITY();",
 				post);
@@ -57,7 +57,7 @@ namespace Backend_portafolio.Sevices
 		{
 			using var connection = new SqlConnection(_connectionString);
 
-			var query = $@"SELECT P.{POST.ID}, P.{POST.TITULO}, P.{POST.DESCRIPCION}, P.{POST.COVER}, P.{POST.CREADO},
+			var query = $@"SELECT P.{POST.ID}, P.{POST.TITULO}, P.{POST.DESCRIPCION}, P.{POST.COVER}, P.{POST.CREADO}, P.{POST.CATEGORIA_ID}, P.{POST.FORMAT_ID}, P.{POST.USER_ID},
 						U.{POST.NOMBRE} as {POST.USER}, F.{FORMAT.NOMBRE} as {POST.FORMAT}, C.{CATEGORIA.NOMBRE} as {POST.CATEGORIA}
 						FROM {POST.TABLA} P
 						INNER JOIN {CATEGORIA.TABLA} C

@@ -1,7 +1,6 @@
 ﻿using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace Backend_portafolio.Controllers
 {
@@ -100,5 +99,13 @@ namespace Backend_portafolio.Controllers
 			return Json(true);
 
 		}
-	}
+
+        [HttpGet]
+        [Route("api/[controller]/get")]
+        public async Task<IActionResult> ObtenerJSON()
+        {
+            var formatos = await _repositoryFormat.Obtener();
+            return Json(formatos);
+        }
+    }
 }

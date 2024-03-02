@@ -46,7 +46,7 @@
                                     @foreach (var format in formats)
                                     {
                                         <li class="w-100">
-                                            <a asp-action="Index" asp-controller="@format.controller" asp-route-format="@format.name" class="nav-link px-0 text-white">
+                                            <a asp-action="Index" asp-controller="Posts" asp-route-format="@format.name" class="nav-link px-0 text-white">
                                                 <span class="item_size ms-4">@format.name</span>
                                             </a>
                                         </li>
@@ -56,10 +56,10 @@
 
                         </li>
                         <li>
-                            <a href="#subMenucategorias" data-bs-toggle="collapse" class="nav-link px-0 align-middle text-white">
+                            <a href="#subMenuCategories" data-bs-toggle="collapse" class="nav-link px-0 align-middle text-white">
                                 <i class="iconos fa-solid fa-pen"></i> <span class="ms-1 item_size">Categoria</span>
                             </a>
-                            <ul class="collapse nav flex-column ms-1" id="subMenucategorias" data-bs-parent="#menu">
+                            <ul class="collapse nav flex-column ms-1" id="subMenuCategories" data-bs-parent="#menu">
                                 <li class="w-100">
                                     <a asp-action="Index" asp-controller="Categorias" class="nav-link px-0 text-white"> <span class="item_size ms-4">Listado</span></a>
                                 </li>
@@ -69,10 +69,10 @@
                             </ul>
                         </li>
                         <li>
-                            <a href="#subMenucategorias" data-bs-toggle="collapse" class="nav-link px-0 align-middle text-white">
+                            <a href="#subMenuFormats" data-bs-toggle="collapse" class="nav-link px-0 align-middle text-white">
                                 <i class="iconos fa-solid fa-pen"></i> <span class="ms-1 item_size">Formatos</span>
                             </a>
-                            <ul class="collapse nav flex-column ms-1" id="subMenucategorias" data-bs-parent="#menu">
+                            <ul class="collapse nav flex-column ms-1" id="subMenuFormats" data-bs-parent="#menu">
                                 <li class="w-100">
                                     <a asp-action="Index" asp-controller="Formats" class="nav-link px-0 text-white"> <span class="item_size ms-4">Listado</span></a>
                                 </li>

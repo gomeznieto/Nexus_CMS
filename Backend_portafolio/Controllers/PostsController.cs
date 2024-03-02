@@ -36,7 +36,7 @@ namespace Backend_portafolio.Controllers
 		{
 			var posts = await _repositoryPosts.ObtenerPorFormato(format);
 			var model = posts
-				.GroupBy(p => p.formatName)
+				.GroupBy(p => p.format)
 				.Select(p => new ListPostViewModel()
 				{
 					format = p.Key,
@@ -59,11 +59,11 @@ namespace Backend_portafolio.Controllers
 
 			model.user_id = usuarioID;
 			model.categories = await ObtenerCategorias();
-			model.formatName = format;
+			model.format = format;
 
 			var formats = await _repositoryFormat.Obtener();
             model.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
-            model.formatName = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
+            model.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
 
             return View(model);
         }
@@ -101,7 +101,7 @@ namespace Backend_portafolio.Controllers
 
 			await _repositoryPosts.Crear(viewModel);
 
-            return RedirectToAction("Index", "Posts", new { format = viewModel.formatName });
+            return RedirectToAction("Index", "Posts", new { format = viewModel.format });
         }
 
 		[HttpGet]
@@ -118,7 +118,7 @@ namespace Backend_portafolio.Controllers
 
             var formats = await _repositoryFormat.Obtener();
             modelView.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
-			modelView.formatName = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
+			modelView.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
 
             return View(modelView);
 		}
@@ -151,7 +151,7 @@ namespace Backend_portafolio.Controllers
 
 			await _repositoryPosts.Editar(viewModel);
 
-            return RedirectToAction("Index", "Posts", new { format = viewModel.formatName });
+            return RedirectToAction("Index", "Posts", new { format = viewModel.format });
         }
 
         [HttpPost]
@@ -178,5 +178,15 @@ namespace Backend_portafolio.Controllers
 			var formats = await _repositoryFormat.Obtener();
 			return formats.Select(format => new SelectListItem(format.name, format.id.ToString()));
 		}
-	}
+
+		//API - TODO: HEADERS CON TOKEN
+
+        [HttpGet]
+        [Route("api/[controller]/get")]
+        public async Task<IActionResult> ObtenerJSON()
+        {
+            var posts = await _repositoryPosts.Obtener();
+            return Json(posts);
+        }
+    }
 }

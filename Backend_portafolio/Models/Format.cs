@@ -9,6 +9,5 @@ namespace Backend_portafolio.Models
 		[Display(Name = "Formato de Entrada")]
 		[Remote(action: "VerificarExisteFormato", controller: "Formats")]
 		public string name { get; set; }
-		public string controller { get; set; } = "Posts";
 	}
 }

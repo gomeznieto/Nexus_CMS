@@ -26,8 +26,8 @@
 					{
 						<tr>
 							<td>@post.title</td>
-							<td>@post.categoryName</td>
-							<td>@post.formatName</td>
+							<td>@post.category</td>
+							<td>@post.format</td>
 							<td>@post.created_at.ToShortDateString()</td>
 							<td>
 							<a class="btn btn-primary" asp-action="Editar" asp-route-id="@post.id" asp-route-format="@ViewBag.Format">Editar</a>

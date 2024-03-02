@@ -11,7 +11,7 @@
     <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
     <input type="hidden" asp-for="user_id" />
     <input type="hidden" asp-for="format_id" />
-    <input type="hidden" asp-for="formatName" />
+    <input type="hidden" asp-for="format" />
 
     <div class="mb-3">
         <label asp-for="title" class="form-label"></label>
@@ -38,7 +38,7 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Crear</button>
-    <a asp-action="Index" asp-route-format="@Model.formatName" class="btn btn-danger">Cancelar</a>
+    <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-danger">Cancelar</a>
 </form>
 
 
