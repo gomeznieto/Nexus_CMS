@@ -1,22 +1,56 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  
+    margin-bottom: 60px;
+}
+
+.closeModal {
+    display: none;
+}
+
+.modalBorrar {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    width: 400px;
+    max-width: 90%;
+}
+
+.modal-content {
+    color: #000;
+}
+
+.btn {
+    cursor: pointer;
+}
+
+.bgModal {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(200, 200, 200, 0.5);
+    top: 0;
+    left: 0;
 }

@@ -23,16 +23,19 @@
 			<tbody>
 				@foreach (var post in format.posts)
 				{
-					<tr>
-						<td>@post.title</td>
-						<td>@post.categoryName</td>
-						<td>@post.formatName</td>
-						<td>@post.created_at.ToShortDateString()</td>
-						<td>
-						<a class="btn btn-primary" asp-action="Editar" asp-route-id="@post.id">Editar</a>
-						<a class="btn btn-danger" onclick="openModal({id: '@post.id', name: '@post.title'})")>Borrar</a>
-						</td>
-					</tr>
+					if(format.posts.Count() != 0)
+					{
+						<tr>
+							<td>@post.title</td>
+							<td>@post.categoryName</td>
+							<td>@post.formatName</td>
+							<td>@post.created_at.ToShortDateString()</td>
+							<td>
+								<a class="btn btn-primary" asp-action="Editar" asp-route-id="@post.id">Editar</a>
+								<a class="btn btn-danger" onclick="openModal({id: '@post.id', name: '@post.title'})" )>Borrar</a>
+							</td>
+						</tr>
+					}
 				}
 			</tbody>
 
