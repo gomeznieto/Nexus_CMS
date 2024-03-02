@@ -19,9 +19,11 @@ namespace Backend_portafolio.Controllers
 
 		public async Task<IActionResult> Index()
 		{
-            var formats = await _repositoriyFormat.Obtener();
-            var formatsJson = JsonSerializer.Serialize(formats.ToList());
-            HttpContext.Session.SetString("Formats", formatsJson);
+            //var formats = await _repositoriyFormat.Obtener();
+            //var formatsJson = JsonSerializer.Serialize(formats.ToList());
+            //HttpContext.Session.SetString("Formats", formatsJson);
+			await Helper.Session.UpdateSession(HttpContext, _repositoriyFormat);
+
             return View();
 		}
 

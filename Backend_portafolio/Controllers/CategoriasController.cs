@@ -59,7 +59,7 @@ namespace Backend_portafolio.Controllers
 			var existeCategoria = await _repositoryCategorias.Existe(name);
 
 			if(existeCategoria)
-				return Json($"EL nombre {name} ya existe!");
+				return Json($"El nombre {name} ya existe!");
 
 			return Json(true);
 

@@ -13,6 +13,10 @@ namespace Backend_portafolio.Sevices
 
 	public interface IRepositoryFormat
 	{
+		Task Borrar(int id);
+		Task Crear(Format format);
+		Task Editar(Format format);
+		Task<bool> Existe(string name);
 		Task<IEnumerable<Format>> Obtener();
 		Task<Format> ObtenerPorId(int id);
 	}
@@ -36,6 +40,42 @@ namespace Backend_portafolio.Sevices
 		{
 			using var connection = new SqlConnection(_connectionString);
 			return await connection.QueryFirstOrDefaultAsync<Format>($@"SELECT {FORMAT.ID}, {FORMAT.NOMBRE} FROM {FORMAT.TABLA} WHERE {FORMAT.ID} = @{FORMAT.ID}", new { id });
+		}
+
+		public async Task Crear(Format format)
+		{
+			using var connection = new SqlConnection(_connectionString);
+			var id = await connection.QuerySingleAsync<int>($@"INSERT INTO {FORMAT.TABLA} ({FORMAT.NOMBRE}) VALUES (@{FORMAT.NOMBRE}); SELECT SCOPE_IDENTITY();", format);
+			format.id = id;
+		}
+
+		public async Task Editar(Format format)
+		{
+			using var connection = new SqlConnection(_connectionString);
+			await connection.ExecuteAsync($@"UPDATE {FORMAT.TABLA} SET ({FORMAT.NOMBRE} = @{FORMAT.NOMBRE}) WHERE {FORMAT.ID} = @{FORMAT.ID};", format);
+		}
+
+		public async Task Borrar(int id)
+		{
+			using var connection = new SqlConnection(_connectionString);
+			await connection.ExecuteAsync($@"DELETE FROM {FORMAT.TABLA} WHERE {FORMAT.ID} = @{FORMAT.ID}", new { id });
+		}
+
+		public async Task<bool> Existe(string name)
+		{
+			using var connection = new SqlConnection(_connectionString);
+			var existe = await connection.QueryFirstOrDefaultAsync<bool>(
+					$@"IF EXISTS (
+                    SELECT 1 FROM {FORMAT.TABLA}
+                    WHERE UPPER({FORMAT.NOMBRE}) = UPPER(@{FORMAT.NOMBRE})
+						)
+						SELECT 1
+					ELSE
+						SELECT 0"
+							, new { name }
+						);
+
+			return existe;
 		}
 	}
 }
