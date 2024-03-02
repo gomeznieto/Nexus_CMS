@@ -29,7 +29,7 @@ namespace Backend_portafolio.Sevices
 		public async Task<IEnumerable<Format>> Obtener()
 		{
 			using var connection = new SqlConnection(_connectionString);
-			return await connection.QueryAsync<Format>($@"SELECT {FORMAT.ID}, {FORMAT.NOMBRE} FROM {FORMAT.TABLA}");
+			return await connection.QueryAsync<Format>($@"SELECT {FORMAT.ID}, {FORMAT.NOMBRE} FROM {FORMAT.TABLA} ORDER BY {FORMAT.NOMBRE}");
 		}
 
 		public async Task<Format> ObtenerPorId(int id)

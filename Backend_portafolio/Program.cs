@@ -4,12 +4,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSession();
 
 //Modelos
 builder.Services.AddTransient<IRepositoryCategorias, RepositoryCategorias>();
 builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<IRepositoryFormat, RepositoryFormat>();
 builder.Services.AddTransient<IRepositoryPosts, RepositoryPosts>();
+builder.Services.AddHttpContextAccessor();
 
 //Auto Mapper
 builder.Services.AddAutoMapper(typeof(Program));
@@ -28,6 +30,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthorization();
 

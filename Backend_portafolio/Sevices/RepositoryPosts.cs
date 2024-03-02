@@ -28,7 +28,8 @@ namespace Backend_portafolio.Sevices
 		Task Crear(Post post);
 		Task Editar(Post post);
 		Task<IEnumerable<Post>> Obtener();
-		Task<Post> ObtenerPorId(int id);
+        Task<IEnumerable<Post>> ObtenerPorFormato(string name);
+        Task<Post> ObtenerPorId(int id);
 	}
 
 	public class RepositoryPosts : IRepositoryPosts
@@ -69,13 +70,38 @@ namespace Backend_portafolio.Sevices
 			return await connection.QueryAsync<Post>(query);
 		}
 
-		public async Task<Post> ObtenerPorId(int id)
+        public async Task<IEnumerable<Post>> ObtenerPorFormato(string name)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            var query = $@"SELECT P.{POST.ID}, P.{POST.TITULO}, P.{POST.DESCRIPCION}, P.{POST.COVER}, P.{POST.CREADO},
+						U.{POST.NOMBRE} as {POST.USER}, F.{FORMAT.NOMBRE} as {POST.FORMAT}, C.{CATEGORIA.NOMBRE} as {POST.CATEGORIA}
+						FROM {POST.TABLA} P
+						INNER JOIN {CATEGORIA.TABLA} C
+						ON P.{POST.CATEGORIA_ID} = C.id
+						INNER JOIN users U 
+						ON P.{POST.USER_ID} = U.id
+						INNER JOIN {FORMAT.TABLA}
+						F ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
+						WHERE F.{FORMAT.NOMBRE} = @{FORMAT.NOMBRE}
+						ORDER BY P.{POST.CREADO} DESC;";
+			 
+            return await connection.QueryAsync<Post>(query, new { name });
+        }
+
+        public async Task<Post> ObtenerPorId(int id)
 		{
 			using var connection = new SqlConnection(_connectionString);
 			return await connection.QueryFirstOrDefaultAsync<Post>($@"
-								SELECT {POST.ID}, {POST.TITULO}, {POST.DESCRIPCION}, {POST.COVER}, {POST.CATEGORIA_ID}, {POST.USER_ID}, {POST.FORMAT_ID}, {POST.CREADO}
-								FROM {POST.TABLA}
-								WHERE {POST.ID} = @{POST.ID}", new { id });
+								SELECT P.{POST.ID}, P.{POST.TITULO}, P.{POST.DESCRIPCION}, P.{POST.COVER}, P.{POST.CREADO},
+								U.{POST.NOMBRE} as {POST.USER}, F.{FORMAT.NOMBRE} as {POST.FORMAT}, C.{CATEGORIA.NOMBRE} as {POST.CATEGORIA}
+								FROM {POST.TABLA} P
+								INNER JOIN {CATEGORIA.TABLA} C
+								ON P.{POST.CATEGORIA_ID} = C.id
+								INNER JOIN users U ON P.{POST.USER_ID} = U.id
+								INNER JOIN {FORMAT.TABLA}
+								F ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
+								WHERE P.{POST.ID} = @{POST.ID}", new { id });
 		}
 
 		public async Task Editar(Post post)

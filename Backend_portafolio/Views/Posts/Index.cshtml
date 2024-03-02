@@ -3,11 +3,10 @@
 	ViewData["Title"] = "Entradas";
 }
 
-<h1>Entradas</h1>
-<a asp-action="Crear" class="btn btn-primary">Crear</a>
+<h1>@ViewBag.Format</h1>
+<a asp-action="Crear" asp-route-format="@ViewBag.Format" class="btn btn-primary">Crear nuevo @ViewBag.Format </a>
 	@foreach (var format in Model)
 	{
-		<h3>@format.format</h3>
 		<table class="table">
 
 			<thead>
@@ -31,7 +30,7 @@
 							<td>@post.formatName</td>
 							<td>@post.created_at.ToShortDateString()</td>
 							<td>
-								<a class="btn btn-primary" asp-action="Editar" asp-route-id="@post.id">Editar</a>
+							<a class="btn btn-primary" asp-action="Editar" asp-route-id="@post.id" asp-route-format="@ViewBag.Format">Editar</a>
 								<a class="btn btn-danger" onclick="openModal({id: '@post.id', name: '@post.title'})" )>Borrar</a>
 							</td>
 						</tr>

@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Format>
+@{
+    ViewData["Title"] = "Formato de entradas";
+}
+
+<a asp-action="Crear" class="btn btn-primary">Crear un nuevo formato</a>
+<table class="table">
+
+	<thead>
+		<tr>
+			<th>Titulo</th>
+			<th>Acciones</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		@foreach (var format in Model)
+		{
+			<tr>
+				<td>@format.name</td>
+
+				<td>
+					<a class="btn btn-primary" asp-action="Editar" asp-route-id="@format.id">Editar</a>
+					<a class="btn btn-danger" onclick="openModal({id: '@format.id', name: '@format.name'})" )>Borrar</a>
+				</td>
+			</tr>		
+		}
+	</tbody>
+
+</table>
+
+@*MODAL PARA BORRAR - PASAR A UN PARTIAL*@
+<div class="closeModal" id="modal">
+	<div class="bgModal" onclick="closeModal()">
+		<div class="modalBorrar modal-content p-4">
+			<h4 id="modalMsg" class="mb-4"></h4>
+			<form asp-controller="Formats" asp-action="Borrar" method="post">
+				<input type="hidden" name="id" />
+				<button type="submit" class="btn btn-danger">Borrar</button>
+				<a class="btn btn-primary" onclick="closeModal()">Cancelar</a>
+			</form>
+		</div>
+	</div>
+</div>

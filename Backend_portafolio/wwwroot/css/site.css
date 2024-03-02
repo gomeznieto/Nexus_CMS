@@ -1,3 +1,8 @@
+:root {
+    --bg-color-primary: rgba(0, 0, 0, 0.8);
+    --text-color-primry: white;
+}
+
 html {
     font-size: 14px;
 }
@@ -18,9 +23,52 @@ html {
 }
 
 body {
-    margin-bottom: 60px;
+    background-color: var(--bg-color-primary);
+    color: var(--text-color-primry);
 }
 
+/* MENU */
+
+.menu_width{
+    width: 70px;
+    transition: all ease-in-out 0.3s;
+}
+
+.iconos{
+    font-size: 24px;
+}
+
+.item_size {
+    display: none;
+    transition: all ease-in-out 0.3s;
+}
+
+.collapse {
+    transition: all ease-in-out 0.3s;
+}
+
+@media (min-width: 768px) {
+    .menu_width {
+        width: 250px;
+        transition: all ease-in-out 0.3s;
+    }
+
+    .iconos {
+        font-size: 12px;
+    }
+
+    .item_size {
+        display: inline-block;
+        transition: all ease-in-out 0.3s;
+    }
+}
+
+table tbody,
+table thead{
+    color: var(--text-color-primry);
+}
+
+/* MODALES */
 .closeModal {
     display: none;
 }

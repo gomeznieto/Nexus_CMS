@@ -3,6 +3,7 @@ using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.SqlServer.Server;
 using System.Reflection;
 
 namespace Backend_portafolio.Controllers
@@ -31,9 +32,9 @@ namespace Backend_portafolio.Controllers
 
 		[HttpGet]
 
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index(string format)
 		{
-			var posts = await _repositoryPosts.Obtener();
+			var posts = await _repositoryPosts.ObtenerPorFormato(format);
 			var model = posts
 				.GroupBy(p => p.formatName)
 				.Select(p => new ListPostViewModel()
@@ -43,11 +44,14 @@ namespace Backend_portafolio.Controllers
 
 				}).ToList();
 
+			//Formato para retornar al listado correspondiente
+			ViewBag.Format = format;
+
 			return View(model);
 		}
 
         [HttpGet]
-        public async Task <IActionResult> Crear()
+        public async Task <IActionResult> Crear(string format)
         {
 			var usuarioID = _usersService.ObtenerUsuario();
 	
@@ -55,9 +59,13 @@ namespace Backend_portafolio.Controllers
 
 			model.user_id = usuarioID;
 			model.categories = await ObtenerCategorias();
-			model.formats = await ObtenerFormatos();
+			model.formatName = format;
 
-			return View(model);
+			var formats = await _repositoryFormat.Obtener();
+            model.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
+            model.formatName = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
+
+            return View(model);
         }
 
 		[HttpPost]
@@ -67,8 +75,9 @@ namespace Backend_portafolio.Controllers
 			if(!ModelState.IsValid)
 			{
 				viewModel.categories = await ObtenerCategorias();
-				viewModel.formats = await ObtenerCategorias();
-				return View(viewModel);
+				//viewModel.formats = await ObtenerCategorias();
+
+                return View(viewModel);
 			}
 
 			//Verificamos que la categoria que nos mandan exista
@@ -92,11 +101,11 @@ namespace Backend_portafolio.Controllers
 
 			await _repositoryPosts.Crear(viewModel);
 
-			return RedirectToAction("Index");
-		}
+            return RedirectToAction("Index", "Posts", new { format = viewModel.formatName });
+        }
 
 		[HttpGet]
-		public async Task<IActionResult> Editar(int id)
+		public async Task<IActionResult> Editar(int id, string format)
 		{
 			var model = await _repositoryPosts.ObtenerPorId(id);
 
@@ -105,9 +114,13 @@ namespace Backend_portafolio.Controllers
 
 			modelView.user_id = _usersService.ObtenerUsuario();
 			modelView.categories = await ObtenerCategorias();
-			modelView.formats = await ObtenerFormatos();
+            //modelView.formats = await ObtenerFormatos();
 
-			return View(modelView);
+            var formats = await _repositoryFormat.Obtener();
+            modelView.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
+			modelView.formatName = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
+
+            return View(modelView);
 		}
 
 		[HttpPost]
@@ -138,11 +151,10 @@ namespace Backend_portafolio.Controllers
 
 			await _repositoryPosts.Editar(viewModel);
 
-			return RedirectToAction("Index");
+            return RedirectToAction("Index", "Posts", new { format = viewModel.formatName });
+        }
 
-		}
-
-		[HttpPost]
+        [HttpPost]
 		public async Task<IActionResult>Borrar(int id)
 		{
 			var post = await _repositoryPosts.ObtenerPorId(id);
