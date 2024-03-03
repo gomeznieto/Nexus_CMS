@@ -6,7 +6,6 @@
 
 <h1>Editar @Model.title</h1>
 <h3>En esta sección puede crear cualquier tipo de entrada, por ejemplo proyectos, blog, tutoriales, etc...</h3>
-<p>@Model.format_id</p>
 
 <form asp-action="Editar" method="post" class="container mt-5">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
@@ -22,7 +21,7 @@
 
     <div class="mb-3">
         <label asp-for="description" class="form-label"></label>
-        <textarea asp-for="description" class="form-control"></textarea>
+        <textarea asp-for="description" class="form-control textarea-style " rows="10"></textarea>
         <span asp-validation-for="description" class="text-danger"></span>
     </div>
 
@@ -34,7 +33,7 @@
 
     <div class="mb-3">
         <label asp-for="category_id" class="form-label"></label>
-        <select asp-for="category_id" asp-items="Model.categories" class="form-select"></select>
+        <select asp-for="category_id" asp-items="Model.categories" class="form-select select-style"></select>
         <span asp-validation-for="category_id" class="text-danger"></span>
     </div>
 
