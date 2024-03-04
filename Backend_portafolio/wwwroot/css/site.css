@@ -2,12 +2,15 @@
     --bg-color-primary: #1a202c;
     --bg-color-menu-primary: #181c27;
     --text-color-primary: white;
-    --text-color-menu: rgb(172, 175, 179);
+    --text-color-menu: rgb(160, 174, 192);
     --text-colot-menu-hover: rgb(255, 255, 255);
     --bg-color-icon: rgb(79, 209, 197);
     --color-border-focus: rgb(99, 179, 237);
     --bg-input: rgb(45, 55, 72);
     --bg-menu-focus: rgb(32, 64, 68);
+    --color-border-focus: rgb(63, 68, 78);
+    --text-color-error: rgb(252, 129, 129);
+    --text-color-disabled: rgb(63, 68, 78);
 }
 
 html {
@@ -38,37 +41,31 @@ body {
 
 /* MENU */
 
-.menu_width{
+.menu_width {
     width: 70px;
     transition: all ease-in-out 0.3s;
+    color: var(--text-color-menu);
 }
 
 .menu-color {
     background-color: var(--bg-color-menu-primary);
+    color: var(--text-color-menu) !important;
 }
-
-    .menu-color-font ul li a {
-        color: var(--text-color-menu);
-    }
-    .menu-color-font ul li a:hover{
-        color: var(--text-colot-menu-hover);
-    }
-    .menu-color-font li a:focus {
-        color: var(--text-colot-menu-hover);
-        background-color: var(--bg-menu-focus);
-        width: 230px;
-    }
 
 .iconos {
     font-size: 16px;
     color: var(--bg-color-icon);
+    border: 1px solid var(--color-border-focus);
+    padding: 4px;
+    border-radius: 5px;
 }
+
 
     .iconos:focus {
         color: var(--text-colot-menu-hover);
     }
 
-.item_size {
+.item_nav {
     display: none;
     transition: all ease-in-out 0.3s;
 }
@@ -77,7 +74,19 @@ body {
     transition: all ease-in-out 0.3s;
 }
 
+.item_size {
+    display: none;
+}
+
+.menu-hamb {
+    color: var(--text-color-menu) !important;
+}
+
 @media (min-width: 768px) {
+    .menu-hamb {
+        color: var(--text-color-menu) !important;
+    }
+
     .menu_width {
         width: 250px;
         transition: all ease-in-out 0.3s;
@@ -85,12 +94,46 @@ body {
 
     .iconos {
         font-size: 12px;
+        border: 1px solid var(--color-border-focus);
+        padding: 4px;
+        border-radius: 5px;
+    }
+
+    .subiconos {
+        font-size: 10px;
+    }
+
+    .nav-title:hover {
+        color: var(--text-colot-menu-hover);
+        background-color: var(--bg-menu-focus);
+    }
+
+    .nav-title {
+        color: var(--text-color-menu) !important;
+        font-weight: 500;
+        width: 230px;
+        font-size: 16px;
+    }
+
+    .menu-color-font {
+        color: var(--text-color-menu);
     }
 
     .item_size {
         display: inline-block;
-        transition: all ease-in-out 0.3s;
     }
+
+    .item_subNav {
+        font-size: 14px;
+        text-decoration: none;
+        background-color: none;
+        color: var(--text-color-menu) !important;
+        font-weight: 500;
+    }
+
+        .item_subNav:hover {
+            color: var(--text-colot-menu-hover) !important;
+        }
 }
 
 table tbody,
@@ -112,21 +155,45 @@ form input[type="text"] {
         border-block-color: var(--color-border-focus);
     }
 
+.input-style,
 .select-style,
 .textarea-style {
     background-color: var(--bg-color-primary);
     color: var(--text-color-menu);
 }
+    .input-style:focus,
     .select-style:focus,
     .textarea-style:focus {
         background-color: var(--bg-input);
         color: var(--text-colot-menu-hover);
     }
 
-    form label{
-        font-size: 20px;
-        font-weight: 500;
+.input-style-disabled {
+    color: var(--text-color-disabled);
+    background-color: var(--bg-color-primary) !important;
+}
+
+form label {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.form-error {
+    display: none;
+    color: var(--text-color-error);
+    font-style: italic;
+    margin-top: 10px;
+}
+    .form-error::before {
+        content: "*";
+        color: var(--text-color-error);
+        margin-top: 10px;
+        margin-right: 5px;
     }
+
+.field-validation-error {
+    display: block;
+}
 
 
 /* MODALES */

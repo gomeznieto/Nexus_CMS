@@ -4,46 +4,91 @@
     ViewData["Title"] = "Crear post";
 }
 
-<h1>Crear Entrada</h1>
-<h3>En esta sección puede crear cualquier tipo de entrada, por ejemplo proyectos, blog, tutoriales, etc...</h3>
+<div class="mt-5">
+    <h1>Crear @Model.format</h1>
+    <fs-4>El texto debe ser escrito con markdown para poder colocar estilos.</fs-4>
 
-<form asp-action="Crear" method="post" class="container mt-5">
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-    <input type="hidden" asp-for="user_id" />
-    <input type="hidden" asp-for="format_id" />
-    <input type="hidden" asp-for="format" />
+    <form asp-action="Crear" method="post" class="mt-5">
 
-    <div class="mb-3">
-        <label asp-for="title" class="form-label"></label>
-        <input asp-for="title" class="form-control" />
-        <span asp-validation-for="title" class="text-danger"></span>
-    </div>
+        <!-- VALIDATION -->
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-    <div class="mb-3">
-        <label asp-for="description" class="form-label"></label>
-        <textarea asp-for="description" class="form-control textarea-style " rows="10"></textarea>
-        <span asp-validation-for="description" class="text-danger"></span>
-    </div>
+        <!-- HIDDEN -->
+        <input type="hidden" asp-for="user_id" />
+        <input type="hidden" asp-for="format_id" />
+        <input type="hidden" asp-for="format" />
+        <input type="hidden" asp-for="mediaList" />
 
-    <div class="mb-3">
-        <label asp-for="cover" class="form-label"></label>
-        <input asp-for="cover" class="form-control" />
-        <span asp-validation-for="cover" class="text-danger"></span>
-    </div>
+        <div class="mb-3">
+            <input asp-for="title" class="form-control fs-2 fw-bolder" placeholder="Agregar titulo"/>
+            <span asp-validation-for="title" class="form-error"></span>
+        </div>
 
-    <div class="mb-3">
-        <label asp-for="category_id" class="form-label"></label>
-        <select asp-for="category_id" asp-items="Model.categories" class="form-select"></select>
-        <span asp-validation-for="category_id" class="text-danger"></span>
-    </div>
+        <div class="mb-3">
+            <textarea asp-for="description" class="form-control textarea-style" rows="10" placeholder="Agregar contenido de la entrada"></textarea>
+            <span asp-validation-for="description" class="form-error"></span>
+        </div>
 
-    <button type="submit" class="btn btn-primary">Crear</button>
-    <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-danger">Cancelar</a>
-</form>
+        <div class="mb-3">
+            <input asp-for="cover" class="form-control" placeholder="Agregar la imagen principal para ilustracion"/>
+            <span asp-validation-for="cover" class="form-error"></span>
+        </div>
+
+        <div class="mb-3">
+            <select asp-for="category_id" asp-items="Model.categories" class="form-select select-style"></select>
+            <span asp-validation-for="category_id" class="form-error"></span>
+        </div>
+
+        <button type="button" class="btn btn-secondary mb-3" onclick="addInput()">Agregar Multimedia</button>
+        <div id="inputContainer">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Crear</button>
+        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-danger">Cancelar</a>
+    </form>
+
+    <!-- IMAGENES -->
 
 
+
+</div>
 
 @section Scripts
 {
 	<partial name="_ValidationScriptsPartial" />
+
+    <script>
+        var imageLinks = [];
+
+        function addList(element) {
+            //Agregamos elemento al array
+            let value = element.parentNode.childNodes[0].value;
+            imageLinks.push(value);
+
+            //Modificamos la función del botón
+            element.classList.remove('btn-primary');
+            element.classList.add('btn-danger');
+            element.innerHTML = "Eliminar";
+            element.onclick = function () { removeInput(element); }
+            element.parentNode.childNodes[0].disabled = true;
+            element.parentNode.childNodes[0].classList.remove('input-style');
+            element.parentNode.childNodes[0].classList.add('input-style-disabled');
+         }
+
+        function addInput() {
+
+            var container = document.getElementById('inputContainer');
+            var div = document.createElement('div');
+            div.className = 'input-group';
+            div.innerHTML = '<input class="form-control mb-3 imgList imgAdd input-style" placeholder="Ingrese link multimedia"> <button type="button" class="btn btn-primary ms-2 h-50" onclick="addList(this)">Agregar</button>';
+            container.appendChild(div);
+        }
+
+        function removeInput(element) {
+            let value = element.parentNode.childNodes[0].value;
+            imageLinks = imageLinks.filter(x => x != value);
+            element.parentNode.parentNode.removeChild(element.parentNode);
+        }
+
+    </script>
 }

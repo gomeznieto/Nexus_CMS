@@ -47,14 +47,13 @@ CREATE TABLE post (
 /* FUENTE */
 CREATE TABLE source(
     id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-    title VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     icon VARCHAR(100) NOT NULL
 );
 
 /* LINKS */
 CREATE TABLE link(
     id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-    format VARCHAR(100) NOT NULL,
     url VARCHAR(100) NOT NULL,
     post_id INT NOT NULL,
     FOREIGN KEY (post_id) REFERENCES post(id),
@@ -62,12 +61,20 @@ CREATE TABLE link(
     FOREIGN KEY (source_id) REFERENCES source(id)
 );
 
-/* IMAGENES */
-CREATE TABLE image (
+/* MEDIA TYPE */
+CREATE TABLE mediatype(
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+);
+
+/* MEDIA */
+CREATE TABLE media (
     id INT IDENTITY(1,1) PRIMARY KEY,
     url VARCHAR(100) NOT NULL,
     post_id INT NOT NULL,
-    FOREIGN KEY (post_id) REFERENCES post(id)
+    FOREIGN KEY (post_id) REFERENCES post(id),
+    mediatype_id INT NOT NULL,
+    FOREIGN KEY (mediatype_id) REFERENCES mediatype(id)
 );
 
 
@@ -92,12 +99,12 @@ CREATE TABLE bio(
 );
 
 
+/* CREACIONES DE PRUEBA */
+
 -- CREATE USER
 INSERT INTO users (name, rol, img, cv, about, hobbies, email, password) 
 VALUES ('Jhon Doe', 'Developer', 'https://via.placeholder.com/150', 'https://via.placeholder.com/150', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.',
 'Jhon@mail.com', '123456');
-
-SELECT * FROM users;
 
 -- CREATE FORMATS
 INSERT INTO format (name) VALUES ('Blog'), ('Project'), ('Tutorial');
@@ -109,13 +116,24 @@ INSERT INTO category (name) VALUES ('Web Development'), ('C++'), ('C#'), ('.NET'
 INSERT INTO post (title, description, cover, category_id, user_id, format_id, created_at)
 VALUES ('Post 1', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 2, 1, 1, GETDATE());
 
-SELECT * FROM users;
-SELECT * FROM format;
-SELECT * FROM category;
-SELECT * FROM post;
+--SOURCE
+INSERT INTO source (name, icon)
+VALUES ('Github', 'fa-brands fa-github'),('vmeo', 'fa-brands fa-vmeo'), ('You Tube', 'fa-brands fa-youtube'),('Instargram', 'fa-brands fa-instagram'),('URL', 'fa-solid fa-link');
 
+--INSERT MEDIA TYPE
+INSERT INTO mediatype (name)
+VALUES ('img'), ('video'), ('file');
 
-SELECT P.id, P.title, P.description, P.cover, P.created_at, U.name as userName, F.name as formatName, C.name as categoryName FROM post P
-INNER JOIN category C ON P.category_id = C.id
-INNER JOIN users U ON P.user_id = U.id
-INNER JOIN format F ON P.format_id = F.id;
+/* SELECTS */
+-- SELECT * FROM users;
+-- SELECT * FROM format;
+-- SELECT * FROM category;
+-- SELECT * FROM post;
+-- SELECT * FROM source
+-- SELECT * FROM mediatype
+
+/* SELECTS INNER JOIN */
+-- SELECT P.id, P.title, P.description, P.cover, P.created_at, U.name as userName, F.name as formatName, C.name as categoryName FROM post P
+-- INNER JOIN category C ON P.category_id = C.id
+-- INNER JOIN users U ON P.user_id = U.id
+-- INNER JOIN format F ON P.format_id = F.id;
