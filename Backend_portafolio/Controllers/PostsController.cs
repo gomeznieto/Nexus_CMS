@@ -3,8 +3,8 @@ using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.SqlServer.Server;
-using System.Reflection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
 
 namespace Backend_portafolio.Controllers
 {
@@ -14,20 +14,24 @@ namespace Backend_portafolio.Controllers
 		private readonly IRepositoryCategorias _repositoryCategorias;
 		private readonly IRepositoryFormat _repositoryFormat;
 		private readonly IRepositoryPosts _repositoryPosts;
-		private readonly IMapper _mapper;
+        private readonly IRepositoryMedia _repositoryMedia;
+        private readonly IMapper _mapper;
 
 		public PostsController(
 			IUsersService usersService,
 			IRepositoryCategorias repositoryCategorias, 
 			IRepositoryFormat repositoryFormat,
 			IRepositoryPosts repositoryPosts,
+			IRepositoryMedia repositoryMedia,
 			IMapper mapper)
         {
-			_usersService = usersService;
 			_repositoryCategorias = repositoryCategorias;
 			_repositoryFormat = repositoryFormat;
 			_repositoryPosts = repositoryPosts;
-			_mapper = mapper;
+            _repositoryMedia = repositoryMedia;
+
+			_usersService = usersService;
+            _mapper = mapper;
 		}
 
 		[HttpGet]
@@ -100,6 +104,25 @@ namespace Backend_portafolio.Controllers
 			viewModel.created_at = DateTime.Today;
 
 			await _repositoryPosts.Crear(viewModel);
+
+			//Subir Media
+			if (!viewModel.mediaListString.IsNullOrEmpty())
+			{
+				List<Media> mediaLinks = new List<Media>();
+				List<string> mediaStrings = JsonSerializer.Deserialize<List<string>>(viewModel.mediaListString);
+
+				foreach (var mediaLink in mediaStrings)
+				{
+					Media media = new Media();
+					media.post_id = viewModel.id;
+					media.url = mediaLink;
+					mediaLinks.Add(media);
+				}
+
+				//Subir MeiaLinks
+				IEnumerable<Media> mediaLinksEnumerable = mediaLinks.ToList();
+				await _repositoryMedia.Crear(mediaLinksEnumerable);
+			}
 
             return RedirectToAction("Index", "Posts", new { format = viewModel.format });
         }

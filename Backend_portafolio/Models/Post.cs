@@ -27,5 +27,7 @@ namespace Backend_portafolio.Models
 		public string format { get; set; }
 		public string category { get; set; }
 		public string userName { get; set; }
-	}
+        public IEnumerable<Media> mediaList { get; set; }
+
+    }
 }

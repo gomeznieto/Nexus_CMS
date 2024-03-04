@@ -11,6 +11,7 @@ builder.Services.AddTransient<IRepositoryCategorias, RepositoryCategorias>();
 builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<IRepositoryFormat, RepositoryFormat>();
 builder.Services.AddTransient<IRepositoryPosts, RepositoryPosts>();
+builder.Services.AddTransient<IRepositoryMedia, RepositoryMedia>();
 builder.Services.AddHttpContextAccessor();
 
 //Auto Mapper
