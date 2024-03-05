@@ -128,10 +128,10 @@ VALUES ('img'), ('video'), ('file');
 -- SELECT * FROM users;
 -- SELECT * FROM format;
 -- SELECT * FROM category;
--- SELECT * FROM post;
+SELECT * FROM post;
 -- SELECT * FROM source
--- SELECT * FROM mediatype
-
+SELECT * FROM mediatype
+SELECT * FROM media
 /* SELECTS INNER JOIN */
 -- SELECT P.id, P.title, P.description, P.cover, P.created_at, U.name as userName, F.name as formatName, C.name as categoryName FROM post P
 -- INNER JOIN category C ON P.category_id = C.id

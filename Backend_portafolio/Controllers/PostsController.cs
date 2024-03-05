@@ -15,6 +15,7 @@ namespace Backend_portafolio.Controllers
 		private readonly IRepositoryFormat _repositoryFormat;
 		private readonly IRepositoryPosts _repositoryPosts;
         private readonly IRepositoryMedia _repositoryMedia;
+        private readonly IRepositoryMediatype _repositoryMediatype;
         private readonly IMapper _mapper;
 
 		public PostsController(
@@ -23,16 +24,22 @@ namespace Backend_portafolio.Controllers
 			IRepositoryFormat repositoryFormat,
 			IRepositoryPosts repositoryPosts,
 			IRepositoryMedia repositoryMedia,
+			IRepositoryMediatype repositoryMediatype,
 			IMapper mapper)
         {
 			_repositoryCategorias = repositoryCategorias;
 			_repositoryFormat = repositoryFormat;
 			_repositoryPosts = repositoryPosts;
             _repositoryMedia = repositoryMedia;
-
-			_usersService = usersService;
+            _repositoryMediatype = repositoryMediatype;
+            _usersService = usersService;
             _mapper = mapper;
 		}
+
+		/*
+		 * RUTAS
+		 * =====
+		 */
 
 		[HttpGet]
 
@@ -62,12 +69,18 @@ namespace Backend_portafolio.Controllers
 			var model = new PostViewModel();
 
 			model.user_id = usuarioID;
-			model.categories = await ObtenerCategorias();
 			model.format = format;
 
+			//Obtenemos el formato de la entrada creada
 			var formats = await _repositoryFormat.Obtener();
             model.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
             model.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
+
+			//Obtenemos Categorias Select List
+			model.categories = await ObtenerCategorias();
+
+			//Obtenemos Media Types Select List
+			model.mediaTypes = await ObtenerMediaTypes();
 
             return View(model);
         }
@@ -109,14 +122,16 @@ namespace Backend_portafolio.Controllers
 			if (!viewModel.mediaListString.IsNullOrEmpty())
 			{
 				List<Media> mediaLinks = new List<Media>();
-				List<string> mediaStrings = JsonSerializer.Deserialize<List<string>>(viewModel.mediaListString);
+                List<MediaForm> mediatypes = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString);
 
-				foreach (var mediaLink in mediaStrings)
+                foreach (var mediaLink in mediatypes)
 				{
 					Media media = new Media();
 					media.post_id = viewModel.id;
-					media.url = mediaLink;
-					mediaLinks.Add(media);
+					media.url = mediaLink.media_url;
+					media.id= int.Parse(mediaLink.mediaType_id);
+
+                    mediaLinks.Add(media);
 				}
 
 				//Subir MeiaLinks
@@ -190,6 +205,11 @@ namespace Backend_portafolio.Controllers
 			return RedirectToAction("Index");
 		}
 
+		/*
+		 *  FUNCIONES
+		 *  =========
+		 */
+
 		private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
 		{
 			var categories = await _repositoryCategorias.Obtener();
@@ -202,7 +222,19 @@ namespace Backend_portafolio.Controllers
 			return formats.Select(format => new SelectListItem(format.name, format.id.ToString()));
 		}
 
-		//API - TODO: HEADERS CON TOKEN
+        private async Task<IEnumerable<SelectListItem>> ObtenerMediaTypes()
+        {
+            var mediaTypes = await _repositoryMediatype.Obtener();
+            return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
+        }
+
+
+		/*
+		 *  API
+		 *  ===
+		 */
+
+        //API - TODO: HEADERS CON TOKEN
 
         [HttpGet]
         [Route("api/[controller]/get")]

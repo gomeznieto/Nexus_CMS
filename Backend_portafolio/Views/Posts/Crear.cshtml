@@ -1,4 +1,5 @@
 ﻿@model PostViewModel
+@using System.Text.Json;
 
 @{
     ViewData["Title"] = "Crear post";
@@ -58,26 +59,108 @@
 
         function addList(element) {
             //Agregamos elemento al array
-            let value = element.parentNode.childNodes[0].value;
-            imageLinks.push(value);
+            let select = element.parentNode.childNodes[0];
+            let input = element.parentNode.childNodes[1];
+
+            let valueSelect = select.value;
+            let valueInput = input.value;
+
+            imageLinks.push({ mediaType_id: valueSelect, media_url: valueInput });
 
             //Modificamos la función del botón
             element.classList.remove('btn-primary');
-            element.classList.add('btn-danger');
-            element.innerHTML = "Eliminar";
-            element.onclick = function () { removeInput(element); }
-            element.parentNode.childNodes[0].disabled = true;
-            element.parentNode.childNodes[0].classList.remove('input-style');
-            element.parentNode.childNodes[0].classList.add('input-style-disabled');
+            element.classList.add('btn-secondary');
+            element.innerHTML = "Editar";
+            element.onclick = function () {  editInput(element); }
+
+            //Deshabilitamos los cambios en el input
+            input.disabled = true;
+            input.classList.remove('input-style');
+            input.classList.add('input-style-disabled');
+
+            select.disabled = true;
+            select.classList.remove('input-style');
+            select.classList.add('input-style-disabled');
          }
 
         function addInput() {
-
+            //Agregamos elemento nuevo para agragar nuevo medias
             var container = document.getElementById('inputContainer');
             var div = document.createElement('div');
             div.className = 'input-group';
-            div.innerHTML = '<input class="form-control mb-3 imgList imgAdd input-style" placeholder="Ingrese link multimedia"> <button type="button" class="btn btn-primary ms-2 h-50" onclick="addList(this)">Agregar</button>';
+
+            // Creamos el select
+            var select = document.createElement('select');
+            select.className = 'form-select mb-3 select-style w-25';
+            // Agregamos opciones al select utilizando los SelectListItem del modelo
+            @foreach (var item in Model.mediaTypes)
+            {
+                <text>
+                    var option = document.createElement("option");
+                    option.text = "@item.Text";
+                    option.value = "@item.Value";
+                    select.add(option);
+                </text>
+            }
+                // Agregamos el select al div
+                div.appendChild(select);
+
+            // Creamos el input
+            var input = document.createElement('input');
+            input.className = 'form-control mb-3 imgList imgAdd input-style w-50';
+            input.placeholder = 'Ingrese link multimedia';
+            // Agregamos el input al div
+            div.appendChild(input);
+
+            // Creamos los botones
+            var addButton = document.createElement('button');
+            addButton.type = 'button';
+            addButton.className = 'btn btn-primary ms-2 h-50';
+            addButton.textContent = 'Agregar';
+            addButton.onclick = function () { addList(this); };
+            // Agregamos el botón al div
+            div.appendChild(addButton);
+
+            var removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'btn btn-danger ms-2 h-50';
+            removeButton.textContent = 'Eliminar';
+            removeButton.onclick = function () { removeInput(this); };
+            // Agregamos el botón al div
+            div.appendChild(removeButton);
+
+            // Agregamos el div al contenedor
             container.appendChild(div);
+        }
+
+        function editInput(element){
+
+            let select = element.parentNode.childNodes[0];
+            let input = element.parentNode.childNodes[1];
+            let valueSelect = select.value;
+            let valueInput = input.value;
+
+            //Eliminamos elemento
+            imageLinks = imageLinks.filter(x => x.valueSelect != valueSelect && x.valueInput != valueInput);
+
+            //Habilitamos input para edición
+            input.disabled = false;
+            input.classList.remove('input-style-disabled');
+            input.classList.add('input-style');
+
+            //Habilitamos el <select>
+            select.disabled = false;
+            select.classList.remove('input-style-disabled');
+            select.classList.add('input-style');
+
+            //Modificamos boton Editar a Agregar
+            element.classList.remove('btn-secondary');
+            element.classList.add('btn-primary');
+            element.innerHTML = "Agregar";
+
+            //Agregamos función de Agregar
+            element.onclick = function () { addList(element); }
+
         }
 
         function removeInput(element) {
