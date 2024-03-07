@@ -137,3 +137,8 @@ SELECT * FROM media
 -- INNER JOIN category C ON P.category_id = C.id
 -- INNER JOIN users U ON P.user_id = U.id
 -- INNER JOIN format F ON P.format_id = F.id;
+
+SELECT M.id, M.name 
+FROM media M
+INNER JOIN mediatype MT
+ON MT.id = M.mediatype_id

@@ -36,8 +36,8 @@ namespace Backend_portafolio.Sevices
             foreach (var media in mediaList)
             {
                 await connection.ExecuteAsync(
-                    $@"INSERT INTO {MEDIA.TABLA} ({MEDIA.URL}, {MEDIA.POST_ID}, {MEDIA.MEDIA_ID}) VALUES (@{MEDIA.URL}, @{MEDIA.POST_ID}, 1);",
-                    new { url = media.url, post_id = media.post_id }
+                    $@"INSERT INTO {MEDIA.TABLA} ({MEDIA.URL}, {MEDIA.POST_ID}, {MEDIA.MEDIA_ID}) VALUES (@{MEDIA.URL}, @{MEDIA.POST_ID}, @{MEDIA.MEDIA_ID});",
+                    media
                 );
             }
         }
@@ -46,6 +46,15 @@ namespace Backend_portafolio.Sevices
         {
             using var connection = new SqlConnection(_connectionString);
             return await connection.QueryAsync<Media>($@"SELECT {MEDIA.URL}, {MEDIA.POST_ID}, {MEDIA.MEDIA_ID} FROM {MEDIA.TABLA};"); //TODO MODIFICAR TIPO DE MEDIA
+
+        }
+
+        public async Task<IEnumerable<Media>> ObtenerPorId(int post_id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QueryAsync<Media>($@"SELECT {MEDIA.URL}, {MEDIA.POST_ID}, {MEDIA.MEDIA_ID} FROM {MEDIA.TABLA} WHERE {MEDIA.POST_ID} = @{MEDIA.POST_ID};", new {
+                post_id
+            }); //TODO MODIFICAR TIPO DE MEDIA
 
         }
     }

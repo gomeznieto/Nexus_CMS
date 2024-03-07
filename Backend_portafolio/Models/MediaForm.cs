@@ -2,7 +2,7 @@
 {
     public class MediaForm
     {
-        public string mediaType_id { get; set; }
-        public string media_url { get; set; }
+        public string mediatype_id { get; set; }
+        public string url { get; set; }
     }
 }

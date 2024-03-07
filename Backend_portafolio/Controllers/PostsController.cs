@@ -121,22 +121,20 @@ namespace Backend_portafolio.Controllers
 			//Subir Media
 			if (!viewModel.mediaListString.IsNullOrEmpty())
 			{
-				List<Media> mediaLinks = new List<Media>();
-                List<MediaForm> mediatypes = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString);
+				//Deserializamos string de media
+                List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+				List<Media> medias = new List<Media>();
 
-                foreach (var mediaLink in mediatypes)
+				_mapper.Map(mediaForms, medias);
+
+				//Agregamos el numero de post creado a cada Media
+                foreach (var media in medias)
 				{
-					Media media = new Media();
 					media.post_id = viewModel.id;
-					media.url = mediaLink.media_url;
-					media.id= int.Parse(mediaLink.mediaType_id);
-
-                    mediaLinks.Add(media);
 				}
 
-				//Subir MeiaLinks
-				IEnumerable<Media> mediaLinksEnumerable = mediaLinks.ToList();
-				await _repositoryMedia.Crear(mediaLinksEnumerable);
+				//Subimos MeiaLinks
+				await _repositoryMedia.Crear(medias);
 			}
 
             return RedirectToAction("Index", "Posts", new { format = viewModel.format });
