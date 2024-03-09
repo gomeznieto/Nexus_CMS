@@ -40,6 +40,9 @@ function cleanNodes(element)
     return nodeElementsClean;
 }
 
+/*
+ * Agregamos select e inputl al array
+ */
 function addList(element) {
     //Agregamos elemento al array
     let nodeElementsClean = cleanNodes(element)
@@ -74,12 +77,18 @@ function addList(element) {
     select.classList.remove('input-style');
     select.classList.add('input-style-disabled');
 }
+
+/*
+ * habilitamos select e input para poder editar. Si aceptamos agregamos al array.
+ */
 function editInput(element) {
 
     let nodeElementsClean = cleanNodes(element)
 
     let select = nodeElementsClean[0];
     let input = nodeElementsClean[1];
+    let btnCancelar = nodeElementsClean[3];
+
     let valueSelect = select.value;
     let valueInput = input.value;
 
@@ -104,8 +113,45 @@ function editInput(element) {
     //Agregamos función de Agregar
     element.onclick = function () { addList(element); }
 
+    //Modificamos el botón de eliminar
+    btnCancelar.innerHTML = "Cancelar";
+    btnCancelar.onclick = function () { cancelInput(element); }
+
+
 }
 
+/*
+ * Regresamos botones previos a Editar
+ */
+function cancelInput(element) {
+    let nodeElementsClean = cleanNodes(element)
+    let btnCancelar = nodeElementsClean[3];
+    let btnEditar = nodeElementsClean[2];
+    let select = nodeElementsClean[0];
+    let input = nodeElementsClean[1];
+
+    btnCancelar.innerHTML = "Eliminar";
+    btnCancelar.onclick = function () { removeInput(element); }
+
+    btnEditar.innerHTML = "Editar";
+    btnEditar.onclick = function () { editInput(element); }
+    btnEditar.classList.remove("btn-primary")
+    btnEditar.classList.add("btn-secondary")
+
+    //Habilitamos input para edición
+    input.disabled = true;
+    input.classList.remove('input-style');
+    input.classList.add('input-style-disabled');
+
+    //Habilitamos el <select>
+    select.disabled = true;
+    select.classList.remove('input-style');
+    select.classList.add('input-style-disabled');
+}
+
+/*
+ * LiRemovemos items del array si el input es nuevo, sino se agrega el id y valores en default para borrar en controller
+ */
 function removeInput(element) {
 
     let nodeElementsClean = cleanNodes(element)
@@ -125,6 +171,7 @@ function removeInput(element) {
     element.parentNode.parentNode.removeChild(element.parentNode);
 }
 
+// Cargamos los datos del array en el input del formulario
 function enviarDatosAlServidor() {
     // Actualiza el valor del campo oculto con los datos del array
     document.getElementById('imageLinksField').value = JSON.stringify(imageLinks);

@@ -36,6 +36,8 @@
         </div>
 
         <h3 class="fs-5">Media</h3>
+
+        <!-- Listado editable y eliminable de los media del usuario-->
         @foreach (var media in Model.mediaList)
         {
             <div class="input-group">
@@ -52,10 +54,12 @@
         }
 
         <div id="inputContainer"></div>
-        <button type="button" class="btn btn-secondary mb-3" onclick="addInput()">Agregar Multimedia</button>
 
-        <!-- Listado editable y eliminable de los media del usuario-->
         <!-- Boton que permita seguir agregando media -->
+        <button type="button" class="btn btn-secondary mb-3 d-flex" onclick="addInput()">Agregar Multimedia</button>
+
+        <h3 class="fs-5">Links</h3>
+        <button type="button" class="btn btn-secondary mb-5 d-flex" >Agregar Link</button>
 
         <button type="submit" class="btn btn-primary" onclick="enviarDatosAlServidor()">Editar</button>
         <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-danger">Cancelar</a>
