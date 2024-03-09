@@ -17,8 +17,11 @@ namespace Backend_portafolio.Sevices
     }
     public interface IRepositoryMedia
     {
+        Task Borrar(int id);
         Task Crear(IEnumerable<Media> media);
+        Task Editar(Media nuevoMedia);
         Task<IEnumerable<Media>> Obtener();
+        Task<IEnumerable<Media>> ObtenerPorPost(int post_id);
     }
 
     public class RepositoryMedia : IRepositoryMedia
@@ -45,17 +48,28 @@ namespace Backend_portafolio.Sevices
         public async Task<IEnumerable<Media>> Obtener()
         {
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QueryAsync<Media>($@"SELECT {MEDIA.URL}, {MEDIA.POST_ID}, {MEDIA.MEDIA_ID} FROM {MEDIA.TABLA};"); //TODO MODIFICAR TIPO DE MEDIA
+            return await connection.QueryAsync<Media>($@"SELECT {MEDIA.URL}, {MEDIA.POST_ID}, {MEDIA.MEDIA_ID} FROM {MEDIA.TABLA};");
 
         }
 
-        public async Task<IEnumerable<Media>> ObtenerPorId(int post_id)
+        public async Task<IEnumerable<Media>> ObtenerPorPost(int post_id)
         {
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QueryAsync<Media>($@"SELECT {MEDIA.URL}, {MEDIA.POST_ID}, {MEDIA.MEDIA_ID} FROM {MEDIA.TABLA} WHERE {MEDIA.POST_ID} = @{MEDIA.POST_ID};", new {
+            return await connection.QueryAsync<Media>($@"SELECT {MEDIA.ID}, {MEDIA.URL}, {MEDIA.POST_ID}, {MEDIA.MEDIA_ID} FROM {MEDIA.TABLA} WHERE {MEDIA.POST_ID} = @{MEDIA.POST_ID};", new {
                 post_id
-            }); //TODO MODIFICAR TIPO DE MEDIA
+            });
+        }
 
+        public async Task Editar(Media nuevoMedia)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.ExecuteAsync($@"UPDATE {MEDIA.TABLA} SET {MEDIA.URL} = @{MEDIA.URL}, {MEDIA.MEDIA_ID} = @{MEDIA.MEDIA_ID} WHERE {MEDIA.ID} = @{MEDIA.ID}", nuevoMedia );
+        }
+
+        public async Task Borrar(int id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.ExecuteAsync($@"DELETE {MEDIA.TABLA} WHERE {MEDIA.ID} = @{MEDIA.ID} ", new { id });
         }
     }
 }

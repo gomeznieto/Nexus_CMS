@@ -55,34 +55,7 @@
 	<partial name="_ValidationScriptsPartial" />
 
     <script>
-        var imageLinks = [];
-
-        function addList(element) {
-            //Agregamos elemento al array
-            let select = element.parentNode.childNodes[0];
-            let input = element.parentNode.childNodes[1];
-
-            let valueSelect = select.value;
-            let valueInput = input.value;
-
-            imageLinks.push({ mediatype_id: valueSelect, url: valueInput });
-
-            //Modificamos la función del botón
-            element.classList.remove('btn-primary');
-            element.classList.add('btn-secondary');
-            element.innerHTML = "Editar";
-            element.onclick = function () {  editInput(element); }
-
-            //Deshabilitamos los cambios en el input
-            input.disabled = true;
-            input.classList.remove('input-style');
-            input.classList.add('input-style-disabled');
-
-            select.disabled = true;
-            select.classList.remove('input-style');
-            select.classList.add('input-style-disabled');
-         }
-
+  
         function addInput() {
             //Agregamos elemento nuevo para agragar nuevo medias
             var container = document.getElementById('inputContainer');
@@ -92,6 +65,7 @@
             // Creamos el select
             var select = document.createElement('select');
             select.className = 'form-select mb-3 select-style w-25';
+
             // Agregamos opciones al select utilizando los SelectListItem del modelo
             @foreach (var item in Model.mediaTypes)
             {
@@ -131,47 +105,6 @@
 
             // Agregamos el div al contenedor
             container.appendChild(div);
-        }
-
-        function editInput(element){
-
-            let select = element.parentNode.childNodes[0];
-            let input = element.parentNode.childNodes[1];
-            let valueSelect = select.value;
-            let valueInput = input.value;
-
-            //Eliminamos elemento
-            imageLinks = imageLinks.filter(x => x.valueSelect != valueSelect && x.valueInput != valueInput);
-
-            //Habilitamos input para edición
-            input.disabled = false;
-            input.classList.remove('input-style-disabled');
-            input.classList.add('input-style');
-
-            //Habilitamos el <select>
-            select.disabled = false;
-            select.classList.remove('input-style-disabled');
-            select.classList.add('input-style');
-
-            //Modificamos boton Editar a Agregar
-            element.classList.remove('btn-secondary');
-            element.classList.add('btn-primary');
-            element.innerHTML = "Agregar";
-
-            //Agregamos función de Agregar
-            element.onclick = function () { addList(element); }
-
-        }
-
-        function removeInput(element) {
-            let value = element.parentNode.childNodes[0].value;
-            imageLinks = imageLinks.filter(x => x != value);
-            element.parentNode.parentNode.removeChild(element.parentNode);
-        }
-
-        function enviarDatosAlServidor() {
-            // Actualiza el valor del campo oculto con los datos del array
-            document.getElementById('imageLinksField').value = JSON.stringify(imageLinks);
         }
 
     </script>

@@ -2,8 +2,10 @@
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text.Json;
 
 namespace Backend_portafolio.Controllers
@@ -36,12 +38,12 @@ namespace Backend_portafolio.Controllers
             _mapper = mapper;
 		}
 
-		/*
-		 * RUTAS
-		 * =====
-		 */
 
-		[HttpGet]
+        /* ---------------- */
+        /*      INDEX      */
+        /*    =========     */
+        /* ---------------- */
+        [HttpGet]
 
 		public async Task<IActionResult> Index(string format)
 		{
@@ -61,6 +63,11 @@ namespace Backend_portafolio.Controllers
 			return View(model);
 		}
 
+
+        /* ---------------- */
+        /*      CREAR      */
+        /*    =========     */
+        /* ---------------- */
         [HttpGet]
         public async Task <IActionResult> Crear(string format)
         {
@@ -123,9 +130,9 @@ namespace Backend_portafolio.Controllers
 			{
 				//Deserializamos string de media
                 List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-				List<Media> medias = new List<Media>();
 
-				_mapper.Map(mediaForms, medias);
+                //Mappeamos de MediaForm a Media
+                List<Media> medias = _mapper.Map<List<Media>>(mediaForms);
 
 				//Agregamos el numero de post creado a cada Media
                 foreach (var media in medias)
@@ -140,17 +147,23 @@ namespace Backend_portafolio.Controllers
             return RedirectToAction("Index", "Posts", new { format = viewModel.format });
         }
 
-		[HttpGet]
+
+        /* ---------------- */
+        /*      EDITAR      */
+        /*    =========     */
+        /* ---------------- */
+        [HttpGet]
 		public async Task<IActionResult> Editar(int id, string format)
 		{
 			var model = await _repositoryPosts.ObtenerPorId(id);
 
-			//Auto Mapper
+			//Mapeamos de Post a PostViewModel
 			var modelView = _mapper.Map<PostViewModel>(model);
 
 			modelView.user_id = _usersService.ObtenerUsuario();
 			modelView.categories = await ObtenerCategorias();
-            //modelView.formats = await ObtenerFormatos();
+			modelView.mediaTypes = await ObtenerMediaTypes();
+			modelView.mediaList = await _repositoryMedia.ObtenerPorPost(modelView.id);
 
             var formats = await _repositoryFormat.Obtener();
             modelView.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
@@ -162,7 +175,10 @@ namespace Backend_portafolio.Controllers
 		[HttpPost]
 		public async Task<IActionResult>Editar(PostViewModel viewModel)
 		{
-			if(!ModelState.IsValid)
+
+            /***** POST *****/
+
+            if (!ModelState.IsValid)
 			{
 				viewModel.categories = await ObtenerCategorias();
 				viewModel.formats = await ObtenerCategorias();
@@ -185,11 +201,61 @@ namespace Backend_portafolio.Controllers
 				return RedirectToAction("NoEncontrado", "Home");
 			}
 
-			await _repositoryPosts.Editar(viewModel);
+            await _repositoryPosts.Editar(viewModel);
+
+
+			/***** METAS *****/
+
+            if (!viewModel.mediaListString.IsNullOrEmpty())
+            {
+                //Deserializamos string de media
+                List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString);
+				List<Media> medias = new List<Media>();
+
+				//Verificamos si entre los datos tenemos que actualizar algunos
+				foreach (var mediaForm in mediaForms)
+				{
+                    Media aux = _mapper.Map<Media>(mediaForm);
+                    aux.post_id = viewModel.id;
+
+                    if (aux?.id is null)
+					{
+						//NUEVO
+						medias.Add(aux);
+                    }
+					else if(aux?.id is not null && aux?.url is not null )
+					{
+                        //ACTUALIZAMOS
+                        await _repositoryMedia.Editar(aux);
+					} 
+					else
+					{
+                        //ELIMINAMOS
+                        await _repositoryMedia.Borrar(aux.id);
+                    }
+                }
+
+				//Subimos MeiaLinks
+				await _repositoryMedia.Crear(medias);
+			}
+
+
+            /***** LINKS *****/
+
+			if(!viewModel.linkListString.IsNullOrEmpty())
+			{
+
+			}
+
 
             return RedirectToAction("Index", "Posts", new { format = viewModel.format });
         }
 
+
+        /* ---------------- */
+        /*      BORRAR      */
+        /*    =========     */
+        /* ---------------- */
         [HttpPost]
 		public async Task<IActionResult>Borrar(int id)
 		{
@@ -203,12 +269,8 @@ namespace Backend_portafolio.Controllers
 			return RedirectToAction("Index");
 		}
 
-		/*
-		 *  FUNCIONES
-		 *  =========
-		 */
 
-		private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
+        private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
 		{
 			var categories = await _repositoryCategorias.Obtener();
 			return categories.Select(category => new SelectListItem(category.name, category.id.ToString()));
@@ -224,10 +286,10 @@ namespace Backend_portafolio.Controllers
         {
             var mediaTypes = await _repositoryMediatype.Obtener();
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
-        }
+		}
 
 
-		/*
+        /*
 		 *  API
 		 *  ===
 		 */

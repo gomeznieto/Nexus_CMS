@@ -13,32 +13,51 @@
         <input type="hidden" asp-for="user_id" />
         <input type="hidden" asp-for="format_id" />
         <input type="hidden" asp-for="format" />
+        <input type="hidden" asp-for="mediaListString" id="imageLinksField" />
 
         <div class="mb-3">
-            <label asp-for="title" class="form-label"></label>
-            <input asp-for="title" class="form-control" />
-            <span asp-validation-for="title" class="text-danger"></span>
+            <input asp-for="title" class="form-control fs-2 fw-bolder" placeholder="Agregar titulo" />
+            <span asp-validation-for="title" class="form-error"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="description" class="form-label"></label>
-            <textarea asp-for="description" class="form-control textarea-style " rows="10"></textarea>
-            <span asp-validation-for="description" class="text-danger"></span>
+            <textarea asp-for="description" class="form-control textarea-style" rows="10" placeholder="Agregar contenido de la entrada"></textarea>
+            <span asp-validation-for="description" class="form-error"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="cover" class="form-label"></label>
-            <input asp-for="cover" class="form-control" />
-            <span asp-validation-for="cover" class="text-danger"></span>
+            <input asp-for="cover" class="form-control" placeholder="Agregar la imagen principal para ilustracion" />
+            <span asp-validation-for="cover" class="form-error"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="category_id" class="form-label"></label>
             <select asp-for="category_id" asp-items="Model.categories" class="form-select select-style"></select>
-            <span asp-validation-for="category_id" class="text-danger"></span>
+            <span asp-validation-for="category_id" class="form-error"></span>
         </div>
 
-        <button type="submit" class="btn btn-primary">Editar</button>
+        <h3 class="fs-5">Media</h3>
+        @foreach (var media in Model.mediaList)
+        {
+            <div class="input-group">
+                <select class="form-select mb-3 select-style w-25 input-style-disabled" disabled>
+                    @foreach (var types in Model.mediaTypes)
+                    {
+                        <option selected='@(types.Value == media.mediatype_id.ToString())' value='@types.Value'>@types.Text</option>
+                    }
+                </select>
+                <input asp-for="@media.url" id="@media.id" class="form-control mb-3 imgList imgAdd input-style w-50 me-2 input-style-disabled" disabled />
+                <button type="button" class="btn btn-secondary h-50 me-2" onclick="editInput(this)">Editar</button>
+                <button type="button" class="btn btn-danger h-50" onclick="removeInput(this)">Eliminar</button>
+            </div>
+        }
+
+        <div id="inputContainer"></div>
+        <button type="button" class="btn btn-secondary mb-3" onclick="addInput()">Agregar Multimedia</button>
+
+        <!-- Listado editable y eliminable de los media del usuario-->
+        <!-- Boton que permita seguir agregando media -->
+
+        <button type="submit" class="btn btn-primary" onclick="enviarDatosAlServidor()">Editar</button>
         <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-danger">Cancelar</a>
     </form>
 
@@ -47,4 +66,57 @@
 @section Scripts
 {
 	<partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function addInput() {
+            //Agregamos elemento nuevo para agragar nuevo medias
+            var container = document.getElementById('inputContainer');
+            var div = document.createElement('div');
+            div.className = 'input-group';
+
+            // Creamos el select
+            var select = document.createElement('select');
+            select.className = 'form-select mb-3 select-style w-25';
+
+            // Agregamos opciones al select utilizando los SelectListItem del modelo
+        @foreach (var item in Model.mediaTypes)
+        {
+            <text>
+                        var option = document.createElement("option");
+                option.text = "@item.Text";
+                option.value = "@item.Value";
+                select.add(option);
+            </text>
+        }
+                // Agregamos el select al div
+                div.appendChild(select);
+
+            // Creamos el input
+            var input = document.createElement('input');
+            input.className = 'form-control mb-3 imgList imgAdd input-style w-50';
+            input.placeholder = 'Ingrese link multimedia';
+            // Agregamos el input al div
+            div.appendChild(input);
+
+            // Creamos los botones
+            var addButton = document.createElement('button');
+            addButton.type = 'button';
+            addButton.className = 'btn btn-primary ms-2 h-50';
+            addButton.textContent = 'Agregar';
+            addButton.onclick = function () { addList(this); };
+            // Agregamos el botón al div
+            div.appendChild(addButton);
+
+            var removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'btn btn-danger ms-2 h-50';
+            removeButton.textContent = 'Eliminar';
+            removeButton.onclick = function () { removeInput(this); };
+            // Agregamos el botón al div
+            div.appendChild(removeButton);
+
+            // Agregamos el div al contenedor
+            container.appendChild(div);
+        }
+    </script>
 }

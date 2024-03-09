@@ -8,6 +8,6 @@ namespace Backend_portafolio.Models
 		public IEnumerable<SelectListItem> formats { get; set; }
 		public IEnumerable<SelectListItem> mediaTypes { get; set; }
         public string mediaListString { get; set; }
-		public IEnumerable<MediaForm> mediaForm { get; set; }
+        public string linkListString { get; set; }
     }
 }

@@ -9,8 +9,8 @@ namespace Backend_portafolio.Sevices
         {
             CreateMap<Post, PostViewModel>();
             CreateMap<MediaForm, Media>()
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => int.Parse(src.id)))
                 .ForMember(dest => dest.mediatype_id, opt => opt.MapFrom(src => int.Parse(src.mediatype_id)));
-
         }
     }
 }
