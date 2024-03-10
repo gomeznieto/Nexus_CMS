@@ -218,12 +218,12 @@ namespace Backend_portafolio.Controllers
                     Media aux = _mapper.Map<Media>(mediaForm);
                     aux.post_id = viewModel.id;
 
-                    if (aux?.id is null)
+                    if (aux?.id is 0)
 					{
 						//NUEVO
 						medias.Add(aux);
                     }
-					else if(aux?.id is not null && aux?.url is not null )
+					else if(aux?.id is not 0 && aux?.url is not null )
 					{
                         //ACTUALIZAMOS
                         await _repositoryMedia.Editar(aux);
