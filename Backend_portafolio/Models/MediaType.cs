@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Backend_portafolio.Models
 {
@@ -7,6 +8,7 @@ namespace Backend_portafolio.Models
         public int id { get; set; }
         [Display(Name = "Tipo de Medio")]
         [Required]
-        public string name { get; set; }
+		[Remote(action: "VerificarExisteCategoria", controller: "Mediatype")]
+		public string name { get; set; }
     }
 }

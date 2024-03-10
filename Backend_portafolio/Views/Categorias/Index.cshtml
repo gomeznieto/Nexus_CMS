@@ -9,36 +9,43 @@
 
 <a asp-action="Crear" class="btn btn-primary mb-3">Crear nuevo</a>
 
-<table class="table w-100">
-	<thead>
-		<tr>
-			<th>Categorias</th>
-			<th>Acciones</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach(var categoria in Model)
-		{
+@if(Model.Count() > 0)
+{
+	<table class="table w-100">
+		<thead>
 			<tr>
-				<td>
-					@categoria.name
-				</td>
-				<td>
-					<a class="btn btn-primary" asp-action="Editar" asp-route-id="@categoria.id">Editar</a>
-					<a class="btn btn-danger" onclick="openModal({id: '@categoria.id', name: '@categoria.name'})">Borrar</a>
-				</td>
+				<th>Categorias</th>
+				<th>Acciones</th>
 			</tr>
-		}
-	</tbody>
+		</thead>
+		<tbody>
+			@foreach (var categoria in Model)
+			{
+				<tr>
+					<td>
+						@categoria.name
+					</td>
+					<td>
+						<a class="btn btn-primary" asp-action="Editar" asp-route-id="@categoria.id">Editar</a>
+						<a class="btn btn-danger" onclick="openModal({id: '@categoria.id', name: '@categoria.name'})">Borrar</a>
+					</td>
+				</tr>
+			}
+		</tbody>
 
-</table>
+	</table>
+}
+else
+{
+	<h3>Aún no hay tipos de media. Comience creando uno apretandoen "Crear Nuevo"</h3>
+}
 
 @*MODAL PARA BORRAR - PASAR A UN PARTIAL*@
 <div class="closeModal" id="modal">
 	<div class="bgModal" onclick="closeModal()">
 		<div class="modalBorrar modal-content p-4">
 			<h4 id="modalMsg" class="mb-4"></h4>
-			<form asp-controller="Categorias" asp-action="Borrar" method="post">
+			<form asp-controller="Mediatype" asp-action="Borrar" method="post">
 				<input type="hidden" name="id" />
 				<button type="submit" class="btn btn-danger">Borrar</button>
 				<a class="btn btn-primary" onclick="closeModal()">Cancelar</a>
