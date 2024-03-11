@@ -28,7 +28,7 @@ namespace Backend_portafolio.Controllers
         /***************/
 
         [HttpGet]
-        public async Task<IActionResult> Crear()
+        public  IActionResult Crear()
         {
             return View();
         }
@@ -36,6 +36,23 @@ namespace Backend_portafolio.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Crear(MediaType mediaType)
 		{
+            //Validar Model
+            if(!ModelState.IsValid)
+            {
+                return View(mediaType);
+            }
+
+            //Validar que exista
+            var existe = await _repositoryMediatype.Existe(mediaType.name);
+
+            if(existe)
+            {
+                ModelState.AddModelError(null, "El media type ya existe");
+                return View(mediaType);
+            }
+
+            await _repositoryMediatype.Crear(mediaType);
+
             return RedirectToAction("Index");
 		}
 
@@ -79,26 +96,30 @@ namespace Backend_portafolio.Controllers
 			return RedirectToAction("Index");
 		}
 
-		/***************/
-		/*   BORRAR    */
-		/***************/
-
-        public async Task<IActionResult>Borrar(int id)
+        /***************/
+        /*   BORRAR    */
+        /***************/
+        [HttpPost]
+		public async Task<IActionResult>Borrar(int id)
         {
-            // Verificar si hay links con este tipo de media antes de borrar
-            //Si hay, no borrar. Emitir cartel que indique que primero debe borrar los links
-
 			//Verificamos si existe
 			var existe = await _repositoryMediatype.ObtenerPorId(id);
 
 			if (existe is null)
-			{
 				return RedirectToAction("NoExiste", "Home");
-			}
 
+            //Verificar si se encuentra en uso
+            var borrarTipo = await _repositoryMediatype.sePuedeBorrar(id);
+
+			if (!borrarTipo)
+            {
+			    return Json(new { error = true, mensaje = "No se puede borrar porque se encuentra en uso" });
+            }
+
+			//Borrar
             await _repositoryMediatype.Borrar(id);
 
-            return RedirectToAction("NoExiste", "Home");
+			return Json(new { error = false, mensaje = "Borrado con Éxito" });
 		}
 
 		/***************/

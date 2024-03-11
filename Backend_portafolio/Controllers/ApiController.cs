@@ -28,6 +28,7 @@ namespace Backend_portafolio.Controllers
 		{
 			//TODO: Validar Token
 
+			//TODO: Armar salida con toda la información
 
 			var categorias = await _repositoryCateogorias.Obtener();
 

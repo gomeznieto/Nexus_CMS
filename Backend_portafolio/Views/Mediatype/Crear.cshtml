@@ -1,0 +1,26 @@
+﻿@model MediaType
+
+@{
+	ViewData["Title"] = "Crear categoria";
+}
+
+<h1>Crear Tipo de Media para Links de las entradas</h1>
+<h5>La categoria se refiere a la etiqueta con la que quiera vincular un proyecto o una entrada de blog.</h5>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@* FORMULARIO *@
+<form asp-controller="Mediatype" asp-action="Crear">
+	<div class="mb-3">
+		<div class="flex-column">
+			<label asp-for="name" class="form-label"></label>
+			<input type="text" asp-for="name" class="form-control" />
+			<span asp-validation-for="name" class="text-danger"></span>
+		</div>
+		<button type="submit" class="btn btn-primary mt-3">Crear</button>
+		<a asp-action="Index" class="btn btn-secondary mt-3">cancelar</a>
+	</div>
+</form>
+
+@section Scripts
+{
+	<partial name="_ValidationScriptsPartial" />
+}

@@ -13,12 +13,42 @@ function closeModal() {
 	modal.classList.add("closeModal");
 }
 
+//MENU COLLAPSE
 $('.btn-expand-collapse').click(function (e) {
 	$('.navbar-primary').toggleClass('collapsed');
 });
 
-//ADD MEDIA
+//MODEL RESPUESTA
+async function verificarRespuestaModal(urlPath) {
+    const id = document.getElementsByName("id")[0].value;
+    const url = urlPath + id;
 
+    //Borar
+    const response = await fetch(url, {
+        method: 'POST'
+    });
+
+    const result = await response.json();
+
+    if (result.error) {
+        // Mostrar mensaje de error en el modal correspondiente
+        document.getElementById('mensajeModalError').innerText = result.mensaje;
+        document.getElementById('modalError').style.display = 'block';
+    } else {
+        // Mostrar mensaje de éxito en el modal correspondiente
+        document.getElementById('mensajeModalSuccess').innerText = result.mensaje;
+        document.getElementById('modalSuccess').style.display = 'block';
+    }
+
+    // Cerrar modal de borrado
+    closeModal();
+}
+
+function closeModalResult(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+//ADD MEDIA
 var imageLinks = [];
 
 /*

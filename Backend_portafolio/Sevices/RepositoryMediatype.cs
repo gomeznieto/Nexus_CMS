@@ -15,10 +15,12 @@ namespace Backend_portafolio.Sevices
     public interface IRepositoryMediatype
     {
 		Task Borrar(int id);
+		Task Crear(MediaType mediatype);
 		Task Editar(MediaType mediatype);
 		Task<bool> Existe(string name);
 		Task<IEnumerable<MediaType>> Obtener();
 		Task<MediaType> ObtenerPorId(int id);
+		Task<bool> sePuedeBorrar(int mediatype_id);
 	}
 
     public class RepositoryMediatype : IRepositoryMediatype
@@ -47,7 +49,13 @@ namespace Backend_portafolio.Sevices
 		}
 
 		//TODO CREAR
-
+		public async Task Crear(MediaType mediatype)
+		{
+			using var connection = new SqlConnection(_connectionString);
+			var id = await connection.QuerySingleAsync<int>($@"INSERT INTO {MEDIATYPE.TABLA} ({MEDIATYPE.NAME}) VALUES (@{MEDIATYPE.NAME}) 
+															SELECT SCOPE_IDENTITY()", mediatype);
+			mediatype.id = id;
+		}
 
 		//TODO EDITAR
 		public async Task Editar(MediaType mediaType)
@@ -79,6 +87,16 @@ namespace Backend_portafolio.Sevices
 						);
 
 			return existe;
+		}
+
+		public async Task<bool>sePuedeBorrar(int mediatype_id)
+		{
+			using var connection = new SqlConnection(_connectionString);
+
+			var cantidadDeLinksExistentes =  await connection.QuerySingleAsync<int>($@"SELECT COUNT({MEDIA.ID}) FROM {MEDIA.TABLA} 
+														WHERE {MEDIA.MEDIA_ID} = @{MEDIA.MEDIA_ID}", 
+														new { mediatype_id });
+			return cantidadDeLinksExistentes == 0;
 		}
 	}
 }

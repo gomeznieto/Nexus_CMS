@@ -107,6 +107,11 @@ namespace Backend_portafolio.Controllers
 			if (categoria == null)
 				return View("NoEncontrado", "Home");
 
+			var borrar = await _repositoryCategorias.sePuedeBorrar(id);
+
+			if(!borrar)
+				return Json("No se puede borrar porque se encuentra en uso");
+
 			await _repositoryCategorias.Borrar(id);
 
 			return RedirectToAction("Index");

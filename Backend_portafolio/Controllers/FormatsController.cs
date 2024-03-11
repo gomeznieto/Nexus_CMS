@@ -80,6 +80,10 @@ namespace Backend_portafolio.Controllers
 			if (existe is null)
 				return RedirectToAction("NoEncontrado", "Home");
 
+            var borrar = await _repositoryFormat.sePuedeBorrar(id);
+            if (!borrar)
+                return Json("No se puede borrar por encontrarse en uso");
+
             await _repositoryFormat.Borrar(id);
 
             //Actualizar Session de Formatos para barra de navegacion

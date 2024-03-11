@@ -129,7 +129,7 @@ VALUES ('img'), ('video'), ('file');
 -- SELECT * FROM format;
 -- SELECT * FROM category;
 SELECT * FROM post;
--- SELECT * FROM source
+-- SELECT * FROM sourcee
 SELECT * FROM mediatype
 SELECT * FROM media
 /* SELECTS INNER JOIN */
@@ -138,7 +138,20 @@ SELECT * FROM media
 -- INNER JOIN users U ON P.user_id = U.id
 -- INNER JOIN format F ON P.format_id = F.id;
 
-SELECT M.id, M.name 
+SELECT MT.id, M.url 
 FROM media M
 INNER JOIN mediatype MT
 ON MT.id = M.mediatype_id
+
+SELECT * FROM media WHERE post_id = 22
+
+UPDATE media SET url = '', mediatype_id=0 WHERE post_id = 0;
+
+SELECT * FROM media 
+SELECT * FROM mediatype
+SELECT COUNT(id) FROM media WHERE mediatype_id = 1
+
+SELECT id FROM mediatype WHERE id = 1;
+
+SELECT COUNT(id) FROM post WHERE category_id = 1
+SELECT COUNT(id) FROM post WHERE format_id = 1

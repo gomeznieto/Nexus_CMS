@@ -19,6 +19,7 @@ namespace Backend_portafolio.Sevices
 		Task<bool> Existe(string name);
 		Task<IEnumerable<Format>> Obtener();
 		Task<Format> ObtenerPorId(int id);
+		Task<bool> sePuedeBorrar(int format_id);
 	}
 
 	public class RepositoryFormat : IRepositoryFormat
@@ -76,6 +77,16 @@ namespace Backend_portafolio.Sevices
 						);
 
 			return existe;
+		}
+
+		public async Task<bool> sePuedeBorrar(int format_id)
+		{
+			using var connection = new SqlConnection(_connectionString);
+
+			var cantidadDePost = await connection.QuerySingleAsync<int>($@"SELECT COUNT({POST.ID}) FROM {POST.TABLA} 
+														WHERE {POST.FORMAT_ID} = @{POST.FORMAT_ID}",
+														new { format_id });
+			return cantidadDePost == 0;
 		}
 	}
 }

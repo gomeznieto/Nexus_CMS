@@ -1,0 +1,29 @@
+﻿@model MediaType
+@{
+	ViewData["Title"] = "Editar";
+}
+
+<h1>Editar @Model.name</h1>
+
+@* ERRORES *@
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+@* FORMULARIO *@
+<form asp-controller="Mediatype" asp-action="Editar">
+	<input type="hidden" asp-for="id" />
+	<div class="mb-3">
+		<div class="flex-column">
+			<label asp-for="name" class="form-label"></label>
+			<input type="text" asp-for="name" class="form-control" />
+			<span asp-validation-for="name" class="text-danger"></span>
+		</div>
+		<button type="submit" class="btn btn-primary mt-3">Actualizar</button>
+		<a asp-action="Index" class="btn btn-secondary mt-3">cancelar</a>
+	</div>
+</form>
+
+@* SCRIPTS DE LA PAGINA *@
+@section Scripts
+{
+	<partial name="_ValidationScriptsPartial" />
+}

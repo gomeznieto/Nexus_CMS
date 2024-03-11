@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<MediaType>
 @{
-    ViewData["Title"] = "Tipos de Media";
+	ViewData["Title"] = "Tipos de Media";
 }
 
 <h1>Mediatypes</h1>
@@ -37,11 +37,41 @@
 	<div class="bgModal" onclick="closeModal()">
 		<div class="modalBorrar modal-content p-4">
 			<h4 id="modalMsg" class="mb-4"></h4>
-			<form asp-controller="Categorias" asp-action="Borrar" method="post">
-				<input type="hidden" name="id" />
-				<button type="submit" class="btn btn-danger">Borrar</button>
+			<input type="hidden" name="id" />
+			<div class="d-flex gap-2">
+				<button type="submit" class="btn btn-danger" id="btnModalBorrar" onclick="verificarRespuestaModal('/Mediatype/Borrar/')">Borrar</button>
 				<a class="btn btn-primary" onclick="closeModal()">Cancelar</a>
-			</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+@*MODAL ERROR*@
+<div class="modal" id="modalError">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Error</h5>
+				<button type="button" class="close" onclick="closeModalResult('modalError')">&times;</button>
+			</div>
+			<div class="modal-body" id="mensajeModalError">
+				<!-- Mensaje de error -->
+			</div>
+		</div>
+	</div>
+</div>
+
+@*MODAL EXITO*@
+<div class="modal" id="modalSuccess">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Éxito</h5>
+				<button type="button" class="close" onclick="closeModalResult('modalSuccess')>&times;</button>
+			</div>
+			<div class="modal-body" id="mensajeModalSuccess">
+				<!-- Mensaje de éxito -->
+			</div>
 		</div>
 	</div>
 </div>

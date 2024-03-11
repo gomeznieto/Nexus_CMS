@@ -19,6 +19,7 @@ namespace Backend_portafolio.Sevices
 		Task<IEnumerable<Categoria>> Obtener();
 		Task<Categoria> ObtenerPorId(int id);
 		Task Borrar(int id);
+		Task<bool> sePuedeBorrar(int category_id);
 	}
 
 	public class RepositoryCategorias : IRepositoryCategorias
@@ -89,6 +90,17 @@ namespace Backend_portafolio.Sevices
 		{
 			using var connection = new SqlConnection(_connectionString);
 			await connection.ExecuteAsync($@"DELETE FROM {CATEGORIA.TABLA} WHERE {CATEGORIA.ID} = @{CATEGORIA.ID}", new { id });
+		}
+
+		//VERIFICAR SI SE PUEDE BORRAR
+		public async Task<bool> sePuedeBorrar(int category_id)
+		{
+			using var connection = new SqlConnection(_connectionString);
+
+			var cantidadDeLinksExistentes = await connection.QuerySingleAsync<int>($@"SELECT COUNT({POST.ID}) FROM {POST.TABLA} 
+														WHERE {POST.CATEGORIA_ID} = @{POST.CATEGORIA_ID}",
+														new { category_id });
+			return cantidadDeLinksExistentes == 0;
 		}
 	}
 }
