@@ -112,9 +112,7 @@ namespace Backend_portafolio.Controllers
             var borrarTipo = await _repositoryMediatype.sePuedeBorrar(id);
 
 			if (!borrarTipo)
-            {
-			    return Json(new { error = true, mensaje = "No se puede borrar porque se encuentra en uso" });
-            }
+			    return Json(new { error = true, mensaje = "No se puede borrar porque el tipo de media se encuentra en uso" });
 
 			//Borrar
             await _repositoryMediatype.Borrar(id);

@@ -2,10 +2,8 @@
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Text.Json;
 
 namespace Backend_portafolio.Controllers
@@ -40,8 +38,7 @@ namespace Backend_portafolio.Controllers
 
 
         /* ---------------- */
-        /*      INDEX      */
-        /*    =========     */
+        /*       INDEX      */
         /* ---------------- */
         [HttpGet]
 
@@ -65,8 +62,7 @@ namespace Backend_portafolio.Controllers
 
 
         /* ---------------- */
-        /*      CREAR      */
-        /*    =========     */
+        /*      CREAR       */
         /* ---------------- */
         [HttpGet]
         public async Task <IActionResult> Crear(string format)
@@ -150,7 +146,6 @@ namespace Backend_portafolio.Controllers
 
         /* ---------------- */
         /*      EDITAR      */
-        /*    =========     */
         /* ---------------- */
         [HttpGet]
 		public async Task<IActionResult> Editar(int id, string format)
@@ -254,19 +249,28 @@ namespace Backend_portafolio.Controllers
 
         /* ---------------- */
         /*      BORRAR      */
-        /*    =========     */
         /* ---------------- */
         [HttpPost]
 		public async Task<IActionResult>Borrar(int id)
 		{
+			//Verificar si existe
 			var post = await _repositoryPosts.ObtenerPorId(id);
 
 			if(post is null)
 				return View("NoEncontrado", "Home");
 
-			await _repositoryPosts.Borrar(id);
+			try
+			{
+				await _repositoryPosts.Borrar(id);
+			}
+			catch(Exception ex)
+			{
+				return Json(new { error = true, mensaje = "Se produjo un error" });
 
-			return RedirectToAction("Index");
+			}
+
+			return Json(new { error = false, mensaje = "Borrado con Éxito" });
+
 		}
 
 

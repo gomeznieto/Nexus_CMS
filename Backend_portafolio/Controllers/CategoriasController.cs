@@ -102,19 +102,23 @@ namespace Backend_portafolio.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Borrar(int id)
 		{
+			//Verificar si existe
 			var categoria = await _repositoryCategorias.ObtenerPorId(id);
 
 			if (categoria == null)
 				return View("NoEncontrado", "Home");
 
+
+			//Verificar si no está en uso
 			var borrar = await _repositoryCategorias.sePuedeBorrar(id);
 
 			if(!borrar)
-				return Json("No se puede borrar porque se encuentra en uso");
+				return Json(new { error = true, mensaje = "No se puede borrar porque se encuentra en uso" });
 
+			//Borrar
 			await _repositoryCategorias.Borrar(id);
 
-			return RedirectToAction("Index");
+			return Json(new { error = false, mensaje = "Borrado con Éxito" });
 		}
 	}
 }

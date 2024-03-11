@@ -71,7 +71,10 @@ namespace Backend_portafolio.Controllers
 			return RedirectToAction("Index");
 		}
 
-        [HttpPost]
+		/***************/
+		/*   BORRAR    */
+		/***************/
+		[HttpPost]
         public async Task<IActionResult>Borrar(int id)
 		{
 
@@ -81,16 +84,22 @@ namespace Backend_portafolio.Controllers
 				return RedirectToAction("NoEncontrado", "Home");
 
             var borrar = await _repositoryFormat.sePuedeBorrar(id);
-            if (!borrar)
-                return Json("No se puede borrar por encontrarse en uso");
 
-            await _repositoryFormat.Borrar(id);
+            if (!borrar)
+				return Json(new { error = true, mensaje = "No se puede borrar porque el formato se encuentra en uso" });
+
+			await _repositoryFormat.Borrar(id);
 
             //Actualizar Session de Formatos para barra de navegacion
             await Helper.Session.UpdateSession(HttpContext, _repositoryFormat);
 
-            return RedirectToAction("Index");
+			return Json(new { error = false, mensaje = "Borrado con Éxito" });
 		}
+
+
+		/***************/
+		/*  FUNCIONES  */
+		/***************/
 
 		[HttpGet]
 		public async Task<IActionResult> VerificarExisteFormato(string name)

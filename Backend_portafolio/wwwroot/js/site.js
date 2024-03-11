@@ -22,13 +22,15 @@ $('.btn-expand-collapse').click(function (e) {
 async function verificarRespuestaModal(urlPath) {
     const id = document.getElementsByName("id")[0].value;
     const url = urlPath + id;
-
+    console.log(url)
     //Borar
     const response = await fetch(url, {
         method: 'POST'
     });
 
     const result = await response.json();
+
+    console.log(result)
 
     if (result.error) {
         // Mostrar mensaje de error en el modal correspondiente
@@ -46,6 +48,7 @@ async function verificarRespuestaModal(urlPath) {
 
 function closeModalResult(modalId) {
     document.getElementById(modalId).style.display = 'none';
+    location.reload();
 }
 
 //ADD MEDIA
