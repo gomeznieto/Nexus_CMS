@@ -13,15 +13,29 @@ namespace Backend_portafolio.Controllers
 			_repositoryCategorias = repositoryCategorias;
 		}
 
+		/************/
+		/*  INDEX  */
+		/************/
 		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
-			var categorias = await _repositoryCategorias.Obtener();
-			
-			return View(categorias.OrderBy(x => x.name).ToList());
+			try
+			{
+				var categorias = await _repositoryCategorias.Obtener();
+
+				return View(categorias.OrderBy(x => x.name).ToList());
+			} catch (Exception ex)
+			{
+				return RedirectToAction("Index", "Home");
+			}
 		}
 
-        [HttpGet]
+
+		/************/
+		/*  CREAR   */
+		/************/
+
+		[HttpGet]
 		public IActionResult Crear()
 		{
 			return View() ;
@@ -53,17 +67,10 @@ namespace Backend_portafolio.Controllers
 			return RedirectToAction("Index");
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> VerificarExisteCategoria(string name)
-		{
-			var existeCategoria = await _repositoryCategorias.Existe(name);
 
-			if(existeCategoria)
-				return Json($"El nombre {name} ya existe!");
-
-			return Json(true);
-
-		}
+		/************/
+		/*  EDITAR  */
+		/************/
 
 		[HttpGet]
 		public async Task<IActionResult> Editar(int id)
@@ -99,6 +106,11 @@ namespace Backend_portafolio.Controllers
 			return RedirectToAction("Index");
 		}
 
+
+		/************/
+		/*  BORRAR  */
+		/************/
+
 		[HttpPost]
 		public async Task<IActionResult> Borrar(int id)
 		{
@@ -119,6 +131,21 @@ namespace Backend_portafolio.Controllers
 			await _repositoryCategorias.Borrar(id);
 
 			return Json(new { error = false, mensaje = "Borrado con Éxito" });
+		}
+
+		/***************/
+		/*  FUNCIONES  */
+		/***************/
+		[HttpGet]
+		public async Task<IActionResult> VerificarExisteCategoria(string name)
+		{
+			var existeCategoria = await _repositoryCategorias.Existe(name);
+
+			if (existeCategoria)
+				return Json($"El nombre {name} ya existe!");
+
+			return Json(true);
+
 		}
 	}
 }

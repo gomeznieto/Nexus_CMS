@@ -37,244 +37,287 @@ namespace Backend_portafolio.Controllers
 		}
 
 
-        /* ---------------- */
-        /*       INDEX      */
-        /* ---------------- */
-        [HttpGet]
+		/***********/
+		/*  INDEX  */
+		/***********/
+
+		[HttpGet]
 
 		public async Task<IActionResult> Index(string format)
 		{
-			var posts = await _repositoryPosts.ObtenerPorFormato(format);
-			var model = posts
-				.GroupBy(p => p.format)
-				.Select(p => new ListPostViewModel()
-				{
-					format = p.Key,
-					posts = p.AsEnumerable(),
+			try
+			{
+				var posts = await _repositoryPosts.ObtenerPorFormato(format);
+				var model = posts
+					.GroupBy(p => p.format)
+					.Select(p => new ListPostViewModel()
+					{
+						format = p.Key,
+						posts = p.AsEnumerable(),
 
-				}).ToList();
+					}).ToList();
 
-			//Formato para retornar al listado correspondiente
-			ViewBag.Format = format;
+				//Formato para retornar al listado correspondiente
+				ViewBag.Format = format;
 
-			return View(model);
+				return View(model);
+			}
+			catch (Exception ex)
+			{
+				return RedirectToAction("Index", "Home");
+			}
 		}
 
 
-        /* ---------------- */
-        /*      CREAR       */
-        /* ---------------- */
-        [HttpGet]
+		/***********/
+		/*  CREAR  */
+		/***********/
+
+		[HttpGet]
         public async Task <IActionResult> Crear(string format)
         {
-			var usuarioID = _usersService.ObtenerUsuario();
-	
-			var model = new PostViewModel();
+			try
+			{
+				var usuarioID = _usersService.ObtenerUsuario();
 
-			model.user_id = usuarioID;
-			model.format = format;
+				var model = new PostViewModel();
 
-			//Obtenemos el formato de la entrada creada
-			var formats = await _repositoryFormat.Obtener();
-            model.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
-            model.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
+				model.user_id = usuarioID;
+				model.format = format;
 
-			//Obtenemos Categorias Select List
-			model.categories = await ObtenerCategorias();
+				//Obtenemos el formato de la entrada creada
+				var formats = await _repositoryFormat.Obtener();
+				model.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
+				model.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
 
-			//Obtenemos Media Types Select List
-			model.mediaTypes = await ObtenerMediaTypes();
+				//Obtenemos Categorias Select List
+				model.categories = await ObtenerCategorias();
 
-            return View(model);
+				//Obtenemos Media Types Select List
+				model.mediaTypes = await ObtenerMediaTypes();
+
+				return View(model);
+			}
+			catch(Exception ex)
+			{
+				return RedirectToAction("Index", "Home");
+			}
         }
 
 		[HttpPost]
 		public async Task<IActionResult> Crear(PostViewModel viewModel)
 		{
-			//verificamos que el model state sea valido antes de continuar
-			if(!ModelState.IsValid)
+			try
 			{
-				viewModel.categories = await ObtenerCategorias();
-				//viewModel.formats = await ObtenerCategorias();
-
-                return View(viewModel);
-			}
-
-			//Verificamos que la categoria que nos mandan exista
-			var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
-
-			if(categoria is null)
-			{
-				return RedirectToAction("NoEncontrado", "Home");
-			}
-
-			//Verificamos que el formato que nos mandan exista
-			var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
-
-			if (Formato is null)
-			{
-				return RedirectToAction("NoEncontrado", "Home");
-			}
-
-			//Colocamos fecha actual
-			viewModel.created_at = DateTime.Today;
-
-			await _repositoryPosts.Crear(viewModel);
-
-			//Subir Media
-			if (!viewModel.mediaListString.IsNullOrEmpty())
-			{
-				//Deserializamos string de media
-                List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                //Mappeamos de MediaForm a Media
-                List<Media> medias = _mapper.Map<List<Media>>(mediaForms);
-
-				//Agregamos el numero de post creado a cada Media
-                foreach (var media in medias)
+				//verificamos que el model state sea valido antes de continuar
+				if (!ModelState.IsValid)
 				{
-					media.post_id = viewModel.id;
+					viewModel.categories = await ObtenerCategorias();
+					//viewModel.formats = await ObtenerCategorias();
+
+					return View(viewModel);
 				}
 
-				//Subimos MeiaLinks
-				await _repositoryMedia.Crear(medias);
+				//Verificamos que la categoria que nos mandan exista
+				var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
+
+				if (categoria is null)
+				{
+					return RedirectToAction("NoEncontrado", "Home");
+				}
+
+				//Verificamos que el formato que nos mandan exista
+				var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
+
+				if (Formato is null)
+				{
+					return RedirectToAction("NoEncontrado", "Home");
+				}
+
+				//Colocamos fecha actual
+				viewModel.created_at = DateTime.Today;
+
+				await _repositoryPosts.Crear(viewModel);
+
+				//Subir Media
+				if (!viewModel.mediaListString.IsNullOrEmpty())
+				{
+					//Deserializamos string de media
+					List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+					//Mappeamos de MediaForm a Media
+					List<Media> medias = _mapper.Map<List<Media>>(mediaForms);
+
+					//Agregamos el numero de post creado a cada Media
+					foreach (var media in medias)
+					{
+						media.post_id = viewModel.id;
+					}
+
+					//Subimos MeiaLinks
+					await _repositoryMedia.Crear(medias);
+				}
+
+				//Subir links
+
+				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+			} 
+			catch (Exception ex)
+			{
+				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+
 			}
-
-            return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-        }
+		}
 
 
-        /* ---------------- */
-        /*      EDITAR      */
-        /* ---------------- */
-        [HttpGet]
+		/************/
+		/*  EDITAR  */
+		/************/
+		[HttpGet]
 		public async Task<IActionResult> Editar(int id, string format)
 		{
-			var model = await _repositoryPosts.ObtenerPorId(id);
+			try
+			{
+				var model = await _repositoryPosts.ObtenerPorId(id);
 
-			//Mapeamos de Post a PostViewModel
-			var modelView = _mapper.Map<PostViewModel>(model);
+				//Mapeamos de Post a PostViewModel
+				var modelView = _mapper.Map<PostViewModel>(model);
 
-			modelView.user_id = _usersService.ObtenerUsuario();
-			modelView.categories = await ObtenerCategorias();
-			modelView.mediaTypes = await ObtenerMediaTypes();
-			modelView.mediaList = await _repositoryMedia.ObtenerPorPost(modelView.id);
+				modelView.user_id = _usersService.ObtenerUsuario();
+				modelView.categories = await ObtenerCategorias();
+				modelView.mediaTypes = await ObtenerMediaTypes();
+				modelView.mediaList = await _repositoryMedia.ObtenerPorPost(modelView.id);
 
-            var formats = await _repositoryFormat.Obtener();
-            modelView.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
-			modelView.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
+				var formats = await _repositoryFormat.Obtener();
+				modelView.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
+				modelView.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
 
-            return View(modelView);
+				return View(modelView);
+			}
+			catch (Exception ex)
+			{
+				return RedirectToAction("Index", "Home");
+			}
 		}
 
 		[HttpPost]
 		public async Task<IActionResult>Editar(PostViewModel viewModel)
 		{
-
-            /***** POST *****/
-
-            if (!ModelState.IsValid)
+			try
 			{
-				viewModel.categories = await ObtenerCategorias();
-				viewModel.formats = await ObtenerCategorias();
-				return View(viewModel);
-			}
+				/***** POST *****/
 
-			//Verificamos que la categoria que nos mandan exista
-			var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
-
-			if (categoria is null)
-			{
-				return RedirectToAction("NoEncontrado", "Home");
-			}
-
-			//Verificamos que el formato que nos mandan exista
-			var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
-
-			if (Formato is null)
-			{
-				return RedirectToAction("NoEncontrado", "Home");
-			}
-
-            await _repositoryPosts.Editar(viewModel);
-
-
-			/***** METAS *****/
-
-            if (!viewModel.mediaListString.IsNullOrEmpty())
-            {
-                //Deserializamos string de media
-                List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString);
-				List<Media> medias = new List<Media>();
-
-				//Verificamos si entre los datos tenemos que actualizar algunos
-				foreach (var mediaForm in mediaForms)
+				if (!ModelState.IsValid)
 				{
-                    Media aux = _mapper.Map<Media>(mediaForm);
-                    aux.post_id = viewModel.id;
+					viewModel.categories = await ObtenerCategorias();
+					viewModel.formats = await ObtenerCategorias();
+					return View(viewModel);
+				}
 
-                    if (aux?.id is 0)
-					{
-						//NUEVO
-						medias.Add(aux);
-                    }
-					else if(aux?.id is not 0 && aux?.url is not null )
-					{
-                        //ACTUALIZAMOS
-                        await _repositoryMedia.Editar(aux);
-					} 
-					else
-					{
-                        //ELIMINAMOS
-                        await _repositoryMedia.Borrar(aux.id);
-                    }
-                }
+				//Verificamos que la categoria que nos mandan exista
+				var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
 
-				//Subimos MeiaLinks
-				await _repositoryMedia.Crear(medias);
+				if (categoria is null)
+				{
+					return RedirectToAction("NoEncontrado", "Home");
+				}
+
+				//Verificamos que el formato que nos mandan exista
+				var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
+
+				if (Formato is null)
+				{
+					return RedirectToAction("NoEncontrado", "Home");
+				}
+
+				await _repositoryPosts.Editar(viewModel);
+
+
+				/***** METAS *****/
+
+				if (!viewModel.mediaListString.IsNullOrEmpty())
+				{
+					//Deserializamos string de media
+					List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString);
+					List<Media> medias = new List<Media>();
+
+					//Verificamos si entre los datos tenemos que actualizar algunos
+					foreach (var mediaForm in mediaForms)
+					{
+						Media aux = _mapper.Map<Media>(mediaForm);
+						aux.post_id = viewModel.id;
+
+						if (aux?.id is 0)
+						{
+							//NUEVO
+							medias.Add(aux);
+						}
+						else if (aux?.id is not 0 && aux?.url is not null)
+						{
+							//ACTUALIZAMOS
+							await _repositoryMedia.Editar(aux);
+						}
+						else
+						{
+							//ELIMINAMOS
+							await _repositoryMedia.Borrar(aux.id);
+						}
+					}
+
+					//Subimos MeiaLinks
+					await _repositoryMedia.Crear(medias);
+				}
+
+
+				/***** LINKS *****/
+
+				if (!viewModel.linkListString.IsNullOrEmpty())
+				{
+
+				}
+
+
+				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 			}
-
-
-            /***** LINKS *****/
-
-			if(!viewModel.linkListString.IsNullOrEmpty())
+			catch (Exception ex)
 			{
-
+				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 			}
-
-
-            return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+            
         }
 
 
-        /* ---------------- */
-        /*      BORRAR      */
-        /* ---------------- */
-        [HttpPost]
+		/************/
+		/*  BORRAR  */
+		/************/
+		[HttpPost]
 		public async Task<IActionResult>Borrar(int id)
 		{
-			//Verificar si existe
-			var post = await _repositoryPosts.ObtenerPorId(id);
-
-			if(post is null)
-				return View("NoEncontrado", "Home");
-
 			try
 			{
+				//Verificar si existe
+				var post = await _repositoryPosts.ObtenerPorId(id);
+
+				if(post is null)
+					return View("NoEncontrado", "Home");
+
 				await _repositoryPosts.Borrar(id);
+
+				return Json(new { error = false, mensaje = "Borrado con Éxito" });
 			}
 			catch(Exception ex)
 			{
 				return Json(new { error = true, mensaje = "Se produjo un error" });
 
 			}
-
-			return Json(new { error = false, mensaje = "Borrado con Éxito" });
-
 		}
 
+		/*****************/
+		/*   FUNCIONES   */
+		/*****************/
 
-        private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
+
+		private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
 		{
 			var categories = await _repositoryCategorias.Obtener();
 			return categories.Select(category => new SelectListItem(category.name, category.id.ToString()));
@@ -293,14 +336,13 @@ namespace Backend_portafolio.Controllers
 		}
 
 
-        /*
-		 *  API
-		 *  ===
-		 */
+		/***********/
+		/*   API   */
+		/***********/
 
-        //API - TODO: HEADERS CON TOKEN
+		//API - TODO: HEADERS CON TOKEN
 
-        [HttpGet]
+		[HttpGet]
         [Route("api/[controller]/get")]
         public async Task<IActionResult> ObtenerJSON()
         {

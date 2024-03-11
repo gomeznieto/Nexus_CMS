@@ -7,9 +7,16 @@ namespace Backend_portafolio.Helper
     {
         public static async Task UpdateSession(HttpContext httpContext, IRepositoryFormat repositoryFormat)
         {
-            var formats = await repositoryFormat.Obtener();
-            var formatsJson = JsonSerializer.Serialize(formats.ToList());
-            httpContext.Session.SetString("Formats", formatsJson);
+			try
+			{
+				var formats = await repositoryFormat.Obtener();
+				var formatsJson = JsonSerializer.Serialize(formats.ToList());
+				httpContext.Session.SetString("Formats", formatsJson);
+			}
+			catch (Exception)
+			{
+				throw new Exception("Se ha producido un error");
+			}
         }
     }
 }

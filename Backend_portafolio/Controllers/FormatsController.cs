@@ -1,6 +1,7 @@
 ﻿using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.SqlServer.Server;
 
 namespace Backend_portafolio.Controllers
 {
@@ -13,14 +14,31 @@ namespace Backend_portafolio.Controllers
             _repositoryFormat = repositoryFormat;
         }
 
-        public async Task<IActionResult> Index()
-        {
-            var formats = await _repositoryFormat.Obtener();
+		/***********/
+		/*  INDEX  */
+		/***********/
 
-            return View(formats);
+		public async Task<IActionResult> Index()
+        {
+			try
+			{
+				var formats = await _repositoryFormat.Obtener();
+
+				return View(formats);
+			}
+			catch (Exception ex)
+			{
+
+				return RedirectToAction("Index", "Home");
+			}
         }
 
-        [HttpGet]
+
+		/***********/
+		/*  CREAR  */
+		/***********/
+
+		[HttpGet]
         public IActionResult Crear()
         {
             return View();
@@ -29,46 +47,76 @@ namespace Backend_portafolio.Controllers
         [HttpPost]
         public async Task<IActionResult> Crear(Format model)
         {
-            if(!ModelState.IsValid)
-            {
-                return View(model);
-            }
+			try
+			{
+				//Validamos Model
+				if (!ModelState.IsValid)
+				{
+					return View(model);
+				}
 
-            await _repositoryFormat.Crear(model);
+				//Creamos formato
+				await _repositoryFormat.Crear(model);
 
-            //Actualizar Session de Formatos para barra de navegacion
-            await Helper.Session.UpdateSession(HttpContext, _repositoryFormat);
+				//Actualizar Session de Formatos para barra de navegacion
+				await Helper.Session.UpdateSession(HttpContext, _repositoryFormat);
 
-            return RedirectToAction("Index");
-        }
+				return RedirectToAction("Index");
+			}
+			catch (Exception ex)
+			{
+				return RedirectToAction("Index");
+			}
+		}
 
         [HttpGet]
 		public async Task<IActionResult> Editar(int id)
 		{
-			var format = await _repositoryFormat.ObtenerPorId(id);
-            
-            if(format is null)
-				return RedirectToAction("NoEncontrado", "Home");
+			try
+			{
+				//verificamos si existe
+				var format = await _repositoryFormat.ObtenerPorId(id);
 
-			return View(format);
+				if (format is null)
+					return RedirectToAction("NoEncontrado", "Home");
+
+				return View(format);
+			}
+			catch (Exception)
+			{
+				return RedirectToAction("Index", "Home");
+			}
 		}
+
+
+		/***********/
+		/*  EDITAR */
+		/***********/
 
 		[HttpPost]
         public async Task<IActionResult> Editar(Format model)
         {
-			if (!ModelState.IsValid)
+			try
 			{
-				return View(model);
+				//Verificamos Model
+				if (!ModelState.IsValid)
+					return View(model);
+
+				//Verificamos si existe
+				var existe = await _repositoryFormat.ObtenerPorId(model.id);
+
+				if (existe is null)
+					return RedirectToAction("NoEncontrado", "Home");
+
+				//Editamos
+				await _repositoryFormat.Editar(model);
+
+				return RedirectToAction("Index");
 			}
-
-            var existe = await _repositoryFormat.ObtenerPorId(model.id);
-
-            if(existe is null)
-				return RedirectToAction("NoEncontrado", "Home");
-
-			await _repositoryFormat.Editar(model);
-
-			return RedirectToAction("Index");
+			catch (Exception)
+			{
+				return RedirectToAction("Index");
+			}
 		}
 
 		/***************/
@@ -77,23 +125,29 @@ namespace Backend_portafolio.Controllers
 		[HttpPost]
         public async Task<IActionResult>Borrar(int id)
 		{
+			try
+			{
+				var existe = await _repositoryFormat.ObtenerPorId(id);
 
-			var existe = await _repositoryFormat.ObtenerPorId(id);
+				if (existe is null)
+					return RedirectToAction("NoEncontrado", "Home");
 
-			if (existe is null)
-				return RedirectToAction("NoEncontrado", "Home");
+				var borrar = await _repositoryFormat.sePuedeBorrar(id);
 
-            var borrar = await _repositoryFormat.sePuedeBorrar(id);
+				if (!borrar)
+					return Json(new { error = true, mensaje = "No se puede borrar porque el formato se encuentra en uso" });
 
-            if (!borrar)
-				return Json(new { error = true, mensaje = "No se puede borrar porque el formato se encuentra en uso" });
+				await _repositoryFormat.Borrar(id);
 
-			await _repositoryFormat.Borrar(id);
+				//Actualizar Session de Formatos para barra de navegacion
+				await Helper.Session.UpdateSession(HttpContext, _repositoryFormat);
 
-            //Actualizar Session de Formatos para barra de navegacion
-            await Helper.Session.UpdateSession(HttpContext, _repositoryFormat);
-
-			return Json(new { error = false, mensaje = "Borrado con Éxito" });
+				return Json(new { error = false, mensaje = "Borrado con Éxito" });
+			}
+			catch (Exception)
+			{
+				return Json(new { error = true, mensaje = "Se producjo un error al momento de intentar borrar. Pruebe en otro momento!" });
+			}
 		}
 
 
@@ -104,21 +158,36 @@ namespace Backend_portafolio.Controllers
 		[HttpGet]
 		public async Task<IActionResult> VerificarExisteFormato(string name)
 		{
-			var existeCategoria = await _repositoryFormat.Existe(name);
+			try
+			{
+				var existeCategoria = await _repositoryFormat.Existe(name);
 
-			if (existeCategoria)
-				return Json($"El nombre {name} ya existe!");
+				if (existeCategoria)
+					return Json($"El nombre {name} ya existe!");
 
-			return Json(true);
+				return Json(true);
+			}
+			catch (Exception)
+			{
+
+				return Json($"Se produjo un error al intentear validar {name}. Intente con otro nombre o en otro momento!");
+			}
 
 		}
 
         [HttpGet]
         [Route("api/[controller]/get")]
-        public async Task<IActionResult> ObtenerJSON()
+        public async Task<IActionResult> apiJSON()
         {
-            var formatos = await _repositoryFormat.Obtener();
-            return Json(formatos);
+			try
+			{
+				var formatos = await _repositoryFormat.Obtener();
+				return Json(formatos);
+			}
+			catch (Exception)
+			{
+				return Json(new { error = true, mensaje = "Se ha producido un error."});
+			}
         }
     }
 }

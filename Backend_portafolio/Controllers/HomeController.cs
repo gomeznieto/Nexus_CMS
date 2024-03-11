@@ -19,9 +19,17 @@ namespace Backend_portafolio.Controllers
 
 		public async Task<IActionResult> Index()
 		{
-			await Helper.Session.UpdateSession(HttpContext, _repositoriyFormat);
+			try
+			{
+				await Helper.Session.UpdateSession(HttpContext, _repositoriyFormat);
 
-            return View();
+				return View();
+			}
+			catch (Exception)
+			{
+
+				return View();
+			}
 		}
 
 		public IActionResult NoEncontrado()
