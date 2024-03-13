@@ -4,41 +4,40 @@
 }
 
 <h1>@ViewBag.Format</h1>
-<a asp-action="Crear" asp-route-format="@ViewBag.Format" class="btn btn-primary">Crear nuevo @ViewBag.Format </a>
+<a asp-action="Crear" asp-route-format="@ViewBag.Format" class="btn btn-action">Crear nuevo @ViewBag.Format </a>
 	@foreach (var format in Model)
 	{
-		<table class="table">
-
-			<thead>
-				<tr>
-					<th>Titulo</th>
-					<th>Categoria</th>
-					<th>Formato</th>
-					<th>Creación</th>
-					<th>Acciones</th>
-				</tr>
-			</thead>
-
-			<tbody>
-				@foreach (var post in format.posts)
-				{
-					if(format.posts.Count() != 0)
+		<div class="border-table">
+		<table class="table table-borderless">
+			<thead class="table-text-color text-uppercase border-bottom table-border-row-color">
+					<tr class="table-titles">
+					<th scope="col" class="col-4">Titulo</th>
+					<th scope="col" class="col-4">Categoria</th>
+					<th scope="col" class="col-2">Formato</th>
+					<th scope="col" class="col-2">Creación</th>
+					<th scope="col" class="col-3">Acciones</th>
+					</tr>
+				</thead>
+			<tbody class="table-body">
+					@foreach (var post in format.posts)
 					{
-						<tr>
-							<td>@post.title</td>
-							<td>@post.category</td>
-							<td>@post.format</td>
-							<td>@post.created_at.ToShortDateString()</td>
-							<td>
-							<a class="btn btn-primary" asp-action="Editar" asp-route-id="@post.id" asp-route-format="@ViewBag.Format">Editar</a>
-								<a class="btn btn-danger" onclick="openModal({id: '@post.id', name: '@post.title'})" )>Borrar</a>
-							</td>
-						</tr>
+						if (format.posts.Count() != 0)
+						{
+						<tr class="@(post == format.posts.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
+								<td>@post.title</td>
+								<td>@post.category</td>
+								<td>@post.format</td>
+								<td>@post.created_at.ToShortDateString()</td>
+								<td class="d-flex gap-2">
+								<a class="btn btn-edit" asp-action="Editar" asp-route-id="@post.id" asp-route-format="@ViewBag.Format">Editar</a>
+								<a class="btn btn-delete" onclick="openModal({id: '@post.id', name: '@post.title'})" )>Borrar</a>
+								</td>
+							</tr>
+						}
 					}
-				}
-			</tbody>
-
-		</table>
+				</tbody>
+			</table>
+		</div>
 	}
 
 <!-- MODAL -->

@@ -3,31 +3,34 @@
     ViewData["Title"] = "Formato de entradas";
 }
 
-<a asp-action="Crear" class="btn btn-primary">Crear un nuevo formato</a>
-<table class="table">
+<h1 class="mb-3">Listado de Formatos</h1>
+<p class="fs-6 mb-3">Categorias que se utilizan para organizar las entradas.</p>
+<a asp-action="Crear" class="btn btn-action">Crear nuevo formato</a>
 
-	<thead>
-		<tr>
-			<th>Titulo</th>
-			<th>Acciones</th>
-		</tr>
-	</thead>
+<div class="border-table">
+	<table class="table table-borderless">
+		<thead class="table-text-color text-uppercase border-bottom table-border-row-color">
+			<tr class="table-titles">
+				<th class="col-10">Formatos</th>
+				<th class="col-2">Acciones</th>
+			</tr>
+		</thead>
 
-	<tbody>
-		@foreach (var format in Model)
-		{
-			<tr>
-				<td>@format.name</td>
+		<tbody>
+			@foreach (var format in Model)
+			{
+				<tr class="@(format == Model.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
+					<td>@format.name</td>
+					<td class="d-flex gap-2">
+						<a class="btn btn-action" asp-action="Editar" asp-route-id="@format.id">Editar</a>
+						<a class="btn btn-delete" onclick="openModal({id: '@format.id', name: '@format.name'})" )>Borrar</a>
+					</td>
+				</tr>
+			}
+		</tbody>
 
-				<td>
-					<a class="btn btn-primary" asp-action="Editar" asp-route-id="@format.id">Editar</a>
-					<a class="btn btn-danger" onclick="openModal({id: '@format.id', name: '@format.name'})" )>Borrar</a>
-				</td>
-			</tr>		
-		}
-	</tbody>
-
-</table>
+	</table>
+</div>
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Formats" }' />

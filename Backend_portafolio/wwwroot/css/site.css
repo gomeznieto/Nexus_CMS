@@ -8,9 +8,16 @@
     --color-border-focus: rgb(99, 179, 237);
     --bg-input: rgb(45, 55, 72);
     --bg-menu-focus: rgb(32, 64, 68);
-    --color-border-focus: rgb(63, 68, 78);
+    --btn-color-border-focus: rgb(50, 105, 153);
     --text-color-error: rgb(252, 129, 129);
     --text-color-disabled: rgb(63, 68, 78);
+    --bg-btn-action: #81E6D9;
+    --bg-btn-action-hover: rgb(79, 209, 197);
+    --bg-btn-delete: rgb(254, 178, 178);
+    --bg-btn-delete-hover: rgb(252, 129, 129);
+    --bg-btn-edit: rgb(144, 205, 244);
+    --bg-btn-edit-hover: rgb(99, 179, 237);
+    color-scheme: dark;
 }
 
 html {
@@ -230,3 +237,66 @@ form label {
     top: 0;
     left: 0;
 }
+
+/* TABLE */
+.table-text-color {
+    color: var(--text-color-menu);
+}
+
+.table {
+    margin-top: 1rem;
+    width: 100%;
+    font-size: 14px;
+}
+
+.border-table {
+    margin-top: 1rem;
+    padding: 1rem 2rem;
+    border: 2px solid var(--text-color-disabled);
+    border-radius: 15px;
+}
+
+.table-border-row-color {
+    border-bottom: 1px solid var(--text-color-disabled) !important;
+}
+
+
+/* BUTTOM */
+.btn-font{
+    font-weight: 600;
+}
+
+.btn-action {
+    font-weight: 600;
+    background-color: var(--bg-btn-action);
+}
+    .btn-action:hover {
+        background-color: var(--bg-btn-action-hover);
+    }
+    .btn-action:focus {
+        border: 3px solid var(--btn-color-border-focus);
+    }
+
+.btn-edit {
+    font-weight: 600;
+    background-color: var(--bg-btn-edit)
+}
+
+    .btn-edit:hover {
+        background-color: var(--bg-btn-edit-hover)
+    }
+
+    .btn-edit:focus {
+        border: 3px solid var(--btn-color-border-focus);
+    }
+
+.btn-delete {
+    font-weight: 600;
+    background-color: var(--bg-btn-delete)
+}
+    .btn-delete:hover {
+        background-color: var(--bg-btn-delete-hover)
+    }
+    .btn-delete:focus {
+        border: 3px solid var(--btn-color-border-focus);
+    }

@@ -1,7 +1,6 @@
 ﻿using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.SqlServer.Server;
 
 namespace Backend_portafolio.Controllers
 {

@@ -3,35 +3,35 @@
 	ViewData["Title"] = "Tipos de Media";
 }
 
-<h1>Mediatypes</h1>
-<h5>Categorias que se utilizan para organizar las entradas.</h5>
+<h1 class="mb-3">Listado de Tipos de Media</h1>
+<p class="fs-6 mb-3">Categorias que se utilizan para organizar las entradas.</p>
 
-<a asp-action="Crear" class="btn btn-primary mb-3">Crear nuevo</a>
-
-<table class="table w-100">
-	<thead>
-		<tr>
-			<th>Media types</th>
-			<th>Acciones</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var mediatype in Model)
-		{
-			<tr>
-				<td>
-					@mediatype.name
-				</td>
-				<td>
-					<a class="btn btn-primary" asp-action="Editar" asp-route-id="@mediatype.id">Editar</a>
-					<a class="btn btn-danger" onclick="openModal({id: '@mediatype.id', name: '@mediatype.name'})">Borrar</a>
-				</td>
+<a asp-action="Crear" class="btn btn-action mb-3">Crear nuevo tipo de media</a>
+<div class="border-table">
+	<table class="table table-borderless">
+		<thead class="table-text-color text-uppercase border-bottom table-border-row-color">
+			<tr class="table-titles">
+				<th class="col-10">Media types</th>
+				<th class="col-2">Acciones</th>
 			</tr>
-		}
-	</tbody>
+		</thead>
+		<tbody>
+			@foreach (var mediatype in Model)
+			{
+				<tr class="@(mediatype == Model.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
+					<td>
+						@mediatype.name
+					</td>
+					<td class="d-flex gap-2">
+						<a class="btn btn-edit" asp-action="Editar" asp-route-id="@mediatype.id">Editar</a>
+						<a class="btn btn-delete" onclick="openModal({id: '@mediatype.id', name: '@mediatype.name'})">Borrar</a>
+					</td>
+				</tr>
+			}
+		</tbody>
 
-</table>
-
+	</table>
+</div>
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Mediatype" }' />
