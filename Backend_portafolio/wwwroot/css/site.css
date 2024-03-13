@@ -1,10 +1,13 @@
 :root {
+    --bg-red: rgb(252, 129, 129);
+    --bg-red-hover: rgb(254, 178, 178);
     --bg-color-primary: #1a202c;
     --bg-color-menu-primary: #181c27;
     --text-color-primary: white;
     --text-color-menu: rgb(160, 174, 192);
     --text-colot-menu-hover: rgb(255, 255, 255);
     --bg-color-icon: rgb(79, 209, 197);
+    --color-border-icons: rgb(63, 68, 78);
     --color-border-focus: rgb(99, 179, 237);
     --bg-input: rgb(45, 55, 72);
     --bg-menu-focus: rgb(32, 64, 68);
@@ -17,6 +20,10 @@
     --bg-btn-delete-hover: rgb(252, 129, 129);
     --bg-btn-edit: rgb(144, 205, 244);
     --bg-btn-edit-hover: rgb(99, 179, 237);
+    --bg-btn-add: rgb(183, 194, 218);
+    --bg-btn-add-hover: rgb(100, 130, 192);
+    --bg-modal-close: rgb(57, 67, 83);
+    --bg-modal: rgb(45, 55, 72);
     color-scheme: dark;
 }
 
@@ -62,7 +69,7 @@ body {
 .iconos {
     font-size: 16px;
     color: var(--bg-color-icon);
-    border: 1px solid var(--color-border-focus);
+    border: 1px solid var(--color-border-icons);
     padding: 4px;
     border-radius: 5px;
 }
@@ -101,7 +108,7 @@ body {
 
     .iconos {
         font-size: 12px;
-        border: 1px solid var(--color-border-focus);
+        border: 1px solid var(--color-border-icons);
         padding: 4px;
         border-radius: 5px;
     }
@@ -208,12 +215,21 @@ form label {
     display: none;
 }
 
-.modalBorrar {
+.modal-danger{
+    background-color: var(--bg-red)
+}
+
+#modalError,
+#modalSuccess{
+    display: none;
+}
+
+.modalAlert{
     position: fixed;
-    top: 50%;
+    top: 25%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #fff;
+    background-color: var(--bg-modal);
     border: 1px solid #000;
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
@@ -222,7 +238,7 @@ form label {
 }
 
 .modal-content {
-    color: #000;
+    color: #fff;
 }
 
 .btn {
@@ -233,10 +249,23 @@ form label {
     position: absolute;
     width: 100vw;
     height: 100vh;
-    background-color: rgb(200, 200, 200, 0.5);
+    background-color: rgb(0, 0, 0, 0.5);
     top: 0;
     left: 0;
 }
+
+.btn-close-modal {
+    font-size: 20px;
+    color: var(--bg-red) !important;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all ease-in-out 0.2s;
+}
+
+    .btn-close-modal:hover {
+        color: var(--bg-red-hover) !important;
+    }
+
 
 /* TABLE */
 .table-text-color {
@@ -298,5 +327,18 @@ form label {
         background-color: var(--bg-btn-delete-hover)
     }
     .btn-delete:focus {
+        border: 3px solid var(--btn-color-border-focus);
+    }
+
+.btn-add {
+    font-weight: 600;
+    background-color: var(--bg-btn-add)
+}
+
+    .btn-add:hover {
+        background-color: var(--bg-btn-add-hover)
+    }
+
+    .btn-add:focus {
         border: 3px solid var(--btn-color-border-focus);
     }

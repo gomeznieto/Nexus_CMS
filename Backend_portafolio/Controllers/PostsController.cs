@@ -303,11 +303,11 @@ namespace Backend_portafolio.Controllers
 
 				await _repositoryPosts.Borrar(id);
 
-				return Json(new { error = false, mensaje = "Borrado con Éxito" });
+				return Json(new { error = false, mensaje = "¡La entrada ha sido borrada correctamente!" });
 			}
 			catch(Exception ex)
 			{
-				return Json(new { error = true, mensaje = "Se produjo un error" });
+				return Json(new { error = true, mensaje = "La entrada no se pudo borrar.\n¡Se ha producido un error!" });
 
 			}
 		}

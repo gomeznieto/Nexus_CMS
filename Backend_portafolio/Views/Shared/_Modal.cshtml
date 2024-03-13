@@ -2,42 +2,49 @@
 @*MODAL PARA BORRAR - PASAR A UN PARTIAL*@
 <div class="closeModal" id="modal">
 	<div class="bgModal" onclick="closeModal()">
-		<div class="modalBorrar modal-content p-4">
-			<h4 id="modalMsg" class="mb-4"></h4>
+		<div class="modalAlert modal-content p-4">
+			<h4 class="text-center fs-5 fw-bold">Advertencia</h4>
+			<p id="modalMsg" class="mb-4 text-center"></p>
 			<input type="hidden" name="id" />
-			<div class="d-flex gap-2">
-				<button type="submit" class="btn btn-danger" id="btnModalBorrar" onclick="verificarRespuestaModal('@Model.url/Borrar/')">Borrar </button>
-				<a class="btn btn-primary" onclick="closeModal()">Cancelar</a>
+			<div class="d-flex gap-2 justify-content-center">
+				<button type="submit" class="btn btn-delete" id="btnModalBorrar" onclick="verificarRespuestaModal('@Model.url/Borrar/')">Borrar </button>
+				<a class="btn btn-edit" onclick="closeModal()">Cancelar</a>
 			</div>
 		</div>
 	</div>
 </div>
 
 @*MODAL ERROR*@
-<div class="modal" id="modalError">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
+<div id="modalError">
+	<div class="bgModal" onclick="closeModalResult('modalError')">
+		<div class="modalAlert">
+			<div class="d-flex justify-content-between p-3">
 				<h5 class="modal-title">Error</h5>
-				<button type="button" class="close" onclick="closeModalResult('modalError')">&times;</button>
+				<a class="btn-close-modal" onclick="closeModalResult('modalError')">&times;</a>
 			</div>
-			<div class="modal-body" id="mensajeModalError">
-				<!-- Mensaje de error -->
+			<div class="modal-body mb-3 d-flex flex-column justify-content-center align-items-center gap-4">
+				<div class="rounded-circle modal-danger d-flex justify-content-center align-items-center p-3">
+					<i class="fa-solid fa-xmark text-gray fs-1"></i>
+				</div>
+				<p id="mensajeModalError" class="fs-5 text-center"></p>
 			</div>
 		</div>
 	</div>
 </div>
 
 @*MODAL EXITO*@
-<div class="modal" id="modalSuccess">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
+<div id="modalSuccess">
+	<div class="bgModal" onclick="closeModalResult('modalError')">
+		<div class="modalAlert">
+			<div class="d-flex justify-content-between p-3 mb-3">
 				<h5 class="modal-title">Éxito</h5>
-				<button type="button" class="close" onclick="closeModalResult('modalSuccess')">&times;</button>
+				<a class="btn-close-modal" onclick="closeModalResult('modalError')">&times;</a>
 			</div>
-			<div class="modal-body" id="mensajeModalSuccess">
-				<!-- Mensaje de éxito -->
+			<div class="modal-body mb-3 d-flex flex-column justify-content-center align-items-center gap-4">
+				<div class="rounded-circle bg-success d-flex justify-content-center align-items-center p-3">
+					<i class="fa-solid fa-check text-white fs-1"></i>
+				</div>
+				<p id="mensajeModalSuccess" class="fs-5 text-center"></p>
 			</div>
 		</div>
 	</div>

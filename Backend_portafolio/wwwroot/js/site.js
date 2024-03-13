@@ -22,20 +22,19 @@ $('.btn-expand-collapse').click(function (e) {
 async function verificarRespuestaModal(urlPath) {
     const id = document.getElementsByName("id")[0].value;
     const url = urlPath + id;
-    console.log(url)
-    //Borar
+
+    //Borrar
     const response = await fetch(url, {
         method: 'POST'
     });
 
     const result = await response.json();
 
-    console.log(result)
-
     if (result.error) {
         // Mostrar mensaje de error en el modal correspondiente
         document.getElementById('mensajeModalError').innerText = result.mensaje;
         document.getElementById('modalError').style.display = 'block';
+
     } else {
         // Mostrar mensaje de éxito en el modal correspondiente
         document.getElementById('mensajeModalSuccess').innerText = result.mensaje;

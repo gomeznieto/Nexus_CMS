@@ -48,21 +48,21 @@
                     }
                 </select>
                 <input asp-for="@media.url" id="@media.id" class="form-control mb-3 imgList imgAdd input-style w-50 me-2 input-style-disabled" disabled />
-                <button type="button" class="btn btn-secondary h-50 me-2" onclick="editInput(this)">Editar</button>
-                <button type="button" class="btn btn-danger h-50" onclick="removeInput(this)">Eliminar</button>
+                <button type="button" class="btn btn-edit h-50 me-2" onclick="editInput(this)">Editar</button>
+                <button type="button" class="btn btn-delete h-50" onclick="removeInput(this)">Eliminar</button>
             </div>
         }
 
         <div id="inputContainer"></div>
 
         <!-- Boton que permita seguir agregando media -->
-        <button type="button" class="btn btn-secondary mb-3 d-flex" onclick="addInput()">Agregar Multimedia</button>
+        <button type="button" class="btn btn-add mb-3 d-flex" onclick="addInput()">Agregar Multimedia</button>
 
         <h3 class="fs-5">Links</h3>
-        <button type="button" class="btn btn-secondary mb-5 d-flex" >Agregar Link</button>
+        <button type="button" class="btn btn-add mb-5 d-flex" >Agregar Link</button>
 
-        <button type="submit" class="btn btn-primary" onclick="enviarDatosAlServidor()">Editar</button>
-        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-danger">Cancelar</a>
+        <button type="submit" class="btn btn-edit" onclick="enviarDatosAlServidor()">Editar</button>
+        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete">Cancelar</a>
     </form>
 
 </div>
@@ -105,7 +105,7 @@
             // Creamos los botones
             var addButton = document.createElement('button');
             addButton.type = 'button';
-            addButton.className = 'btn btn-primary ms-2 h-50';
+            addButton.className = 'btn btn-action ms-2 h-50';
             addButton.textContent = 'Agregar';
             addButton.onclick = function () { addList(this); };
             // Agregamos el botón al div
@@ -113,7 +113,7 @@
 
             var removeButton = document.createElement('button');
             removeButton.type = 'button';
-            removeButton.className = 'btn btn-danger ms-2 h-50';
+            removeButton.className = 'btn btn-delete ms-2 h-50';
             removeButton.textContent = 'Eliminar';
             removeButton.onclick = function () { removeInput(this); };
             // Agregamos el botón al div

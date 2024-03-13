@@ -4,19 +4,18 @@
 	ViewData["Title"] = "Crear categoria";
 }
 
-<h1>Crear Formato de Entrada</h1>
-<h5>La categoria se refiere a la etiqueta con la que quiera vincular un proyecto o una entrada de blog.</h5>
+<h1 class="mb-3">Crear Formato de Entrada</h1>
+<p class="mb-5 fs-6">El Formato es la manera de agrupar distintas entradas (Blog, Tutorial, Viaje, Proyecto...) </p>
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 @* FORMULARIO *@
 <form asp-controller="Formats" asp-action="Crear">
 	<div class="mb-3">
 		<div class="flex-column">
-			<label asp-for="name" class="form-label"></label>
-			<input type="text" asp-for="name" class="form-control" />
+			<input type="text" asp-for="name" class="form-control" placeholder="Ingrese el Formato que quiere crear" />
 			<span asp-validation-for="name" class="text-danger"></span>
 		</div>
-		<button type="submit" class="btn btn-primary mt-3">Crear</button>
-		<a asp-action="Index" class="btn btn-secondary mt-3">cancelar</a>
+		<button type="submit" class="btn btn-action mt-3">Crear</button>
+		<a asp-action="Index" class="btn btn-delete mt-3">cancelar</a>
 	</div>
 </form>
 
