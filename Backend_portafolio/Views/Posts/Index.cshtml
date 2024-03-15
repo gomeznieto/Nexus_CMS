@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ListPostViewModel>
+﻿@model IEnumerable<Post>
 @{
 	ViewData["Title"] = "Entradas";
 }
@@ -6,15 +6,18 @@
 <h1>@ViewBag.Format</h1>
 <div class="d-flex justify-content-between align-items-center">
 	<a asp-action="Crear" asp-route-format="@ViewBag.Format" class="btn btn-action">Crear nuevo @ViewBag.Format </a>
-	<div class="d-flex justify-content-center align-items-center gap-2">
-		<input type="text" class="form-control input-style" placeholder="Buscar entrada..." />
+
+	<!-- BUSCADOR-->
+	<form method="post" asp-action="Index" class="d-flex justify-content-center align-items-center gap-2">
+		<input type="hidden" name="format" value="@ViewBag.Format"/>
+		<input type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
 		<div class="input-group-append">
-			<a class="btn btn-action">Buscar</a>
+			<button type="submit" class="btn btn-action" @* onclick="buscarPost(this)" *@>Buscar</button>
 		</div>
-	</div>
+	</form>
+
 </div>
-	@foreach (var format in Model)
-	{
+
 		<div class="border-table mb-3">
 			<table class="table table-borderless">
 				<thead class="table-text-color text-uppercase border-bottom table-border-row-color">
@@ -27,11 +30,11 @@
 					</tr>
 				</thead>
 			<tbody class="table-body">
-					@foreach (var post in format.posts)
+					@foreach (var post in Model)
 					{
-						if (format.posts.Count() != 0)
+						if (Model.Count() != 0)
 						{
-						<tr class="@(post == format.posts.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
+						<tr class="@(post == Model.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
 								<td>@post.title</td>
 								<td>@post.category</td>
 								<td>@post.format</td>
@@ -46,7 +49,6 @@
 				</tbody>
 			</table>
 		</div>
-	}
 
 <nav class="w-100 d-flex justify-content-center">
 	<ul class="pagination justify-content-end">

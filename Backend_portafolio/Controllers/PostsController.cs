@@ -3,6 +3,7 @@ using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 
@@ -47,20 +48,35 @@ namespace Backend_portafolio.Controllers
 		{
 			try
 			{
-				var posts = await _repositoryPosts.ObtenerPorFormato(format);
-				var model = posts
-					.GroupBy(p => p.format)
-					.Select(p => new ListPostViewModel()
-					{
-						format = p.Key,
-						posts = p.AsEnumerable(),
-
-					}).ToList();
+				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format);
 
 				//Formato para retornar al listado correspondiente
 				ViewBag.Format = format;
 
-				return View(model);
+				return View(posts);
+			}
+			catch (Exception ex)
+			{
+				return RedirectToAction("Index", "Home");
+			}
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Index(string format, string buscar)
+		{
+			try
+			{
+				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format);
+
+				if (!buscar.IsNullOrEmpty())
+				{
+					posts = posts.Where(p => p.title.ToUpper().Contains(buscar.ToUpper()));
+				}
+
+				//Formato para retornar al listado correspondiente
+				ViewBag.Format = format;
+
+				return View(posts);
 			}
 			catch (Exception ex)
 			{

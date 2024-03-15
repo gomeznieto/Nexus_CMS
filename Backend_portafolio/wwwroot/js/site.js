@@ -209,3 +209,12 @@ function enviarDatosAlServidor() {
     document.getElementById('imageLinksField').value = JSON.stringify(imageLinks);
     imageLinks = [];
 }
+
+/* BUSCAR */
+function buscarPost(element) {
+
+    let nodeElementsClean = cleanNodes(element.parentNode)
+
+    const inputValue = nodeElementsClean[0].value;
+    window.location.href = `Posts?format=Project&buscar=${inputValue}`;
+}
