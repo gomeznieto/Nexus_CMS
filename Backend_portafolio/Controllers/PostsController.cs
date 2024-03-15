@@ -110,7 +110,7 @@ namespace Backend_portafolio.Controllers
 			try
 			{
 				//verificamos que el model state sea valido antes de continuar
-				if (!ModelState.IsValid)
+                if (!ModelState.IsValid)
 				{
 					viewModel.categories = await ObtenerCategorias();
 					//viewModel.formats = await ObtenerCategorias();

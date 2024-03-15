@@ -4,12 +4,20 @@
 }
 
 <h1>@ViewBag.Format</h1>
-<a asp-action="Crear" asp-route-format="@ViewBag.Format" class="btn btn-action">Crear nuevo @ViewBag.Format </a>
+<div class="d-flex justify-content-between align-items-center">
+	<a asp-action="Crear" asp-route-format="@ViewBag.Format" class="btn btn-action">Crear nuevo @ViewBag.Format </a>
+	<div class="d-flex justify-content-center align-items-center gap-2">
+		<input type="text" class="form-control input-style" placeholder="Buscar entrada..." />
+		<div class="input-group-append">
+			<a class="btn btn-action">Buscar</a>
+		</div>
+	</div>
+</div>
 	@foreach (var format in Model)
 	{
-		<div class="border-table">
-		<table class="table table-borderless">
-			<thead class="table-text-color text-uppercase border-bottom table-border-row-color">
+		<div class="border-table mb-3">
+			<table class="table table-borderless">
+				<thead class="table-text-color text-uppercase border-bottom table-border-row-color">
 					<tr class="table-titles">
 					<th scope="col" class="col-4">Titulo</th>
 					<th scope="col" class="col-4">Categoria</th>
@@ -39,6 +47,22 @@
 			</table>
 		</div>
 	}
+
+<nav class="w-100 d-flex justify-content-center">
+	<ul class="pagination justify-content-end">
+
+		<li class="page-item">
+			<button class="page-link bg-pagination" href="#" tabindex="-1" disabled>Anterior</button>
+		</li>
+
+		<li class="page-item"><a class="page-link bg-pagination" href="#">1</a></li>
+
+		<li class="page-item">
+			<button class="page-link bg-pagination" href="#">Siguiente</button>
+		</li>
+
+	</ul>
+</nav>
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Posts" }' />

@@ -342,3 +342,29 @@ form label {
     .btn-add:focus {
         border: 3px solid var(--btn-color-border-focus);
     }
+
+/* PAGINATION */
+.bg-pagination {
+    background-color: var(--bg-input) !important;
+    color: var(--text-color-primary);
+    border-color: var(--color-border-icons);
+}
+
+    .bg-pagination:hover {
+        background-color: var(--bg-color-primary) !important;
+        color: var(--text-color-primary);
+        border-color: var(--color-border-focus);
+    }
+
+    .bg-pagination:disabled,
+    .bg-pagination[disabled] {
+        color: var(--text-color-menu);
+        opacity: 1;
+        border-color: var(--color-border-icons);
+    }
+
+        .bg-pagination:disabled:hover,
+        .bg-pagination[disabled]:hover {
+            background-color: var(--bg-input) !important;
+            border-color: none !important;
+        }
