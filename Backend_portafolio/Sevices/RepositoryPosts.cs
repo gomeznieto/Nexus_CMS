@@ -23,7 +23,8 @@ namespace Backend_portafolio.Sevices
 		public const string CATEGORIA = "category";
 		public const string USER = "userName";
 		public const string NOMBRE = "name";
-	}
+		public const string CANTIDAD = "cantidad";
+    }
 
 	public interface IRepositoryPosts
 	{
@@ -32,7 +33,8 @@ namespace Backend_portafolio.Sevices
 		Task Editar(Post post);
         Task EditarBorrador(int id, bool editar);
         Task<IEnumerable<Post>> Obtener();
-        Task<IEnumerable<Post>> ObtenerPorFormato(string name);
+        Task<int> ObtenerCantidadPorFormato(string formato);
+        Task<IEnumerable<Post>> ObtenerPorFormato(string name, int page);
         Task<Post> ObtenerPorId(int id);
 	}
 
@@ -74,7 +76,7 @@ namespace Backend_portafolio.Sevices
 			return await connection.QueryAsync<Post>(query);
 		}
 
-        public async Task<IEnumerable<Post>> ObtenerPorFormato(string name)
+        public async Task<IEnumerable<Post>> ObtenerPorFormato(string name, int page)
         {
             using var connection = new SqlConnection(_connectionString);
 
@@ -88,7 +90,9 @@ namespace Backend_portafolio.Sevices
 						INNER JOIN {FORMAT.TABLA}
 						F ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
 						WHERE F.{FORMAT.NOMBRE} = @{FORMAT.NOMBRE}
-						ORDER BY P.{POST.CREADO} DESC;";
+						ORDER BY P.{POST.CREADO} DESC
+						OFFSET {(page-1) * 4} ROWS
+						FETCH NEXT {4} ROWS ONLY;";
 			 
             var postList = await connection.QueryAsync<Post>(query, new { name });
 			return postList;
@@ -109,7 +113,17 @@ namespace Backend_portafolio.Sevices
 								WHERE P.{POST.ID} = @{POST.ID}", new { id });
 		}
 
-		public async Task Editar(Post post)
+		public async Task<int> ObtenerCantidadPorFormato(string name)
+		{
+            using var connection = new SqlConnection(_connectionString);
+			return await connection.QueryFirstAsync<int>($@"SELECT COUNT(P.{POST.ID}) 
+															FROM {POST.TABLA} P
+															INNER JOIN {FORMAT.TABLA} F
+															ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
+															WHERE F.{FORMAT.NOMBRE} = @{FORMAT.NOMBRE}", new { name });
+        }
+
+        public async Task Editar(Post post)
 		{
 			using var connection = new SqlConnection(_connectionString);
 			await connection.ExecuteAsync($@"UPDATE {POST.TABLA} 

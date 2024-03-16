@@ -1,9 +1,14 @@
 ﻿@model IEnumerable<Post>
 @{
 	ViewData["Title"] = "Entradas";
+
+	int pageValue;
+	if (!int.TryParse(ViewContext.HttpContext.Request.Query["page"], out pageValue))
+	{
+		pageValue = 1;
+	}
 }
 
-<h1>@ViewBag.Format</h1>
 <div class="d-flex justify-content-between align-items-center">
 	<a asp-action="Crear" asp-route-format="@ViewBag.Format" class="btn btn-action">Crear nuevo @ViewBag.Format </a>
 
@@ -57,15 +62,24 @@
 <nav class="w-100 d-flex justify-content-center">
 	<ul class="pagination justify-content-end">
 
-		<li class="page-item">
-			<button class="page-link bg-pagination" href="#" tabindex="-1" disabled>Anterior</button>
-		</li>
+		@if (pageValue != 1)
+		{
+			<li class="page-item">
+				<a class="page-link bg-pagination" href="/Posts/?format=@ViewBag.Format&page=@((pageValue - 1).ToString())"><i class="fa-solid fa-chevron-left"></i></a>
+			</li>
+		}
 
-		<li class="page-item"><a class="page-link bg-pagination" href="#">1</a></li>
+		@for (int i = 1; i <= ViewBag.Cantidad / 4; i++)
+		{
+			<li class="page-item"><a class="page-link @(pageValue == i ? "bg-pagination-active" : "bg-pagination")" href="/Posts/?format=@ViewBag.Format&page=@(i.ToString())">@(i)</a></li>
+		}
 
-		<li class="page-item">
-			<button class="page-link bg-pagination" href="#">Siguiente</button>
-		</li>
+		@if ((pageValue) < (ViewBag.Cantidad / 4))
+		{
+			<li class="page-item">
+				<a class="page-link bg-pagination" href="/Posts/?format=@ViewBag.Format&page=@((pageValue + 1).ToString())"><i class="fa-solid fa-chevron-right"></i></a>
+			</li>
+		}
 
 	</ul>
 </nav>

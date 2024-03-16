@@ -371,6 +371,11 @@ form label {
             background-color: var(--bg-input) !important;
             border-color: none !important;
         }
+.bg-pagination-active {
+    background-color: var(--bg-btn-action);
+    color: var(--text-color-disabled);
+    border-color: var(--color-border-icons);
+}
 
 /* PUBLICADO - BORRADOR */
 

@@ -44,14 +44,15 @@ namespace Backend_portafolio.Controllers
 
 		[HttpGet]
 
-		public async Task<IActionResult> Index(string format)
+		public async Task<IActionResult> Index(string format, int page = 1)
 		{
 			try
 			{
-				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format);
+				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, page);
 
 				//Formato para retornar al listado correspondiente
 				ViewBag.Format = format;
+				ViewBag.Cantidad = await _repositoryPosts.ObtenerCantidadPorFormato(format);
 
 				return View(posts);
 			}
@@ -62,12 +63,12 @@ namespace Backend_portafolio.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Index(string format, string buscar)
+		public async Task<IActionResult> Index(string format, string buscar, int page = 1)
 		{
 			try
 			{
-				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format);
-
+				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, page);
+				
 				if (!buscar.IsNullOrEmpty())
 				{
 					posts = posts.Where(p => p.title.ToUpper().Contains(buscar.ToUpper()));
