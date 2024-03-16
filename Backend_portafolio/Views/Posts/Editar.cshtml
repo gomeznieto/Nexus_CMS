@@ -11,8 +11,10 @@
     <form asp-action="Editar" method="post" class="mt-5">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
         <input type="hidden" asp-for="user_id" />
+        <input type="hidden" asp-for="id" id="post_id" />
         <input type="hidden" asp-for="format_id" />
         <input type="hidden" asp-for="format" />
+        <input type="hidden" asp-for="draft" id="draftCheckBox" />
         <input type="hidden" asp-for="mediaListString" id="imageLinksField" />
 
         <div class="mb-3">
@@ -37,6 +39,7 @@
 
         <h3 class="fs-5">Media</h3>
 
+        <!-- MULTIMEDIA -->
         <!-- Listado editable y eliminable de los media del usuario-->
         @foreach (var media in Model.mediaList)
         {
@@ -58,11 +61,21 @@
         <!-- Boton que permita seguir agregando media -->
         <button type="button" class="btn btn-add mb-3 d-flex" onclick="addInput()">Agregar Multimedia</button>
 
+        <!--LINKS-->
         <h3 class="fs-5">Links</h3>
         <button type="button" class="btn btn-add mb-5 d-flex" >Agregar Link</button>
 
+        <!-- CHECKBOX BORRADOR -->
+        <div class="mb-3">
+            @* <p>Guardar como borrador</p>
+            <input type="checkbox" asp-for="draft" /> *@
+
+        </div>
+
         <button type="submit" class="btn btn-edit" onclick="enviarDatosAlServidor()">Editar</button>
-        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete">Cancelar</a>
+        <button type="button" asp-route-format="@Model.format" id="btnBorrador" class="btn btn-borrador" onclick="borrador()">@(Model.draft ? "Publicar" : "Borrador")</button>
+        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-arrow-rotate-left"></i> Regresar</a>
+
     </form>
 
 </div>
@@ -70,6 +83,7 @@
 @section Scripts
 {
 	<partial name="_ValidationScriptsPartial" />
+    <partial name="_Modal" model='new { url = "/Posts" }' />
 
     <script>
         function addInput() {

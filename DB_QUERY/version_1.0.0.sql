@@ -41,7 +41,9 @@ CREATE TABLE post (
     FOREIGN KEY (user_id) REFERENCES users(id),
     format_id INT NOT NULL,
     FOREIGN KEY (format_id) REFERENCES format(id),
-    created_at DATE NOT NULL DEFAULT GETDATE()
+    created_at DATETIME  NOT NULL DEFAULT GETDATE(),
+    modify_at DATETIME  DEFAULT NULL,
+    draft BIT NOT NULL DEFAULT 0
 );
 
 /* FUENTE */
@@ -114,7 +116,27 @@ INSERT INTO category (name) VALUES ('Web Development'), ('C++'), ('C#'), ('.NET'
 
 --INSER POST
 INSERT INTO post (title, description, cover, category_id, user_id, format_id, created_at)
-VALUES ('Post 1', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 2, 1, 1, GETDATE());
+VALUES 
+('Post 1', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 2, 1, 1, GETDATE()),
+('Post 2', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 2, 1, 2, GETDATE()),
+('Post 3', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 3, 1, 3, GETDATE()),
+('Post 4', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 4, 1, 1, GETDATE()),
+('Post 5', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 1, 1, 2, GETDATE()),
+('Post 6', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 2, 1, 3, GETDATE()),
+('Post 7', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 3, 1, 1, GETDATE()),
+('Post 8', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 4, 1, 2, GETDATE()),
+('Post 9', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 1, 1, 3, GETDATE()),
+('Post 10', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 2, 1, 1, GETDATE()),
+('Post 11', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 3, 1, 2, GETDATE()),
+('Post 12', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 4, 1, 3, GETDATE()),
+('Post 13', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 1, 1, 1, GETDATE()),
+('Post 14', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 2, 1, 2, GETDATE()),
+('Post 15', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 3, 1, 3, GETDATE()),
+('Post 16', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 4, 1, 1, GETDATE()),
+('Post 17', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 1, 1, 2, GETDATE()),
+('Post 18', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 2, 1, 3, GETDATE()),
+('Post 19', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 3, 1, 1, GETDATE()),
+('Post 20', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae.', 'https://via.placeholder.com/150', 4, 1, 2, GETDATE());
 
 --SOURCE
 INSERT INTO source (name, icon)
@@ -123,35 +145,3 @@ VALUES ('Github', 'fa-brands fa-github'),('vmeo', 'fa-brands fa-vmeo'), ('You Tu
 --INSERT MEDIA TYPE
 INSERT INTO mediatype (name)
 VALUES ('img'), ('video'), ('file');
-
-/* SELECTS */
--- SELECT * FROM users;
--- SELECT * FROM format;
--- SELECT * FROM category;
-SELECT * FROM post;
--- SELECT * FROM sourcee
-SELECT * FROM mediatype
-SELECT * FROM media
-/* SELECTS INNER JOIN */
--- SELECT P.id, P.title, P.description, P.cover, P.created_at, U.name as userName, F.name as formatName, C.name as categoryName FROM post P
--- INNER JOIN category C ON P.category_id = C.id
--- INNER JOIN users U ON P.user_id = U.id
--- INNER JOIN format F ON P.format_id = F.id;
-
-SELECT MT.id, M.url 
-FROM media M
-INNER JOIN mediatype MT
-ON MT.id = M.mediatype_id
-
-SELECT * FROM media WHERE post_id = 22
-
-UPDATE media SET url = '', mediatype_id=0 WHERE post_id = 0;
-
-SELECT * FROM media 
-SELECT * FROM mediatype
-SELECT COUNT(id) FROM media WHERE mediatype_id = 1
-
-SELECT id FROM mediatype WHERE id = 1;
-
-SELECT COUNT(id) FROM post WHERE category_id = 1
-SELECT COUNT(id) FROM post WHERE format_id = 1

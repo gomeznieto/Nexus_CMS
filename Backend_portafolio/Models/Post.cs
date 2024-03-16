@@ -24,7 +24,9 @@ namespace Backend_portafolio.Models
 		[Required(ErrorMessage = "El campo {0} es requerido")]
 		[Display(Name = "Fecha de creación")]
 		public DateTime created_at { get; set; }
-		public string format { get; set; }
+		public DateTime modify_at { get; set; }
+        public  bool draft { get; set; }
+        public string format { get; set; }
 		public string category { get; set; }
 		public string userName { get; set; }
         public IEnumerable<Media> mediaList { get; set; }

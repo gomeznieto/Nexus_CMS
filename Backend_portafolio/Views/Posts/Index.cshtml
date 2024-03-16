@@ -23,10 +23,12 @@
 				<thead class="table-text-color text-uppercase border-bottom table-border-row-color">
 					<tr class="table-titles">
 					<th scope="col" class="col-4">Titulo</th>
-					<th scope="col" class="col-4">Categoria</th>
-					<th scope="col" class="col-2">Formato</th>
-					<th scope="col" class="col-2">Creación</th>
-					<th scope="col" class="col-3">Acciones</th>
+					<th scope="col" class="col-2">Categoria</th>
+					<th scope="col" class="col-1 text-center">Formato</th>
+					<th scope="col" class="col-2 text-center">Creación</th>
+					<th scope="col" class="col-2 text-center">Modificación</th>
+					<th scope="col" class="col-3 text-center">Borrador</th>
+					<th scope="col" class="col-3 text-center">Acciones</th>
 					</tr>
 				</thead>
 			<tbody class="table-body">
@@ -37,9 +39,11 @@
 						<tr class="@(post == Model.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
 								<td>@post.title</td>
 								<td>@post.category</td>
-								<td>@post.format</td>
-								<td>@post.created_at.ToShortDateString()</td>
-								<td class="d-flex gap-2">
+								<td class="text-center">@post.format</td>
+								<td class="text-center @(post.draft ? "text-borrador" : "text-publicado")">@(post.draft ? "Borrador" : "Publicado")</td>
+								<td class="text-center">@post.created_at.ToShortDateString()</td>
+								<td class="text-center"> @(post.modify_at != DateTime.MinValue ? post.modify_at.ToShortDateString() : " - ")</td>
+								<td class="d-flex gap-2 justify-content-center">
 								<a class="btn btn-edit" asp-action="Editar" asp-route-id="@post.id" asp-route-format="@ViewBag.Format">Editar</a>
 								<a class="btn btn-delete" onclick="openModal({id: '@post.id', name: '@post.title'})" )>Borrar</a>
 								</td>

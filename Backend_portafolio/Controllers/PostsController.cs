@@ -151,7 +151,7 @@ namespace Backend_portafolio.Controllers
 				}
 
 				//Colocamos fecha actual
-				viewModel.created_at = DateTime.Today;
+				viewModel.created_at = DateTime.Now;
 
 				await _repositoryPosts.Crear(viewModel);
 
@@ -246,6 +246,8 @@ namespace Backend_portafolio.Controllers
 					return RedirectToAction("NoEncontrado", "Home");
 				}
 
+				viewModel.modify_at = DateTime.Now;
+
 				await _repositoryPosts.Editar(viewModel);
 
 
@@ -300,6 +302,25 @@ namespace Backend_portafolio.Controllers
 				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 			}
             
+        }
+
+		[HttpPost]
+		public async Task<IActionResult> EditarBorrador(int id, bool draft)
+		{
+			try
+			{
+                var mensaje = draft ? $"La entrada se ha colocado como borrador exitosamente" : $"La entrada se ha publicado exitosamente";
+
+                await _repositoryPosts.EditarBorrador(id, draft);
+
+                return Json(new { error = false, mensaje = mensaje });
+            }
+			catch (Exception ex)
+			{
+
+                return Json(new { error = true, mensaje = ex.Message });
+            }
+
         }
 
 

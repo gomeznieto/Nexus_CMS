@@ -20,6 +20,7 @@
         <input type="hidden" asp-for="format" />
         <input type="hidden" asp-for="mediaListString" id="imageLinksField" />
 
+        <!-- CREACION DE ENTRADA -->
         <div class="mb-3">
             <input asp-for="title" class="form-control fs-2 fw-bolder" placeholder="Agregar titulo"/>
             <span asp-validation-for="title" class="form-error"></span>
@@ -40,12 +41,21 @@
             <span asp-validation-for="category_id" class="form-error"></span>
         </div>
 
+        <!-- AGREGAR MULTIMEDIA -->
         <button type="button" class="btn btn-add  mb-3" onclick="addInput()">Agregar Multimedia</button>
         <div id="inputContainer">
         </div>
 
-        <button type="submit" class="btn btn-action" onclick="enviarDatosAlServidor()">Crear</button>
-        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete">Cancelar</a>
+        <!-- CHECKBOX BORRADOR -->
+        <div class="mb-3">
+            <p>Gaurdar Borrador</p>
+            <input type="checkbox" asp-for="draft" />
+        </div>
+
+        <!-- BUTTON -->
+        <button type="submit" class="btn btn-action" onclick="enviarDatosAlServidor()">Publicar</button>
+        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-add">Borrador</a>
+        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-arrow-rotate-left"></i> Regresar</a>
     </form>
 
 </div>

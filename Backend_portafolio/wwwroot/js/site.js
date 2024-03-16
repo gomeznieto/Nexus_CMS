@@ -218,3 +218,35 @@ function buscarPost(element) {
     const inputValue = nodeElementsClean[0].value;
     window.location.href = `Posts?format=Project&buscar=${inputValue}`;
 }
+
+/* BORRADOR */
+
+async function borrador() {
+    let inputDraft = document.getElementById("draftCheckBox");
+    let postId = document.getElementById("post_id").value;
+    let inputDraftValue = inputDraft.value == "True";
+    inputDraft.value = inputDraftValue ? "False" : "True";
+
+    let btnBorrador = document.getElementById("btnBorrador");
+    btnBorrador.innerHTML = inputDraftValue ? "Borrador" : "Publicar"
+
+    //Fetch
+    let url = `/Posts/EditarBorrador/?id=${postId}&draft=${!inputDraftValue}`
+    const response = await fetch(url, {
+        method: 'POST'
+    });
+
+    const result = await response.json();
+
+    if (result.error) {
+        // Mostrar mensaje de error en el modal correspondiente
+        document.getElementById('mensajeModalError').innerText = result.mensaje;
+        document.getElementById('modalError').style.display = 'block';
+
+    } else {
+        // Mostrar mensaje de éxito en el modal correspondiente
+        document.getElementById('mensajeModalSuccess').innerText = result.mensaje;
+        document.getElementById('modalSuccess').style.display = 'block';
+    }
+
+}

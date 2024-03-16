@@ -22,8 +22,11 @@
     --bg-btn-edit-hover: rgb(99, 179, 237);
     --bg-btn-add: rgb(183, 194, 218);
     --bg-btn-add-hover: rgb(100, 130, 192);
+    --bg-btn-borrador: rgb(63, 68, 78);
+    --bg-btn-borrador-hover: rgb(83, 88, 98);
     --bg-modal-close: rgb(57, 67, 83);
     --bg-modal: rgb(45, 55, 72);
+    --text-color-action: #81E6D9;
     color-scheme: dark;
 }
 
@@ -248,7 +251,7 @@ form label {
 .bgModal {
     position: absolute;
     width: 100vw;
-    height: 100vh;
+    height: 100%;
     background-color: rgb(0, 0, 0, 0.5);
     top: 0;
     left: 0;
@@ -368,3 +371,26 @@ form label {
             background-color: var(--bg-input) !important;
             border-color: none !important;
         }
+
+/* PUBLICADO - BORRADOR */
+
+
+.text-publicado{
+    color: var(--text-color-action);
+    font-style: italic;
+}
+
+.text-borrador {
+    color: var(--text-color-error);
+    font-style: italic;
+}
+
+.btn-borrador {
+    color: var(--text-color-primary);
+    font-weight: 600;
+    background-color: var(--bg-btn-borrador)
+}
+    .btn-borrador:hover {
+        color: var(--text-color-primary);
+        background-color: var(--bg-btn-borrador-hover)
+    }
