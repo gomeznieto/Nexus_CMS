@@ -26,8 +26,13 @@
             <span asp-validation-for="title" class="form-error"></span>
         </div>
 
+         <!-- POST -->
         <div class="mb-3">
-            <textarea asp-for="description" class="form-control textarea-style" rows="10" placeholder="Agregar contenido de la entrada"></textarea>
+            <!-- STYLES -->
+            <partial name="_TextControl" />
+
+            <!-- TEXT -->
+            <textarea asp-for="description" class="form-control textarea-style" rows="10" placeholder="Agregar contenido de la entrada" id="post_text"></textarea>
             <span asp-validation-for="description" class="form-error"></span>
         </div>
 
@@ -54,7 +59,7 @@
 
         <!-- BUTTON -->
         <button type="submit" class="btn btn-action" onclick="enviarDatosAlServidor()">Publicar</button>
-        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-add">Borrador</a>
+        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-add">Borrador</a> <!-- TODO: GUARDA EL POST-->
         <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-arrow-rotate-left"></i> Regresar</a>
     </form>
 
