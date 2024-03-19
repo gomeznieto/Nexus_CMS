@@ -48,10 +48,17 @@ namespace Backend_portafolio.Controllers
 		{
 			try
 			{
-				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, page);
 
-				//Formato para retornar al listado correspondiente
-				ViewBag.Format = format;
+				//crear session de cantidad de post en caso de no haber sido ya creada
+				if (Session.GeCantidadPostsSession(HttpContext) == -1)
+				{
+					Session.CantidadPostsSession(HttpContext, 5);
+				}
+				var cantidadPorPagina = Session.GeCantidadPostsSession(HttpContext);
+				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);
+
+                //Formato para retornar al listado correspondiente
+                ViewBag.Format = format;
 				ViewBag.Cantidad = await _repositoryPosts.ObtenerCantidadPorFormato(format);
 
 				return View(posts);
@@ -71,7 +78,8 @@ namespace Backend_portafolio.Controllers
 		{
 			try
 			{
-				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, page);
+				var cantidadPorPagina = Session.GeCantidadPostsSession(HttpContext);
+				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);
 				
 				if (!buscar.IsNullOrEmpty())
 				{
@@ -322,13 +330,10 @@ namespace Backend_portafolio.Controllers
 
 				}
 
-				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" };
-				Session.ErrorSession(HttpContext, errorModal);
+                return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 
-				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-			}
-			catch (Exception ex)
+            }
+            catch (Exception ex)
 			{
 
 				//Crear mensaje de error para modal

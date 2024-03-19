@@ -21,5 +21,20 @@ namespace Backend_portafolio.Controllers
 			return Json(true);
 		}
 
+		public IActionResult ChangeNumberPosts(int cantidad)
+		{
+			try
+			{
+				Session.CantidadPostsSession(HttpContext, cantidad);
+
+			}
+			catch (Exception ex)
+			{
+				return Json(false);
+			}
+
+			return Json(true);
+		}
+
 	}
 }

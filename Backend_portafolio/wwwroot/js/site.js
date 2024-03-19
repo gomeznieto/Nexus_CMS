@@ -218,9 +218,17 @@ function removeInput(element) {
 
 // Cargamos los datos del array en el input del formulario
 function enviarDatosAlServidor() {
+    console.log("EnviarDatosAlServidor")
     // Actualiza el valor del campo oculto con los datos del array
     document.getElementById('imageLinksField').value = JSON.stringify(imageLinks);
     imageLinks = [];
+}
+
+//Colocamos draft como true
+function Borrador() {
+    console.log("Borrador")
+    const inputDraft = document.getElementById("inputDraft");
+    inputDraft.value = true;
 }
 
 /* BUSCAR */
@@ -307,5 +315,17 @@ function textFormat(format, text) {
         default:
             return "?";
             break;
+    }
+}
+
+/* SELECCIONAR CANTIDAD DE ENTRADAS*/
+async function cambiarCantidadEntradas(cantidadEntradas) {
+    //Mandar por fetch para guardar session con nueva cantidad por entrada
+    const url = `/Modals/ChangeNumberPosts/?cantidad=${cantidadEntradas}` 
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (result) {
+        location.reload();
     }
 }

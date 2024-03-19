@@ -14,22 +14,35 @@
 
 	// Error modal
 	ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
+
+	//Cantidad de entradas por post
+	var cantidadPorPost = Session.GeCantidadPostsSession(HttpContextAccessor.HttpContext);
+
+	//Paginas de entradas
+	var paginas = (ViewBag.Cantidad / cantidadPorPost) + 1;
 }
 
 <h1 class="mb-3">Listado de @ViewBag.Format</h1>
 <p class="fs-6 mb-3">Nulla varius ex ut posuere consectetur. In tincidunt, nisi vitae. </p>
-
+<P>Cantidad de Entradas Totales: @ViewBag.Cantidad</P>
 <div class="d-flex justify-content-between align-items-center">
 
 	<!-- CREAR NUEVO -->
 	<a asp-action="Crear" asp-route-format="@ViewBag.Format" class="btn btn-action">Crear nuevo @ViewBag.Format </a>
+
+	<select onchange="cambiarCantidadEntradas(this.value)" class="form-select select-style w-25">
+		<option selected>Cantidad de Entradas</option>
+		<option value="5">5</option>
+		<option value="10">10</option>
+		<option value="15">15</option>
+	</select>
 
 	<!-- BUSCADOR-->
 	<form method="post" asp-action="Index" class="d-flex justify-content-center align-items-center gap-2">
 		<input type="hidden" name="format" value="@ViewBag.Format"/>
 		<input type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
 		<div class="input-group-append">
-			<button type="submit" class="btn btn-action" @* onclick="buscarPost(this)" *@>Buscar</button>
+			<button type="submit" class="btn btn-action">Buscar</button>
 		</div>
 	</form>
 
@@ -81,12 +94,12 @@
 			</li>
 		}
 
-		@for (int i = 1; i <= ViewBag.Cantidad / 4; i++)
+		@for (int i = 1; i <= @paginas; i++)
 		{
 			<li class="page-item"><a class="page-link @(pageValue == i ? "bg-pagination-active" : "bg-pagination")" href="/Posts/?format=@ViewBag.Format&page=@(i.ToString())">@(i)</a></li>
 		}
 
-		@if ((pageValue) < (ViewBag.Cantidad / 4))
+		@if ((pageValue) < @paginas)
 		{
 			<li class="page-item">
 				<a class="page-link bg-pagination" href="/Posts/?format=@ViewBag.Format&page=@((pageValue + 1).ToString())"><i class="fa-solid fa-chevron-right"></i></a>

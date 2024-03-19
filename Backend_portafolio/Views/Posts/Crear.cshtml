@@ -18,6 +18,7 @@
         <input type="hidden" asp-for="user_id" />
         <input type="hidden" asp-for="format_id" />
         <input type="hidden" asp-for="format" />
+        <input type="hidden" asp-for="draft" id="inputDraft" />
         <input type="hidden" asp-for="mediaListString" id="imageLinksField" />
 
         <!-- CREACION DE ENTRADA -->
@@ -51,15 +52,9 @@
         <div id="inputContainer">
         </div>
 
-        <!-- CHECKBOX BORRADOR -->
-        <div class="mb-3">
-            <p>Gaurdar Borrador</p>
-            <input type="checkbox" asp-for="draft" />
-        </div>
-
         <!-- BUTTON -->
         <button type="submit" class="btn btn-action" onclick="enviarDatosAlServidor()">Publicar</button>
-        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-add">Borrador</a> <!-- TODO: GUARDA EL POST-->
+        <button type="submit" class="btn btn-borrador" onclick="Borrador(); enviarDatosAlServidor();">Borrador</button>
         <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-arrow-rotate-left"></i> Regresar</a>
     </form>
 

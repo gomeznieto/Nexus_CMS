@@ -32,7 +32,7 @@ namespace Backend_portafolio.Sevices
         Task EditarBorrador(int id, bool editar);
         Task<IEnumerable<Post>> Obtener();
         Task<int> ObtenerCantidadPorFormato(string formato);
-        Task<IEnumerable<Post>> ObtenerPorFormato(string name, int page);
+        Task<IEnumerable<Post>> ObtenerPorFormato(string name, int cant, int page);
         Task<Post> ObtenerPorId(int id);
 	}
 
@@ -74,7 +74,7 @@ namespace Backend_portafolio.Sevices
 			return await connection.QueryAsync<Post>(query);
 		}
 
-        public async Task<IEnumerable<Post>> ObtenerPorFormato(string name, int page)
+        public async Task<IEnumerable<Post>> ObtenerPorFormato(string name, int cant, int page)
         {
             using var connection = new SqlConnection(_connectionString);
 
@@ -89,8 +89,8 @@ namespace Backend_portafolio.Sevices
 						F ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
 						WHERE F.{FORMAT.NOMBRE} = @{FORMAT.NOMBRE}
 						ORDER BY P.{POST.CREADO} DESC
-						OFFSET {(page-1) * 4} ROWS
-						FETCH NEXT {4} ROWS ONLY;";
+						OFFSET {(page-1) * cant} ROWS
+						FETCH NEXT {cant} ROWS ONLY;";
 			 
             var postList = await connection.QueryAsync<Post>(query, new { name });
 			return postList;
