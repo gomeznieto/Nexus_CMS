@@ -218,8 +218,10 @@ form label {
     display: none;
 }
 
-.modal-danger{
-    background-color: var(--bg-red)
+.modal-danger {
+    border: 4px solid var(--bg-red);
+    color: var(--bg-red);
+    width: 80px
 }
 
 #modalError,

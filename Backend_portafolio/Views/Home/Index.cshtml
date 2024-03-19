@@ -1,8 +1,24 @@
-﻿@{
+﻿@using Backend_portafolio.Helper
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
     ViewData["Title"] = "Home Page";
+
+    // Error modal
+    ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Panel de Control</h1>
 </div>
+
+<!-- MODAL ERROR -->
+@if (errorModal is not null)
+{
+    <partial name="_ErrorModal" model=errorModal />
+}
+
+

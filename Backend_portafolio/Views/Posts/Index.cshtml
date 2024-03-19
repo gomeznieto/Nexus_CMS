@@ -1,12 +1,19 @@
-﻿@model IEnumerable<Post>
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@using Backend_portafolio.Helper
+
+@model IEnumerable<Post>
 @{
 	ViewData["Title"] = "Entradas";
 
+	//Obtener página desde parámetros de la url
 	int pageValue;
 	if (!int.TryParse(ViewContext.HttpContext.Request.Query["page"], out pageValue))
 	{
 		pageValue = 1;
 	}
+
+	// Error modal
+	ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
 }
 
 <h1 class="mb-3">Listado de @ViewBag.Format</h1>
@@ -91,3 +98,11 @@
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Posts" }' />
+
+<!-- MODAL ERROR -->
+@if (errorModal is not null)
+{
+	<partial name="_ErrorModal" model=errorModal />
+}
+
+

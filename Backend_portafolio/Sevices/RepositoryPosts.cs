@@ -1,8 +1,6 @@
 ﻿using Backend_portafolio.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Hosting;
-using Microsoft.SqlServer.Server;
 
 namespace Backend_portafolio.Sevices
 {

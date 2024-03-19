@@ -13,6 +13,19 @@ function closeModal() {
 	modal.classList.add("closeModal");
 }
 
+async function closeModalError() {
+    const url = `/Modals/DeleteErrorModal`;
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (result) {
+        const modal = document.getElementById("generalErrorModal");
+        modal.classList.add("closeModal");
+    }
+
+
+}
+
 //MENU COLLAPSE
 $('.btn-expand-collapse').click(function (e) {
 	$('.navbar-primary').toggleClass('collapsed');

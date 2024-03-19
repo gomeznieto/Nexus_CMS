@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
+using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 
 namespace Backend_portafolio.Controllers
 {
-	public class PostsController : Controller
+    public class PostsController : Controller
 	{
 		private readonly IUsersService _usersService;
 		private readonly IRepositoryCategorias _repositoryCategorias;
@@ -58,8 +58,12 @@ namespace Backend_portafolio.Controllers
 			}
 			catch (Exception ex)
 			{
-				return RedirectToAction("Index", "Home");
-			}
+				//Crear mensaje de error para modal
+				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
+				Session.ErrorSession(HttpContext, errorModal);
+
+                return RedirectToAction("Index", "Home");
+            }
 		}
 
 		[HttpPost]
@@ -81,7 +85,9 @@ namespace Backend_portafolio.Controllers
 			}
 			catch (Exception ex)
 			{
-				return RedirectToAction("Index", "Home");
+				//Crear mensaje de error para modal
+				Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Se ha producido un error. Intente más tarde!", type = true, path = "Posts" });
+				return RedirectToAction("Index", "Posts", new { format = format });
 			}
 		}
 
@@ -117,6 +123,10 @@ namespace Backend_portafolio.Controllers
 			}
 			catch(Exception ex)
 			{
+				//Crear mensaje de error para modal
+				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
+				Session.ErrorSession(HttpContext, errorModal);
+
 				return RedirectToAction("Index", "Home");
 			}
         }
@@ -140,7 +150,9 @@ namespace Backend_portafolio.Controllers
 
 				if (categoria is null)
 				{
-					return RedirectToAction("NoEncontrado", "Home");
+					//Crear mensaje de error para modal
+					Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+					return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 				}
 
 				//Verificamos que el formato que nos mandan exista
@@ -148,7 +160,9 @@ namespace Backend_portafolio.Controllers
 
 				if (Formato is null)
 				{
-					return RedirectToAction("NoEncontrado", "Home");
+					//Crear mensaje de error para modal
+					Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+					return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 				}
 
 				//Colocamos fecha actual
@@ -181,6 +195,11 @@ namespace Backend_portafolio.Controllers
 			} 
 			catch (Exception ex)
 			{
+				//Crear mensaje de error para modal
+				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Posts" };
+				Session.ErrorSession(HttpContext, errorModal);
+
+				//Redirect a la página anterior
 				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 
 			}
@@ -213,6 +232,10 @@ namespace Backend_portafolio.Controllers
 			}
 			catch (Exception ex)
 			{
+				//Crear mensaje de error para modal
+				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
+				Session.ErrorSession(HttpContext, errorModal);
+
 				return RedirectToAction("Index", "Home");
 			}
 		}
@@ -236,7 +259,9 @@ namespace Backend_portafolio.Controllers
 
 				if (categoria is null)
 				{
-					return RedirectToAction("NoEncontrado", "Home");
+					//Crear mensaje de error para modal
+					Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+					return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 				}
 
 				//Verificamos que el formato que nos mandan exista
@@ -244,7 +269,9 @@ namespace Backend_portafolio.Controllers
 
 				if (Formato is null)
 				{
-					return RedirectToAction("NoEncontrado", "Home");
+					//Crear mensaje de error para modal
+					Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+					return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 				}
 
 				viewModel.modify_at = DateTime.Now;
@@ -295,11 +322,20 @@ namespace Backend_portafolio.Controllers
 
 				}
 
+				//Crear mensaje de error para modal
+				var errorModal = new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" };
+				Session.ErrorSession(HttpContext, errorModal);
 
 				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 			}
 			catch (Exception ex)
 			{
+
+				//Crear mensaje de error para modal
+				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Posts" };
+				Session.ErrorSession(HttpContext, errorModal);
+
+				//Redirige a la página anterior
 				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 			}
             
@@ -387,5 +423,6 @@ namespace Backend_portafolio.Controllers
             var posts = await _repositoryPosts.Obtener();
             return Json(posts);
         }
-    }
+
+	}
 }

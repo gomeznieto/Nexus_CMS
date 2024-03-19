@@ -1,4 +1,6 @@
-﻿using Backend_portafolio.Sevices;
+﻿using Backend_portafolio.Models;
+using Backend_portafolio.Sevices;
+using Microsoft.SqlServer.Server;
 using System.Text.Json;
 
 namespace Backend_portafolio.Helper
@@ -17,6 +19,28 @@ namespace Backend_portafolio.Helper
 			{
 				throw new Exception("Se ha producido un error");
 			}
+        }
+
+		public static void ErrorSession(HttpContext httpContext, ModalViewModel modal)
+		{
+            var formatsJson = JsonSerializer.Serialize(modal);
+            httpContext.Session.SetString("Error", formatsJson);
+        }
+
+		public static ModalViewModel GetErrorSession(HttpContext httpContext)
+		{
+            var errorModal = httpContext.Session.GetString("Error");
+			if (errorModal != null)
+			{
+				return JsonSerializer.Deserialize<ModalViewModel>(errorModal);
+			}
+
+			return null;
+        }
+
+        public static void DeleteErrorSession(HttpContext httpContext)
+        {
+			httpContext.Session.Remove("Error");
         }
     }
 }

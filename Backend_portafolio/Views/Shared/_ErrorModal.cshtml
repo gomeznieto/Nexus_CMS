@@ -1,0 +1,20 @@
+﻿@model ModalViewModel
+
+<div id="generalErrorModal">
+	<div class="bgModal" onclick="closeModalError()">
+		<div class="modalAlert">
+			<div class="d-flex justify-content-end p-3">
+				<a class="btn-close-modal" onclick="closeModalError()">&times;</a>
+			</div>
+			<div class="modal-body mb-3 d-flex flex-column justify-content-center align-items-center gap-4">
+				<div class="rounded-circle modal-danger d-flex justify-content-center align-items-center p-3">
+					<i class="fa-solid fa-xmark text-gray fs-1"></i>
+				</div>
+				<div>
+					<p class="fs-6 text-center">Ooops!</p>
+					<p id="mensajeModalError" class="fs-6 text-center">@Model.message</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

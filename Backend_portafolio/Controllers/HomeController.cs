@@ -1,4 +1,5 @@
-﻿using Backend_portafolio.Models;
+﻿using Backend_portafolio.Helper;
+using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -21,7 +22,7 @@ namespace Backend_portafolio.Controllers
 		{
 			try
 			{
-				await Helper.Session.UpdateSession(HttpContext, _repositoriyFormat);
+				await Session.UpdateSession(HttpContext, _repositoriyFormat);
 
 				return View();
 			}
