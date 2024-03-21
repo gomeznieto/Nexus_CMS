@@ -63,8 +63,8 @@ function closeModalResult(modalId) {
     location.reload();
 }
 
-//ADD MEDIA
 var imageLinks = [];
+var sourceLinks = [];
 
 /*
  * Limpia los elementos que son saltos de líneas '\n'
@@ -88,7 +88,7 @@ function cleanNodes(element)
 /*
  * Agregamos select e inputl al array
  */
-function addList(element) {
+function addList(element, type) {
     //Agregamos elemento al array
     let nodeElementsClean = cleanNodes(element)
 
@@ -102,10 +102,21 @@ function addList(element) {
     //previousMedia Meta. Si no es prevous, es nuevo, se coloca undefined
     let valueId = input.id|| undefined;
 
-    if (valueId == undefined)
-        imageLinks.push({ mediatype_id: valueSelect, url: valueInput });
-    else
-        imageLinks.push({ id: valueId, mediatype_id: valueSelect, url: valueInput })
+    if (valueId == undefined) {
+        if (type == "post") {
+            imageLinks.push({ mediatype_id: valueSelect, url: valueInput });
+        }
+        else {
+            sourceLinks.push({ source_id: valueSelect, url: valueInput });
+        }
+    } else {
+
+        if (type == "source") {
+            imageLinks.push({ id: valueId, mediatype_id: valueSelect, url: valueInput })
+        } else {
+            sourceLinks.push({ id: valueId, source_id: valueSelect, url: valueInput })
+        }
+    }
 
     //Modificamos la función del botón
     element.classList.remove('btn-primary');
@@ -126,7 +137,7 @@ function addList(element) {
 /*
  * habilitamos select e input para poder editar. Si aceptamos agregamos al array.
  */
-function editInput(element) {
+function editInput(element, type) {
 
     let nodeElementsClean = cleanNodes(element)
 
@@ -138,7 +149,11 @@ function editInput(element) {
     let valueInput = input.value;
 
     //Eliminamos elemento
-    imageLinks = imageLinks.filter(x => x.valueSelect != valueSelect && x.valueInput != valueInput);
+    if (type == "post") {
+        imageLinks = imageLinks.filter(x => x.valueSelect != valueSelect && x.valueInput != valueInput);
+    } else {
+        sourceLinks = sourceLinks.filter(x => x.valueSelect != valueSelect && x.valueInput != valueInput);
+    }
 
     //Habilitamos input para edición
     input.disabled = false;
@@ -156,7 +171,7 @@ function editInput(element) {
     element.innerHTML = "Agregar";
 
     //Agregamos función de Agregar
-    element.onclick = function () { addList(element); }
+    element.onclick = function () { addList(element, type); }
 
     //Modificamos el botón de eliminar
     btnCancelar.innerHTML = "Cancelar";
@@ -176,10 +191,10 @@ function cancelInput(element) {
     let input = nodeElementsClean[1];
 
     btnCancelar.innerHTML = "Eliminar";
-    btnCancelar.onclick = function () { removeInput(element); }
+    btnCancelar.onclick = function () { removeInput(element, type); }
 
     btnEditar.innerHTML = "Editar";
-    btnEditar.onclick = function () { editInput(element); }
+    btnEditar.onclick = function () { editInput(element, type); }
     btnEditar.classList.remove("btn-primary")
     btnEditar.classList.add("btn-secondary")
 
@@ -197,7 +212,7 @@ function cancelInput(element) {
 /*
  * LiRemovemos items del array si el input es nuevo, sino se agrega el id y valores en default para borrar en controller
  */
-function removeInput(element) {
+function removeInput(element, type) {
 
     let nodeElementsClean = cleanNodes(element)
 
@@ -206,11 +221,19 @@ function removeInput(element) {
     let valueId = input.id || undefined;
 
     if (valueId == undefined) {
-        //Si el link es nuevo, se borra del List
-        imageLinks = imageLinks.filter(x => x.mediatype_id != select.value && x.url != input.value);
+        if (type == "post") {
+            //Si el link es nuevo, se borra del List
+            imageLinks = imageLinks.filter(x => x.mediatype_id != select.value && x.url != input.value);
+        } else {
+            sourceLinks = sourceLinks.filter(x => x.source_id != select.value && x.url != input.value);
+        }
     } else {
-        //Si el link viene desde base de datos, retornamos solamente el id para poder borrarlo en controller
-        imageLinks.push({ id: valueId, mediatype_id: undefined, url: undefined});
+        if (type == "post") {
+            //Si el link viene desde base de datos, retornamos solamente el id para poder borrarlo en controller
+            imageLinks.push({ id: valueId, mediatype_id: undefined, url: undefined });
+        } else {
+            sourceLinks.push({ id: valueId, source_id: undefined, url: undefined });
+        }
     }
 
     element.parentNode.parentNode.removeChild(element.parentNode);
@@ -218,10 +241,11 @@ function removeInput(element) {
 
 // Cargamos los datos del array en el input del formulario
 function enviarDatosAlServidor() {
-    console.log("EnviarDatosAlServidor")
     // Actualiza el valor del campo oculto con los datos del array
     document.getElementById('imageLinksField').value = JSON.stringify(imageLinks);
+    document.getElementById('sourceLinksField').value = JSON.stringify(sourceLinks);
     imageLinks = [];
+    sourceLinks = [];
 }
 
 //Colocamos draft como true

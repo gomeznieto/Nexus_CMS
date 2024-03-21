@@ -20,6 +20,7 @@
         <input type="hidden" asp-for="format" />
         <input type="hidden" asp-for="draft" id="inputDraft" />
         <input type="hidden" asp-for="mediaListString" id="imageLinksField" />
+        <input type="hidden" asp-for="sourceListString" id="sourceLinksField" />
 
         <!-- CREACION DE ENTRADA -->
         <div class="mb-3">
@@ -48,8 +49,19 @@
         </div>
 
         <!-- AGREGAR MULTIMEDIA -->
-        <button type="button" class="btn btn-add  mb-3" onclick="addInput()">Agregar Multimedia</button>
-        <div id="inputContainer">
+        <div class="mb-3">
+            <h3 class="fs-5">Multi Media</h3>
+            <button type="button" class="btn btn-add mb-3" onclick="addInputMedia()">Agregar Multimedia</button>
+            <div id="inputContainerMedia">
+            </div>
+        </div>
+
+        <!--LINKS-->
+        <div class="mb-3">
+            <h3 class="fs-5">Links</h3>
+            <button type="button" class="btn btn-add mb-3" onclick="addInputLink()">Agregar Link</button>
+            <div id="inputContainerLinks">
+            </div>
         </div>
 
         <!-- BUTTON -->
@@ -66,9 +78,10 @@
 
     <script>
   
-        function addInput() {
+        //Agregar una multi media más
+        function addInputMedia() {
             //Agregamos elemento nuevo para agragar nuevo medias
-            var container = document.getElementById('inputContainer');
+            var container = document.getElementById('inputContainerMedia');
             var div = document.createElement('div');
             div.className = 'input-group';
 
@@ -101,7 +114,7 @@
             addButton.type = 'button';
             addButton.className = 'btn btn-action ms-2 h-50';
             addButton.textContent = 'Agregar';
-            addButton.onclick = function () { addList(this); };
+            addButton.onclick = function () { addList(this, "post"); };
             // Agregamos el botón al div
             div.appendChild(addButton);
 
@@ -109,7 +122,59 @@
             removeButton.type = 'button';
             removeButton.className = 'btn btn-delete ms-2 h-50';
             removeButton.textContent = 'Eliminar';
-            removeButton.onclick = function () { removeInput(this); };
+            removeButton.onclick = function () { removeInput(this, "post"); };
+            // Agregamos el botón al div
+            div.appendChild(removeButton);
+
+            // Agregamos el div al contenedor
+            container.appendChild(div);
+        }
+
+        //Agregat una fuente nueva
+        function addInputLink() {
+            //Agregamos elemento nuevo para agragar nuevo medias
+            var container = document.getElementById('inputContainerLinks');
+            var div = document.createElement('div');
+            div.className = 'input-group';
+
+            // Creamos el select
+            var select = document.createElement('select');
+            select.className = 'form-select mb-3 select-style w-25';
+
+            // Agregamos opciones al select utilizando los SelectListItem del modelo
+        @foreach (var item in Model.sources)
+        {
+            <text>
+                var option = document.createElement("option");
+                option.text = "@item.Text";
+                option.value = "@item.Value";
+                select.add(option);
+            </text>
+        }
+                // Agregamos el select al div
+                div.appendChild(select);
+
+            // Creamos el input
+            var input = document.createElement('input');
+            input.className = 'form-control mb-3 imgList imgAdd input-style w-50';
+            input.placeholder = 'Ingrese link de la fuente';
+            // Agregamos el input al div
+            div.appendChild(input);
+
+            // Creamos los botones
+            var addButton = document.createElement('button');
+            addButton.type = 'button';
+            addButton.className = 'btn btn-action ms-2 h-50';
+            addButton.textContent = 'Agregar';
+            addButton.onclick = function () { addList(this, "source"); };
+            // Agregamos el botón al div
+            div.appendChild(addButton);
+
+            var removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'btn btn-delete ms-2 h-50';
+            removeButton.textContent = 'Eliminar';
+            removeButton.onclick = function () { removeInput(this, "source"); };
             // Agregamos el botón al div
             div.appendChild(removeButton);
 

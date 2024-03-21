@@ -15,6 +15,7 @@
         <input type="hidden" asp-for="format_id" />
         <input type="hidden" asp-for="format" />
         <input type="hidden" asp-for="draft" id="draftCheckBox" />
+        <input type="hidden" asp-for="sourceListString" id="sourceLinksField" />
         <input type="hidden" asp-for="mediaListString" id="imageLinksField" />
 
         <div class="mb-3">
@@ -42,7 +43,7 @@
             <span asp-validation-for="category_id" class="form-error"></span>
         </div>
 
-        <h3 class="fs-5">Media</h3>
+        <h3 class="fs-5">Multi Media</h3>
 
         <!-- MULTIMEDIA -->
         <!-- Listado editable y eliminable de los media del usuario-->
@@ -56,26 +57,37 @@
                     }
                 </select>
                 <input asp-for="@media.url" id="@media.id" class="form-control mb-3 imgList imgAdd input-style w-50 me-2 input-style-disabled" disabled />
-                <button type="button" class="btn btn-edit h-50 me-2" onclick="editInput(this)">Editar</button>
-                <button type="button" class="btn btn-delete h-50" onclick="removeInput(this)">Eliminar</button>
+                <button type="button" class="btn btn-edit h-50 me-2" onclick="editInput(this, 'post')">Editar</button>
+                <button type="button" class="btn btn-delete h-50" onclick="removeInput(this, 'post')">Eliminar</button>
             </div>
         }
 
-        <div id="inputContainer"></div>
+        <div id="inputContainerMedia"></div>
 
         <!-- Boton que permita seguir agregando media -->
-        <button type="button" class="btn btn-add mb-3 d-flex" onclick="addInput()">Agregar Multimedia</button>
+        <button type="button" class="btn btn-add mb-3 d-flex" onclick="addInputMedia()">Agregar Multimedia</button>
 
         <!--LINKS-->
         <h3 class="fs-5">Links</h3>
-        <button type="button" class="btn btn-add mb-5 d-flex" >Agregar Link</button>
+        @foreach (var link in Model.linkList)
+        {
+            <div class="input-group">
+                <select class="form-select mb-3 select-style w-25 input-style-disabled" disabled>
+                    @foreach (var types in Model.mediaTypes)
+                    {
+                        <option selected='@(types.Value == link.source_id.ToString())' value='@types.Value'>@types.Text</option>
+                    }
+                </select>
+                <input asp-for="@link.url" id="@link.id" class="form-control mb-3 imgList imgAdd input-style w-50 me-2 input-style-disabled" disabled />
+                <button type="button" class="btn btn-edit h-50 me-2" onclick="editInput(this, 'source')">Editar</button>
+                <button type="button" class="btn btn-delete h-50" onclick="removeInput(this, 'source')">Eliminar</button>
+            </div>
+        }
 
-        <!-- CHECKBOX BORRADOR -->
-        <div class="mb-3">
-            @* <p>Guardar como borrador</p>
-            <input type="checkbox" asp-for="draft" /> *@
+        <div id="inputContainerLinks"></div>
 
-        </div>
+        <button type="button" class="btn btn-add mb-5 d-flex" onclick="addInputSource()">Agregar Link</button>
+       <!-- TODOD AGREGAR LINKS -->
 
         <button type="submit" class="btn btn-edit" onclick="enviarDatosAlServidor()">Editar</button>
         <button type="button" asp-route-format="@Model.format" id="btnBorrador" class="btn btn-borrador" onclick="borrador()">@(Model.draft ? "Publicar" : "Borrador")</button>
@@ -91,9 +103,9 @@
     <partial name="_Modal" model='new { url = "/Posts" }' />
 
     <script>
-        function addInput() {
+        function addInputMedia() {
             //Agregamos elemento nuevo para agragar nuevo medias
-            var container = document.getElementById('inputContainer');
+            var container = document.getElementById('inputContainerMedia');
             var div = document.createElement('div');
             div.className = 'input-group';
 
@@ -105,7 +117,7 @@
         @foreach (var item in Model.mediaTypes)
         {
             <text>
-                        var option = document.createElement("option");
+                var option = document.createElement("option");
                 option.text = "@item.Text";
                 option.value = "@item.Value";
                 select.add(option);
@@ -126,7 +138,7 @@
             addButton.type = 'button';
             addButton.className = 'btn btn-action ms-2 h-50';
             addButton.textContent = 'Agregar';
-            addButton.onclick = function () { addList(this); };
+            addButton.onclick = function () { addList(this, "post"); };
             // Agregamos el botón al div
             div.appendChild(addButton);
 
@@ -134,7 +146,58 @@
             removeButton.type = 'button';
             removeButton.className = 'btn btn-delete ms-2 h-50';
             removeButton.textContent = 'Eliminar';
-            removeButton.onclick = function () { removeInput(this); };
+            removeButton.onclick = function () { removeInput(this, "post"); };
+            // Agregamos el botón al div
+            div.appendChild(removeButton);
+
+            // Agregamos el div al contenedor
+            container.appendChild(div);
+        }
+
+        function addInputSource() {
+            //Agregamos elemento nuevo para agragar nuevo medias
+            var container = document.getElementById('inputContainerLinks');
+            var div = document.createElement('div');
+            div.className = 'input-group';
+
+            // Creamos el select
+            var select = document.createElement('select');
+            select.className = 'form-select mb-3 select-style w-25';
+
+            // Agregamos opciones al select utilizando los SelectListItem del modelo
+        @foreach (var item in Model.sources)
+        {
+            <text>
+                var option = document.createElement("option");
+                option.text = "@item.Text";
+                option.value = "@item.Value";
+                select.add(option);
+            </text>
+        }
+                // Agregamos el select al div
+                div.appendChild(select);
+
+            // Creamos el input
+            var input = document.createElement('input');
+            input.className = 'form-control mb-3 imgList imgAdd input-style w-50';
+            input.placeholder = 'Ingrese link o fuente';
+            // Agregamos el input al div
+            div.appendChild(input);
+
+            // Creamos los botones
+            var addButton = document.createElement('button');
+            addButton.type = 'button';
+            addButton.className = 'btn btn-action ms-2 h-50';
+            addButton.textContent = 'Agregar';
+            addButton.onclick = function () { addList(this, "source"); };
+            // Agregamos el botón al div
+            div.appendChild(addButton);
+
+            var removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'btn btn-delete ms-2 h-50';
+            removeButton.textContent = 'Eliminar';
+            removeButton.onclick = function () { removeInput(this, "source"); };
             // Agregamos el botón al div
             div.appendChild(removeButton);
 

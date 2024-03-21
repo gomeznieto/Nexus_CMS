@@ -8,9 +8,14 @@ namespace Backend_portafolio.Sevices
         public AutoMapperProfile()
         {
             CreateMap<Post, PostViewModel>();
+
 			CreateMap<MediaForm, Media>()
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => int.Parse(src.id)))
                 .ForMember(dest => dest.mediatype_id, opt => opt.MapFrom(src => int.Parse(src.mediatype_id)));
+
+            CreateMap<LinkForm, Link>()
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => int.Parse(src.id)))
+                .ForMember(dest => dest.source_id, opt => opt.MapFrom(src => int.Parse(src.source_id)));
         }
     }
 }

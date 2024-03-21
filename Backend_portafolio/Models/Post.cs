@@ -30,6 +30,7 @@ namespace Backend_portafolio.Models
 		public string category { get; set; }
 		public string userName { get; set; }
         public IEnumerable<Media> mediaList { get; set; }
+        public IEnumerable<Link> linkList { get; set; }
 
     }
 }

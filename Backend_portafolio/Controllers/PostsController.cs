@@ -17,6 +17,8 @@ namespace Backend_portafolio.Controllers
 		private readonly IRepositoryPosts _repositoryPosts;
         private readonly IRepositoryMedia _repositoryMedia;
         private readonly IRepositoryMediatype _repositoryMediatype;
+        private readonly IRepositorySource _repositorySource;
+        private readonly IRepositoryLink _repositoryLink;
         private readonly IMapper _mapper;
 
 		public PostsController(
@@ -26,13 +28,17 @@ namespace Backend_portafolio.Controllers
 			IRepositoryPosts repositoryPosts,
 			IRepositoryMedia repositoryMedia,
 			IRepositoryMediatype repositoryMediatype,
-			IMapper mapper)
+			IRepositorySource repositorySource,
+			IRepositoryLink repositoryLink,
+            IMapper mapper)
         {
 			_repositoryCategorias = repositoryCategorias;
 			_repositoryFormat = repositoryFormat;
 			_repositoryPosts = repositoryPosts;
             _repositoryMedia = repositoryMedia;
             _repositoryMediatype = repositoryMediatype;
+			_repositorySource = repositorySource;
+			_repositoryLink = repositoryLink;
             _usersService = usersService;
             _mapper = mapper;
 		}
@@ -60,6 +66,7 @@ namespace Backend_portafolio.Controllers
                 //Formato para retornar al listado correspondiente
                 ViewBag.Format = format;
 				ViewBag.Cantidad = await _repositoryPosts.ObtenerCantidadPorFormato(format);
+				ViewBag.Message = "No hay entradas para mostrar";
 
 				return View(posts);
 			}
@@ -88,6 +95,8 @@ namespace Backend_portafolio.Controllers
 
 				//Formato para retornar al listado correspondiente
 				ViewBag.Format = format;
+				ViewBag.Cantidad = posts.Count();
+				ViewBag.Message = $"Sin resultados para \"{buscar}\".";
 
 				return View(posts);
 			}
@@ -127,7 +136,10 @@ namespace Backend_portafolio.Controllers
 				//Obtenemos Media Types Select List
 				model.mediaTypes = await ObtenerMediaTypes();
 
-				return View(model);
+				//Obtener fuente de los links
+				model.sources = await ObtenerSource();
+
+                return View(model);
 			}
 			catch(Exception ex)
 			{
@@ -148,8 +160,6 @@ namespace Backend_portafolio.Controllers
                 if (!ModelState.IsValid)
 				{
 					viewModel.categories = await ObtenerCategorias();
-					//viewModel.formats = await ObtenerCategorias();
-
 					return View(viewModel);
 				}
 
@@ -197,9 +207,28 @@ namespace Backend_portafolio.Controllers
 					await _repositoryMedia.Crear(medias);
 				}
 
-				//Subir links
+				//Subir Links
+                if (!viewModel.sourceListString.IsNullOrEmpty())
+                {
+                    //Deserializamos string de media
+                    List<Link> linksForms = JsonSerializer.Deserialize<List<Link>>(viewModel.sourceListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                    //Mappeamos de MediaForm a Media
+                    List<Link> links = _mapper.Map<List<Link>>(linksForms);
+
+                    //Agregamos el numero de post creado a cada Media
+                    foreach (var link in links)
+                    {
+                        link.post_id = viewModel.id;
+                    }
+
+                    //Subimos MeiaLinks
+                    await _repositoryLink.Crear(links);
+                }
+
+                //Subir links
+
+                return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 			} 
 			catch (Exception ex)
 			{
@@ -230,9 +259,12 @@ namespace Backend_portafolio.Controllers
 				modelView.user_id = _usersService.ObtenerUsuario();
 				modelView.categories = await ObtenerCategorias();
 				modelView.mediaTypes = await ObtenerMediaTypes();
-				modelView.mediaList = await _repositoryMedia.ObtenerPorPost(modelView.id);
+				modelView.sources = await ObtenerSource();
 
-				var formats = await _repositoryFormat.Obtener();
+                modelView.mediaList = await _repositoryMedia.ObtenerPorPost(modelView.id);
+                modelView.linkList = await _repositoryLink.ObtenerPorPost(modelView.id);
+
+                var formats = await _repositoryFormat.Obtener();
 				modelView.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
 				modelView.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
 
@@ -241,7 +273,7 @@ namespace Backend_portafolio.Controllers
 			catch (Exception ex)
 			{
 				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
+				var errorModal = new ModalViewModel { message = ex.Message, type = true, path = "Home" };
 				Session.ErrorSession(HttpContext, errorModal);
 
 				return RedirectToAction("Index", "Home");
@@ -325,7 +357,7 @@ namespace Backend_portafolio.Controllers
 
 				/***** LINKS *****/
 
-				if (!viewModel.linkListString.IsNullOrEmpty())
+				if (!viewModel.sourceListString.IsNullOrEmpty())
 				{
 
 				}
@@ -414,14 +446,20 @@ namespace Backend_portafolio.Controllers
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
 		}
 
+        private async Task<IEnumerable<SelectListItem>> ObtenerSource()
+        {
+            var mediaTypes = await _repositorySource.Obtener();
+            return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
+        }
 
-		/***********/
-		/*   API   */
-		/***********/
 
-		//API - TODO: HEADERS CON TOKEN
+        /***********/
+        /*   API   */
+        /***********/
 
-		[HttpGet]
+        //API - TODO: HEADERS CON TOKEN
+
+        [HttpGet]
         [Route("api/[controller]/get")]
         public async Task<IActionResult> ObtenerJSON()
         {

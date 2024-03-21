@@ -48,6 +48,11 @@
 
 </div>
 
+<!-- RESULTADOS DE ENTRADAS -->
+@if(Model.Count() != 0){
+	
+
+
 <div class="border-table mb-3">
 	<table class="table table-borderless">
 		<thead class="table-text-color text-uppercase border-bottom table-border-row-color">
@@ -82,32 +87,46 @@
 			}
 		</tbody>
 	</table>
-</div>
+	</div>
 
-<nav class="w-100 d-flex justify-content-center">
-	<ul class="pagination justify-content-end">
+	if(paginas > 1)
+	{
+		<nav class="w-100 d-flex justify-content-center">
+			<ul class="pagination justify-content-end">
 
-		@if (pageValue != 1)
-		{
-			<li class="page-item">
-				<a class="page-link bg-pagination" href="/Posts/?format=@ViewBag.Format&page=@((pageValue - 1).ToString())"><i class="fa-solid fa-chevron-left"></i></a>
-			</li>
-		}
+				@if (pageValue != 1)
+				{
+					<li class="page-item">
+						<a class="page-link bg-pagination" href="/Posts/?format=@ViewBag.Format&page=@((pageValue - 1).ToString())"><i class="fa-solid fa-chevron-left"></i></a>
+					</li>
+				}
 
-		@for (int i = 1; i <= @paginas; i++)
-		{
-			<li class="page-item"><a class="page-link @(pageValue == i ? "bg-pagination-active" : "bg-pagination")" href="/Posts/?format=@ViewBag.Format&page=@(i.ToString())">@(i)</a></li>
-		}
+				@for (int i = 1; i <= @paginas; i++)
+				{
+					<li class="page-item"><a class="page-link @(pageValue == i ? "bg-pagination-active" : "bg-pagination")" href="/Posts/?format=@ViewBag.Format&page=@(i.ToString())">@(i)</a></li>
+				}
 
-		@if ((pageValue) < @paginas)
-		{
-			<li class="page-item">
-				<a class="page-link bg-pagination" href="/Posts/?format=@ViewBag.Format&page=@((pageValue + 1).ToString())"><i class="fa-solid fa-chevron-right"></i></a>
-			</li>
-		}
+				@if ((pageValue) < @paginas)
+				{
+					<li class="page-item">
+						<a class="page-link bg-pagination" href="/Posts/?format=@ViewBag.Format&page=@((pageValue + 1).ToString())"><i class="fa-solid fa-chevron-right"></i></a>
+					</li>
+				}
 
-	</ul>
-</nav>
+			</ul>
+		</nav>
+	}
+
+}
+else 
+{
+	<!-- NO HAY RESULTADOS DE ENTRADAS -->
+
+	<div class="d-flex justify-content-center align-items-center flex-column my-5 w-100 h-100 p-5">
+		<i class="fa-solid fa-circle-exclamation mb-5 fs-1 "></i>
+		<h3 class="fs-4">@ViewBag.Message</h3>
+	</div>
+}
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Posts" }' />

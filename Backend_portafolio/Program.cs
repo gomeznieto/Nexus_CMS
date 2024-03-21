@@ -13,6 +13,8 @@ builder.Services.AddTransient<IRepositoryFormat, RepositoryFormat>();
 builder.Services.AddTransient<IRepositoryPosts, RepositoryPosts>();
 builder.Services.AddTransient<IRepositoryMedia, RepositoryMedia>();
 builder.Services.AddTransient<IRepositoryMediatype, RepositoryMediatype>();
+builder.Services.AddTransient<IRepositorySource, RepositorySource>();
+builder.Services.AddTransient<IRepositoryLink, RepositoryLink>();
 builder.Services.AddHttpContextAccessor();
 
 //Auto Mapper

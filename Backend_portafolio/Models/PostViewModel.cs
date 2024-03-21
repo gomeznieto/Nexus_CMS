@@ -7,7 +7,8 @@ namespace Backend_portafolio.Models
 		public IEnumerable<SelectListItem> categories { get; set;}
 		public IEnumerable<SelectListItem> formats { get; set; }
 		public IEnumerable<SelectListItem> mediaTypes { get; set; }
+		public IEnumerable<SelectListItem> sources { get; set; }
         public string mediaListString { get; set; }
-        public string linkListString { get; set; }
+        public string sourceListString { get; set; }
     }
 }
