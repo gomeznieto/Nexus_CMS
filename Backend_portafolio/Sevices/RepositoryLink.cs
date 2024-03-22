@@ -55,9 +55,15 @@ namespace Backend_portafolio.Sevices
         public async Task<IEnumerable<Link>> ObtenerPorPost(int post_id)
         {
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QueryAsync<Link>($@"SELECT {LINK.ID}, {LINK.URL}, {LINK.POST_ID}, {LINK.SOURCE_ID} FROM {LINK.TABLA} WHERE {LINK.POST_ID} = @{LINK.POST_ID};", new {
-                post_id
-            });
+            return await connection.QueryAsync<Link>(
+                        $@"SELECT L.{LINK.ID}, L.{LINK.URL}, L.{LINK.POST_ID}, L.{LINK.SOURCE_ID}, S.{SOURCE.NAME}, S.{SOURCE.ICON}
+                        FROM {LINK.TABLA} L
+                        INNER JOIN {SOURCE.TABLA} S
+                        ON S.{SOURCE.ID} = L.{LINK.SOURCE_ID}
+                        WHERE L.{LINK.POST_ID} = @{LINK.POST_ID};", 
+                        new {
+                            post_id
+                        });
         }
 
         public async Task Editar(Link nuevoLink)

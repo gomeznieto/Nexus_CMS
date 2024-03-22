@@ -1,0 +1,14 @@
+﻿namespace Backend_portafolio.Models
+{
+	public class PostApiModel
+	{
+        public int id { get; set; }
+        public string title { get; set; }
+        public string description { get; set; }
+        public string cover { get; set; }
+        public string Format{ get; set; }
+        public List<ApiMediaModel> images { get; set; }
+        public string category { get; set; }
+        public List<ApiLinkModel> links { get; set; }
+    }
+}

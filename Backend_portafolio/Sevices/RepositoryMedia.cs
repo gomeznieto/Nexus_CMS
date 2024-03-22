@@ -55,9 +55,15 @@ namespace Backend_portafolio.Sevices
         public async Task<IEnumerable<Media>> ObtenerPorPost(int post_id)
         {
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QueryAsync<Media>($@"SELECT {MEDIA.ID}, {MEDIA.URL}, {MEDIA.POST_ID}, {MEDIA.MEDIA_ID} FROM {MEDIA.TABLA} WHERE {MEDIA.POST_ID} = @{MEDIA.POST_ID};", new {
-                post_id
-            });
+            return await connection.QueryAsync<Media>(
+                            $@"SELECT M.{MEDIA.ID}, M.{MEDIA.URL}, M.{MEDIA.POST_ID}, M.{MEDIA.MEDIA_ID}, MT.{MEDIATYPE.NAME}
+                            FROM {MEDIA.TABLA} M
+                            INNER JOIN {MEDIATYPE.TABLA} MT
+                            ON MT.{MEDIATYPE.ID} = M.{MEDIA.MEDIA_ID}
+                            WHERE {MEDIA.POST_ID} = @{MEDIA.POST_ID};", 
+                            new {
+                                post_id
+                            });
         }
 
         public async Task Editar(Media nuevoMedia)

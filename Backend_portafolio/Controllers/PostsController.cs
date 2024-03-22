@@ -482,20 +482,5 @@ namespace Backend_portafolio.Controllers
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
         }
 
-
-        /***********/
-        /*   API   */
-        /***********/
-
-        //API - TODO: HEADERS CON TOKEN
-
-        [HttpGet]
-        [Route("api/[controller]/get")]
-        public async Task<IActionResult> ObtenerJSON()
-        {
-            var posts = await _repositoryPosts.Obtener();
-            return Json(posts);
-        }
-
 	}
 }
