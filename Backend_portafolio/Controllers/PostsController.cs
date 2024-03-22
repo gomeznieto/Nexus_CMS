@@ -211,7 +211,7 @@ namespace Backend_portafolio.Controllers
                 if (!viewModel.sourceListString.IsNullOrEmpty())
                 {
                     //Deserializamos string de media
-                    List<Link> linksForms = JsonSerializer.Deserialize<List<Link>>(viewModel.sourceListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    List<LinkForm> linksForms = JsonSerializer.Deserialize<List<LinkForm>>(viewModel.sourceListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                     //Mappeamos de MediaForm a Media
                     List<Link> links = _mapper.Map<List<Link>>(linksForms);
@@ -321,7 +321,7 @@ namespace Backend_portafolio.Controllers
 
 				/***** METAS *****/
 
-				if (!viewModel.mediaListString.IsNullOrEmpty())
+				if (!viewModel.mediaListString.IsNullOrEmpty() && viewModel.mediaListString != "[]")
 				{
 					//Deserializamos string de media
 					List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString);
@@ -355,12 +355,41 @@ namespace Backend_portafolio.Controllers
 				}
 
 
-				/***** LINKS *****/
+                /***** LINKS *****/
 
-				if (!viewModel.sourceListString.IsNullOrEmpty())
-				{
+                if (!viewModel.sourceListString.IsNullOrEmpty() && viewModel.sourceListString != "[]")
+                {
+                    //Deserializamos string de media
+                    List<LinkForm> linkForms = JsonSerializer.Deserialize<List<LinkForm>>(viewModel.sourceListString);
+                    List<Link> links = new List<Link>();
 
-				}
+                    //Verificamos si entre los datos tenemos que actualizar algunos
+                    foreach (var linkForm in linkForms)
+                    {
+                        Link aux = _mapper.Map<Link>(linkForm);
+
+                        aux.post_id = viewModel.id;
+
+                        if (aux?.id is 0)
+                        {
+                            //NUEVO
+                            links.Add(aux);
+                        }
+                        else if (aux?.id is not 0 && aux?.url is not null)
+                        {
+                            //ACTUALIZAMOS
+                            await _repositoryLink.Editar(aux);
+                        }
+                        else
+                        {
+                            //ELIMINAMOS
+                            await _repositoryLink.Borrar(aux.id);
+                        }
+                    }
+
+                    //Subimos Links
+                    await _repositoryLink.Crear(links);
+                }
 
                 return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 
@@ -369,7 +398,7 @@ namespace Backend_portafolio.Controllers
 			{
 
 				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Posts" };
+				var errorModal = new ModalViewModel { message = ex.Message, type = true, path = "Posts" };
 				Session.ErrorSession(HttpContext, errorModal);
 
 				//Redirige a la página anterior

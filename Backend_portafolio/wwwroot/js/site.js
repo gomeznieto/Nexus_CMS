@@ -89,6 +89,7 @@ function cleanNodes(element)
  * Agregamos select e inputl al array
  */
 function addList(element, type) {
+    console.log({element, type})
     //Agregamos elemento al array
     let nodeElementsClean = cleanNodes(element)
 
@@ -111,12 +112,15 @@ function addList(element, type) {
         }
     } else {
 
-        if (type == "source") {
+        if (type == "post") {
             imageLinks.push({ id: valueId, mediatype_id: valueSelect, url: valueInput })
         } else {
             sourceLinks.push({ id: valueId, source_id: valueSelect, url: valueInput })
         }
     }
+
+    console.log(imageLinks)
+    console.log(sourceLinks)
 
     //Modificamos la función del botón
     element.classList.remove('btn-primary');
