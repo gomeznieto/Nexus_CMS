@@ -1,0 +1,29 @@
+﻿@model Source
+
+@{
+	ViewData["Title"] = "Crear Fuente";
+}
+
+<h1 class="mb-3">Crear Fuente</h1>
+<p class="fs-6 mb-5">Las fuentes nos permiten poder agrupar los links externos que pongamos en las entradas</p>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@* FORMULARIO *@
+<form asp-controller="Sources" asp-action="Crear">
+	<div class="mb-3">
+		<div class="flex-column mb-3">
+			<input type="text" asp-for="name" class="form-control" placeholder="Indique el nombre del tipo de la fuente"/>
+				<span asp-validation-for="name" class="text-borrador fs-6 mt-1"></span>
+		</div>
+		<div class="flex-column mb-3">
+			<input type="text" asp-for="icon" class="form-control" placeholder="Indique el icono de la fuente. Por ejemplo: 'fa-brands fa-vimeo'"/>
+			<span asp-validation-for="icon" class="text-borrador fs-6 mt-1"></span>
+		</div>
+		<button type="submit" class="btn btn-action mt-3">Crear</button>
+		<a asp-action="Index" class="btn btn-delete mt-3">cancelar</a>
+	</div>
+</form>
+
+@section Scripts
+{
+	<partial name="_ValidationScriptsPartial" />
+}

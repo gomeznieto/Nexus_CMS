@@ -45,7 +45,7 @@
 
                         <!-- * HOME -->
                         <li>
-                            <a href="#" class="nav-link align-middle px-3 nav-title">
+                            <a href="/" class="nav-link align-middle px-3 nav-title">
                                 <i class="iconos fa-solid fa-house"></i> <span class="ms-1 item_size">Home</span>
                             </a>
                         </li>
@@ -128,6 +128,29 @@
                                 </li>
                                 <li>
                                     <a asp-action="Crear" asp-controller="Mediatype" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Crear</span>
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- SOURCES -->
+                        <li>
+                            <a href="#subMenuSources" data-bs-toggle="collapse" class="nav-link align-middle nav-title">
+                                <i class="iconos fa-solid fa-pen"></i> <span class="ms-1 item_size">Fuentes</span>
+                            </a>
+                            <ul class="collapse nav flex-column ms-1" id="subMenuSources" data-bs-parent="#menu">
+                                <li class="w-100">
+                                    <a asp-action="Index" asp-controller="Sources" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Listado</span>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-action="Crear" asp-controller="Sources" class="nav-link px-3 item_subNav">
                                         <span class="item_size">
                                             <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Crear</span>
                                         </span>

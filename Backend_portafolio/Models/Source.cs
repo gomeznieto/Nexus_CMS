@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Backend_portafolio.Models
 {
@@ -6,8 +7,11 @@ namespace Backend_portafolio.Models
     {
         public int id { get; set; }
         [Display(Name = "Fuente")]
-        public string name { get; set; }
+		[Required(ErrorMessage = "El campo {0} es requerido")]
+		//[Remote(action: "VerificarExisteCategoria", controller: "Sources")]
+		public string name { get; set; }
         [Display(Name = "Icono")]
-        public string icon { get; set; }
+		[Required(ErrorMessage = "El campo {0} es requerido")]
+		public string icon { get; set; }
     }
 }

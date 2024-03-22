@@ -58,7 +58,7 @@ namespace Backend_portafolio.Controllers
 				//crear session de cantidad de post en caso de no haber sido ya creada
 				if (Session.GeCantidadPostsSession(HttpContext) == -1)
 				{
-					Session.CantidadPostsSession(HttpContext, 5);
+					Session.CantidadPostsSession(HttpContext, 10);
 				}
 				var cantidadPorPagina = Session.GeCantidadPostsSession(HttpContext);
 				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);

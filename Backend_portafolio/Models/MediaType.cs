@@ -7,7 +7,7 @@ namespace Backend_portafolio.Models
     {
         public int id { get; set; }
         [Display(Name = "Tipo de Medio")]
-        [Required]
+		[Required(ErrorMessage = "El campo {0} es requerido")]
 		[Remote(action: "VerificarExisteCategoria", controller: "Mediatype")]
 		public string name { get; set; }
     }
