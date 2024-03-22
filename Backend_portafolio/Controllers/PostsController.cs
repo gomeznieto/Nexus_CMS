@@ -70,7 +70,7 @@ namespace Backend_portafolio.Controllers
 
 				return View(posts);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				//Crear mensaje de error para modal
 				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
@@ -86,6 +86,7 @@ namespace Backend_portafolio.Controllers
 			try
 			{
 				var cantidadPorPagina = Session.GeCantidadPostsSession(HttpContext);
+
 				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);
 				
 				if (!buscar.IsNullOrEmpty())
@@ -100,7 +101,7 @@ namespace Backend_portafolio.Controllers
 
 				return View(posts);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				//Crear mensaje de error para modal
 				Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Se ha producido un error. Intente más tarde!", type = true, path = "Posts" });
@@ -141,7 +142,7 @@ namespace Backend_portafolio.Controllers
 
                 return View(model);
 			}
-			catch(Exception ex)
+			catch(Exception)
 			{
 				//Crear mensaje de error para modal
 				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
@@ -230,7 +231,7 @@ namespace Backend_portafolio.Controllers
 
                 return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 			} 
-			catch (Exception ex)
+			catch (Exception)
 			{
 				//Crear mensaje de error para modal
 				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Posts" };
@@ -270,10 +271,10 @@ namespace Backend_portafolio.Controllers
 
 				return View(modelView);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = ex.Message, type = true, path = "Home" };
+				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
 				Session.ErrorSession(HttpContext, errorModal);
 
 				return RedirectToAction("Index", "Home");
@@ -445,7 +446,7 @@ namespace Backend_portafolio.Controllers
 
 				return Json(new { error = false, mensaje = "¡La entrada ha sido borrada correctamente!" });
 			}
-			catch(Exception ex)
+			catch(Exception)
 			{
 				return Json(new { error = true, mensaje = "La entrada no se pudo borrar.\n¡Se ha producido un error!" });
 

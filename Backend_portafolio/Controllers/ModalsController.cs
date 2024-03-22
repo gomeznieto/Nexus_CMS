@@ -13,7 +13,7 @@ namespace Backend_portafolio.Controllers
 				Session.DeleteErrorSession(HttpContext);
 
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				return Json(false);
 			}
@@ -28,7 +28,7 @@ namespace Backend_portafolio.Controllers
 				Session.CantidadPostsSession(HttpContext, cantidad);
 
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				return Json(false);
 			}

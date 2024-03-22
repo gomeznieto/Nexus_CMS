@@ -1,6 +1,8 @@
-﻿using Backend_portafolio.Models;
+﻿using Backend_portafolio.Helper;
+using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backend_portafolio.Controllers
 {
@@ -17,15 +19,51 @@ namespace Backend_portafolio.Controllers
 		/*  INDEX  */
 		/************/
 		[HttpGet]
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index(int page = 1)
 		{
 			try
 			{
 				var categorias = await _repositoryCategorias.Obtener();
 
+				ViewBag.Cantidad = categorias.Count();
+				ViewBag.Message = $"No hay categorias para mostrar.";
+
 				return View(categorias.OrderBy(x => x.name).ToList());
-			} catch (Exception ex)
+			} 
+			catch (Exception)
 			{
+				//Crear mensaje de error para modal
+				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
+				Session.ErrorSession(HttpContext, errorModal);
+
+				return RedirectToAction("Index", "Home");
+			}
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Index(string buscar)
+		{
+			try
+			{
+				var categorias = await _repositoryCategorias.Obtener();
+
+				if (!buscar.IsNullOrEmpty())
+				{
+					categorias = categorias.Where(p => p.name.ToUpper().Contains(buscar.ToUpper()));
+				}
+
+				ViewBag.Cantidad = categorias.Count();
+				ViewBag.Message = $"Sin resultados para \"{buscar}\".";
+
+				return View(categorias.OrderBy(x => x.name).ToList());
+			}
+			catch (Exception)
+			{
+
+				//Crear mensaje de error para modal
+				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
+				Session.ErrorSession(HttpContext, errorModal);
+
 				return RedirectToAction("Index", "Home");
 			}
 		}

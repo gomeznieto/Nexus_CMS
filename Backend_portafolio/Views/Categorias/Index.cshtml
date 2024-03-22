@@ -1,13 +1,38 @@
-﻿@model IEnumerable<Categoria>
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@using Backend_portafolio.Helper
+
+@model IEnumerable<Categoria>
 
 @{
 	ViewData["Title"] = "Categorias";
+
+	// Error modal
+	ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
 }
 
 <h1 class="mb-3">Listado de Categorias</h1>
 <p class="fs-6 mb-3">Categorias que se utilizan para organizar las entradas.</p>
 
-<a asp-action="Crear" class="btn btn-action mb-3">Crear nueva categoria</a>
+<div class="d-flex justify-content-between align-items-center">
+	<!-- CREAR CATEGORIAS -->
+	<a asp-action="Crear" class="btn btn-action mb-3">Crear nueva categoria</a>
+
+	<!-- CANTIDAD DE CATEGORIAS -->
+	<select onchange="cambiarCantidadEntradas(this.value)" class="form-select select-style w-25">
+		<option selected>Cantidad de Entradas</option>
+		<option value="5">5</option>
+		<option value="10">10</option>
+		<option value="15">15</option>
+	</select>
+
+	<!-- BUSCADOR-->
+	<form method="Categorias" asp-action="Index" method="post" class="d-flex justify-content-center align-items-center gap-2">
+		<input type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
+		<div class="input-group-append">
+			<button type="submit" class="btn btn-action">Buscar</button>
+		</div>
+	</form>
+</div>
 
 @if(Model.Count() > 0)
 {
@@ -44,5 +69,12 @@ else
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Categorias" }' />
+
+<!-- MODAL ERROR -->
+@if (errorModal is not null)
+{
+	<partial name="_ErrorModal" model=errorModal />
+}
+
 
 

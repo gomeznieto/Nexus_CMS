@@ -25,7 +25,7 @@ namespace Backend_portafolio.Controllers
 
 				return View(formats);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 
 				return RedirectToAction("Index", "Home");
@@ -62,7 +62,7 @@ namespace Backend_portafolio.Controllers
 
 				return RedirectToAction("Index");
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				return RedirectToAction("Index");
 			}
