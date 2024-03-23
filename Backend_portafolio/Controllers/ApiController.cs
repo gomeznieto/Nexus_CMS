@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend_portafolio.Controllers
 {
-	public class ApiController : Controller
+	
+	public class ApiController : ControllerBase
 	{
         private readonly IRepositoryCategorias _repositoryCateogorias;
 		private readonly IRepositoryPosts _repositoryPosts;
@@ -35,7 +36,7 @@ namespace Backend_portafolio.Controllers
 
             var categorias = await _repositoryCateogorias.Obtener();
 
-            return Json(categorias);
+            return Ok(categorias);
         }
 
 		public async Task<IActionResult> Formato()
@@ -45,7 +46,7 @@ namespace Backend_portafolio.Controllers
 
 			var formatos = await _repositoryFormat.Obtener();
 
-			return Json(formatos);
+			return Ok(formatos);
 		}
 
 		[HttpGet]
@@ -56,7 +57,7 @@ namespace Backend_portafolio.Controllers
 
 			var categorias = await _repositoryCateogorias.Obtener();
 
-			return Json(categorias);
+			return Ok(categorias);
 		}
 
 		[HttpGet]
@@ -65,6 +66,9 @@ namespace Backend_portafolio.Controllers
 			//TODO: Validar Token
 
 			var posts = await _repositoryPosts.Obtener();
+
+			if(posts is null)
+				return NotFound();
 
 			List<PostApiModel> postsApiModels = new List<PostApiModel>();
 
@@ -87,7 +91,35 @@ namespace Backend_portafolio.Controllers
 				postsApiModels.Add(aux);
 			}
 
-			return Json(postsApiModels);
+			return Ok(postsApiModels);
+		}
+
+		[HttpGet("{controller}/{action}/{id}")]
+		public async Task<IActionResult> Entrada(int id)
+		{
+			//TODO: Validar Token
+
+			var post = await _repositoryPosts.ObtenerPorId(id);
+
+			if (post is null)
+				return NotFound();	
+
+			PostApiModel aux = new PostApiModel();
+
+			aux.id = post.id;
+			aux.title = post.title;
+			aux.description = post.description;
+			aux.cover = post.cover;
+			aux.Format = post.format;
+			aux.category = post.category;
+
+			var imagenes = await _repositoryMedia.ObtenerPorPost(aux.id);
+			aux.images = imagenes.Select(i => new ApiMediaModel { url = i.url, mediaType = i.name }).ToList();
+
+			var links = await _repositoryLink.ObtenerPorPost(aux.id);
+			aux.links = links.Select(l => new ApiLinkModel { url = l.url, source = l.name, icon = l.icon }).ToList();
+
+			return Ok(aux);
 		}
 	}
 }
