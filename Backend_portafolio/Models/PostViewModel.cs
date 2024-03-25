@@ -10,5 +10,6 @@ namespace Backend_portafolio.Models
 		public IEnumerable<SelectListItem> sources { get; set; }
         public string mediaListString { get; set; }
         public string sourceListString { get; set; }
+        public string categoryListString { get; set; }
     }
 }

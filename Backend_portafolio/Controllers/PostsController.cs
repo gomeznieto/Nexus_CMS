@@ -235,7 +235,11 @@ namespace Backend_portafolio.Controllers
                     await _repositoryLink.Crear(links);
                 }
 
-                //Subir links
+                //Subir Categorias
+                if (!viewModel.sourceListString.IsNullOrEmpty())
+				{
+
+				}
 
                 return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 			} 

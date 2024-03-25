@@ -243,6 +243,72 @@ function removeInput(element, type) {
     element.parentNode.parentNode.removeChild(element.parentNode);
 }
 
+//Agregar categorias
+let categoryList = [];
+function addCategory(element) {
+    const categoryId = element.options[element.selectedIndex].value;
+    const categoryName = element.options[element.selectedIndex].text;
+    const postId = element.getAttribute("postId");
+
+    //Objeto
+    let obj = {
+        post_id: parseInt(postId),
+        catedgory_id: parseInt(categoryId)
+    }
+
+    if (postId == 0) {
+
+        //Post Nuevo
+        if (!categoryList.find(c => c.catedgory_id == categoryId))
+        {
+            //El elemento no se encuentra en la lista
+            categoryList.push(obj);
+
+            addCategoryTag(categoryName, categoryId) 
+        }
+    } else {
+        //Post edicion
+        if (!categoryList.find(c => c.catedgory_id == categoryId))
+        {
+            //El elemento no se encuentra en la lista
+            categoryList.push(obj);
+
+            addCategoryTag(categoryName, categoryId) 
+        }
+    }
+
+    //Colocamos el selected en la opción inicial
+    element.selectedIndex = 0;
+}
+
+//Renderizar tag de la categoria en la página
+function addCategoryTag(categoryName, categoryId) {
+    const categoryContainer = document.getElementById("categoryContainer");
+
+    const categoria = document.createElement("div");
+    categoria.classList.add("btn", "btn-add", "me-2", "mt-3");
+
+    const icon = document.createElement("i");
+    icon.classList.add("fas", "fa-tag", "me-1"); // Ajusta las clases según sea necesario
+    categoria.appendChild(icon); // Añadimos el icono primero
+
+    categoria.appendChild(document.createTextNode(categoryName)); // Después añadimos el texto
+
+    categoria.onclick = function () { deleteCategory(categoria, categoryId); }
+
+    categoryContainer.appendChild(categoria);
+}
+
+//Borrar categoria del tag
+function deleteCategory(categoria, categoryId) {
+
+    categoryList = categoryList.filter(c => c.catedgory_id != categoryId);
+
+    const categoryContainer = document.getElementById("categoryContainer")
+    categoryContainer.removeChild(categoria)
+
+}
+
 // Cargamos los datos del array en el input del formulario
 function enviarDatosAlServidor() {
     // Actualiza el valor del campo oculto con los datos del array

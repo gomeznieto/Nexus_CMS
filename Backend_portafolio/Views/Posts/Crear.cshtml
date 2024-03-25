@@ -21,6 +21,7 @@
         <input type="hidden" asp-for="draft" id="inputDraft" />
         <input type="hidden" asp-for="mediaListString" id="imageLinksField" />
         <input type="hidden" asp-for="sourceListString" id="sourceLinksField" />
+        <input type="hidden" asp-for="categoryListString" id="categoryListField" />
 
         <!-- CREACION DE ENTRADA -->
         <div class="mb-3">
@@ -43,9 +44,17 @@
             <span asp-validation-for="cover" class="form-error"></span>
         </div>
 
+        <!-- AGREGAR CATEGORIAS -->
         <div class="mb-3">
-            <select asp-for="category_id" asp-items="Model.categories" class="form-select select-style"></select>
-            <span asp-validation-for="category_id" class="form-error"></span>
+            <select class="form-select select-style" id="selectCategory" postId="@Model.id" onchange="addCategory(this)">
+                <option disabled selected>Seleccione categorías</option>
+                @foreach (var category in Model.categories)
+                {
+                    <option value="@category.Value">@category.Text</option>
+                }
+            </select>
+
+            <div class="mb-3 d-flex" id="categoryContainer"></div>
         </div>
 
         <!-- AGREGAR MULTIMEDIA -->
