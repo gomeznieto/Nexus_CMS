@@ -67,18 +67,18 @@ namespace Backend_portafolio.Sevices
 						INNER JOIN {CATEGORIA.TABLA} C
 						ON P.{POST.CATEGORIA_ID} = C.id
 						INNER JOIN users U ON P.{POST.USER_ID} = U.id
-						INNER JOIN {FORMAT.TABLA}
-						F ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
+						INNER JOIN {FORMAT.TABLA}F
+						ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
 						ORDER BY F.{FORMAT.NOMBRE}, P.{POST.CREADO} DESC;";
 
 			return await connection.QueryAsync<Post>(query);
 		}
 
-        public async Task<IEnumerable<Post>> ObtenerPorFormato(string name, int cant, int page)
-        {
-            using var connection = new SqlConnection(_connectionString);
+		public async Task<IEnumerable<Post>> ObtenerPorFormato(string name, int cant, int page)
+		{
+			using var connection = new SqlConnection(_connectionString);
 
-            var query = $@"SELECT P.{POST.ID}, P.{POST.TITULO}, P.{POST.DESCRIPCION}, P.{POST.COVER}, P.{POST.CREADO}, P.{POST.BORRADOR}, P.{POST.MODIFICADO},
+			var query = $@"SELECT P.{POST.ID}, P.{POST.TITULO}, P.{POST.DESCRIPCION}, P.{POST.COVER}, P.{POST.CREADO}, P.{POST.BORRADOR}, P.{POST.MODIFICADO},
 						U.{POST.NOMBRE} as {POST.USER}, F.{FORMAT.NOMBRE} as {POST.FORMAT}, C.{CATEGORIA.NOMBRE} as {POST.CATEGORIA}
 						FROM {POST.TABLA} P
 						INNER JOIN {CATEGORIA.TABLA} C
@@ -89,14 +89,14 @@ namespace Backend_portafolio.Sevices
 						F ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
 						WHERE F.{FORMAT.NOMBRE} = @{FORMAT.NOMBRE}
 						ORDER BY P.{POST.CREADO} DESC
-						OFFSET {(page-1) * cant} ROWS
+						OFFSET {(page - 1) * cant} ROWS
 						FETCH NEXT {cant} ROWS ONLY;";
-			 
-            var postList = await connection.QueryAsync<Post>(query, new { name });
-			return postList;
-        }
 
-        public async Task<Post> ObtenerPorId(int id)
+			var postList = await connection.QueryAsync<Post>(query, new { name });
+			return postList;
+		}
+
+		public async Task<Post> ObtenerPorId(int id)
 		{
 			using var connection = new SqlConnection(_connectionString);
 			return await connection.QueryFirstOrDefaultAsync<Post>($@"

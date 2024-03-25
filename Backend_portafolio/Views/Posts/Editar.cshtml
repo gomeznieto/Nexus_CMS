@@ -38,10 +38,17 @@
             <span asp-validation-for="cover" class="form-error"></span>
         </div>
 
+        <!-- CATEGORIA -->
         <div class="mb-3">
-            <select asp-for="category_id" asp-items="Model.categories" class="form-select select-style"></select>
-            <span asp-validation-for="category_id" class="form-error"></span>
+            <select  asp-items="Model.categories" class="form-select select-style"></select>
         </div>
+
+       <div class="mb-3 d-flex gap-2">
+            @foreach (var category in Model.categoryList)
+            {
+                <a class="btn btn-add"><i class="fa-solid fa-tag me-1"></i>@category.Categoria.name</a>
+            }
+       </div>
 
         <h3 class="fs-5">Multi Media</h3>
 

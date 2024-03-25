@@ -11,6 +11,14 @@ namespace Backend_portafolio.Sevices
 		public const string ID = "id";
 		public const string NOMBRE = "name";
 	}
+
+	struct CATEGORIA_POST
+	{
+		public const string TABLA = "category_post";
+		public const string ID = "id";
+		public const string CATEGORY_ID = "category_id";
+		public const string POST_ID = "post_id";
+	}
 	public interface IRepositoryCategorias
 	{
 		Task Editar(Categoria categoria);
@@ -20,6 +28,7 @@ namespace Backend_portafolio.Sevices
 		Task<Categoria> ObtenerPorId(int id);
 		Task Borrar(int id);
 		Task<bool> sePuedeBorrar(int category_id);
+		Task<IEnumerable<Category_Post>> ObtenerCategoriaPostPorId(int id);
 	}
 
 	public class RepositoryCategorias : IRepositoryCategorias
@@ -57,6 +66,26 @@ namespace Backend_portafolio.Sevices
 		{
 			using var connection = new SqlConnection(_connectionString);
 			return await connection.QueryAsync<Categoria>($@"SELECT {CATEGORIA.ID}, {CATEGORIA.NOMBRE} FROM {CATEGORIA.TABLA}");
+
+		}
+
+		public async Task<IEnumerable<Category_Post>> ObtenerCategoriaPostPorId(int id)
+		{
+			using var connection = new SqlConnection(_connectionString);
+			var query = $@"SELECT CP.{CATEGORIA_POST.ID}, CP.{CATEGORIA_POST.POST_ID}, C.{CATEGORIA.ID}, C.{CATEGORIA.NOMBRE}
+						FROM {CATEGORIA.TABLA} C
+						INNER JOIN {CATEGORIA_POST.TABLA} CP
+						ON CP.{CATEGORIA_POST.CATEGORY_ID} = C.{CATEGORIA.ID}
+						WHERE CP.{CATEGORIA_POST.POST_ID} = @{POST.ID}";
+
+			return await connection.QueryAsync<Category_Post, Categoria, Category_Post>(query, (category_Post, categoria) =>
+			{
+				category_Post.Categoria = categoria;
+				return category_Post;
+			},
+			splitOn: $"id",
+			param: new { id }
+			);
 
 		}
 

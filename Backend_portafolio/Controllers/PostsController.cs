@@ -60,8 +60,16 @@ namespace Backend_portafolio.Controllers
 				{
 					Session.CantidadPostsSession(HttpContext, 10);
 				}
+
+				//Obtener cantidades para generar paginación
 				var cantidadPorPagina = Session.GeCantidadPostsSession(HttpContext);
 				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);
+
+				//Obtenemos categorias para mostrar en lista
+				foreach (var post in posts)
+				{
+					post.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(post.id);
+				}
 
                 //Formato para retornar al listado correspondiente
                 ViewBag.Format = format;
@@ -264,6 +272,7 @@ namespace Backend_portafolio.Controllers
 
                 modelView.mediaList = await _repositoryMedia.ObtenerPorPost(modelView.id);
                 modelView.linkList = await _repositoryLink.ObtenerPorPost(modelView.id);
+				modelView.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(modelView.id);
 
                 var formats = await _repositoryFormat.Obtener();
 				modelView.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();

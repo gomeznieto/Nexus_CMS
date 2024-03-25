@@ -66,14 +66,38 @@
 			<th scope="col" class="col-3 text-center">Acciones</th>
 			</tr>
 		</thead>
-	<tbody class="table-body">
+		<tbody class="table-body">
 			@foreach (var post in Model)
 			{
 				if (Model.Count() != 0)
 				{
 				<tr class="@(post == Model.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
 						<td>@post.title</td>
-						<td>@post.category</td>
+						<td>
+							@if(post.categoryList?.Count() > 0 )
+							{
+								@foreach (var category in post.categoryList)
+								{
+										
+									@if (category != post.categoryList.Last())
+									{
+										<span>
+											@category.Categoria.name,
+										</span >
+									}
+									else
+									{
+									<span>
+										@category.Categoria.name
+									</span>
+									}
+								}
+							}
+							else
+							{
+								<span> - </span>
+							}
+						</td>
 						<td class="text-center">@post.format</td>
 						<td class="text-center @(post.draft ? "text-borrador" : "text-publicado")">@(post.draft ? "Borrador" : "Publicado")</td>
 						<td class="text-center">@post.created_at.ToShortDateString()</td>

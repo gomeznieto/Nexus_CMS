@@ -35,7 +35,7 @@ CREATE TABLE post (
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     cover VARCHAR(100) NOT NULL,
-    category_id INT NOT NULL,
+    category_id INT NOT NULL, --BORRAR CUANDO CATEGORY_POST ESTÉ IMPLEMENTADO
     FOREIGN KEY (category_id) REFERENCES category(id),
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
@@ -44,6 +44,15 @@ CREATE TABLE post (
     created_at DATETIME  NOT NULL DEFAULT GETDATE(),
     modify_at DATETIME  DEFAULT NULL,
     draft BIT NOT NULL DEFAULT 0
+);
+
+/* CATEGORIA POR ENTRADA*/
+CREATE TABLE category_post(
+    id INT IDENTITY (1,1) PRIMARY KEY,
+    category_id INT NOT NULL,
+    FOREIGN KEY (category_id) REFERENCES category(id),
+    post_id INT NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES post(id),
 );
 
 /* FUENTE */
@@ -145,3 +154,13 @@ VALUES ('Github', 'fa-brands fa-github'),('vmeo', 'fa-brands fa-vmeo'), ('You Tu
 --INSERT MEDIA TYPE
 INSERT INTO mediatype (name)
 VALUES ('img'), ('video'), ('file');
+
+--INSERT CATEGORIA POST
+INSERT INTO category_post (category_id, post_id)
+VALUES
+(1, 1),
+(1, 2),
+(2, 1),
+(3, 2),
+(3, 3);
+
