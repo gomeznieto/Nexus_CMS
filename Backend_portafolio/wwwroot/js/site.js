@@ -286,14 +286,21 @@ function addCategoryTag(categoryName, categoryId) {
     const categoryContainer = document.getElementById("categoryContainer");
 
     const categoria = document.createElement("div");
-    categoria.classList.add("btn", "btn-add", "me-2", "mt-3");
+    categoria.classList.add("btn", "tag", "me-2", "mt-3");
 
+    // Agregar el botón para cerrar
+    const cerrarCategoria = document.createElement("div");
+    cerrarCategoria.classList.add("close-btn"); // Clase CSS para el botón de cierre
+    cerrarCategoria.innerText = "x";
+    categoria.appendChild(cerrarCategoria);
+
+    // Agregar el icono
     const icon = document.createElement("i");
-    icon.classList.add("fas", "fa-tag", "me-1"); // Ajusta las clases según sea necesario
-    categoria.appendChild(icon); // Añadimos el icono primero
+    icon.classList.add("fas", "fa-tag", "me-1"); // Ajustar las clases según sea necesario
+    categoria.appendChild(icon);
 
-    categoria.appendChild(document.createTextNode(categoryName)); // Después añadimos el texto
-
+    // Agregar el nombre de la categoría
+    categoria.appendChild(document.createTextNode(categoryName));
     categoria.onclick = function () { deleteCategory(categoria, categoryId); }
 
     categoryContainer.appendChild(categoria);

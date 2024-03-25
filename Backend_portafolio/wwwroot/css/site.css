@@ -26,6 +26,7 @@
     --bg-btn-borrador-hover: rgb(83, 88, 98);
     --bg-modal-close: rgb(57, 67, 83);
     --bg-modal: rgb(45, 55, 72);
+    --bg-tag: rgb(49, 151, 149); 
     --text-color-action: #81E6D9;
     color-scheme: dark;
 }
@@ -401,3 +402,28 @@ form label {
         color: var(--text-color-primary);
         background-color: var(--bg-btn-borrador-hover)
     }
+
+
+    /* Tags */
+.close-btn{
+    color: var(--text-color-primary);
+    font-size: 10px;
+    padding-bottom: 2px;
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: var(--bg-modal-close);
+    width: 15px;
+    height: 15px;
+}
+
+.tag {
+    position: relative;
+    color: var(--text-color-primary);
+    font-weight: 600;
+    background-color: var(--bg-tag);
+}

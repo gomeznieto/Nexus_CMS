@@ -46,6 +46,7 @@
 
         <!-- AGREGAR CATEGORIAS -->
         <div class="mb-3">
+            <h3 class="fs-5">Categorias</h3>
             <select class="form-select select-style" id="selectCategory" postId="@Model.id" onchange="addCategory(this)">
                 <option disabled selected>Seleccione categorías</option>
                 @foreach (var category in Model.categories)
