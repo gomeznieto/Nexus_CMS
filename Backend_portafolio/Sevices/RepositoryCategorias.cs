@@ -44,7 +44,7 @@ namespace Backend_portafolio.Sevices
 		public async Task Crear(Categoria categoria)
 		{
 			using var connection = new SqlConnection(_connectionString);
-			var id = await connection.QuerySingleAsync<int>($@"INSERT INTO {CATEGORIA.TABLA} ({CATEGORIA.NOMBRE}) VALUES (@{CATEGORIA.NOMBRE}) 
+			var id = await connection.ExecuteScalarAsync<int>($@"INSERT INTO {CATEGORIA.TABLA} ({CATEGORIA.NOMBRE}) VALUES (@{CATEGORIA.NOMBRE}) 
 												SELECT SCOPE_IDENTITY()", categoria);
 			categoria.id = id;
 		}
