@@ -67,11 +67,13 @@ namespace Backend_portafolio.Sevices
 						INNER JOIN {CATEGORIA.TABLA} C
 						ON P.{POST.CATEGORIA_ID} = C.id
 						INNER JOIN users U ON P.{POST.USER_ID} = U.id
-						INNER JOIN {FORMAT.TABLA}F
+						INNER JOIN {FORMAT.TABLA} F
 						ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
 						ORDER BY F.{FORMAT.NOMBRE}, P.{POST.CREADO} DESC;";
 
-			return await connection.QueryAsync<Post>(query);
+			var posts = await connection.QueryAsync<Post>(query);
+
+            return posts;
 		}
 
 		public async Task<IEnumerable<Post>> ObtenerPorFormato(string name, int cant, int page)

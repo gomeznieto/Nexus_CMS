@@ -88,6 +88,8 @@ namespace Backend_portafolio.Controllers
             }
 		}
 
+
+		// Lógica para el buscador
 		[HttpPost]
 		public async Task<IActionResult> Index(string format, string buscar, int page = 1)
 		{

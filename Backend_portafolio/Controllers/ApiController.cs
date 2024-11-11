@@ -70,11 +70,11 @@ namespace Backend_portafolio.Controllers
 			if(posts is null)
 				return NotFound();
 
-			List<PostApiModel> postsApiModels = new List<PostApiModel>();
+			List<ApiPostModel> postsApiModels = new List<ApiPostModel>();
 
 			foreach ( var post in posts )
 			{
-				PostApiModel aux = new PostApiModel();
+				ApiPostModel aux = new ApiPostModel();
 				aux.id = post.id;
 				aux.title = post.title;
 				aux.description = post.description;
@@ -104,7 +104,7 @@ namespace Backend_portafolio.Controllers
 			if (post is null)
 				return NotFound();	
 
-			PostApiModel aux = new PostApiModel();
+			ApiPostModel aux = new ApiPostModel();
 
 			aux.id = post.id;
 			aux.title = post.title;

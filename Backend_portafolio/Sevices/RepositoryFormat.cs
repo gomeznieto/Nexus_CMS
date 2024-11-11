@@ -46,7 +46,7 @@ namespace Backend_portafolio.Sevices
 		public async Task Crear(Format format)
 		{
 			using var connection = new SqlConnection(_connectionString);
-			var id = await connection.QuerySingleAsync<int>($@"INSERT INTO {FORMAT.TABLA} ({FORMAT.NOMBRE}) VALUES (@{FORMAT.NOMBRE}); SELECT SCOPE_IDENTITY();", format);
+			var id = await connection.ExecuteScalarAsync<int>($@"INSERT INTO {FORMAT.TABLA} ({FORMAT.NOMBRE}) VALUES (@{FORMAT.NOMBRE}); SELECT SCOPE_IDENTITY();", format);
 			format.id = id;
 		}
 

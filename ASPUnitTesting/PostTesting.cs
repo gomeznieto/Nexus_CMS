@@ -41,7 +41,7 @@ namespace ASPUnitTesting
 		public async void Get_Quantity()
 		{
 			var result = (OkObjectResult) await _apiController.Entrada();
-			var posts = Assert.IsType<List<PostApiModel>>(result.Value);
+			var posts = Assert.IsType<List<ApiPostModel>>(result.Value);
 			Assert.True(posts.Count() > 0);
 		}
 
@@ -58,7 +58,7 @@ namespace ASPUnitTesting
 		{
 			int id = 1;
 			var result = (OkObjectResult)await _apiController.Entrada(id);
-			var post = Assert.IsType<PostApiModel>(result.Value);
+			var post = Assert.IsType<ApiPostModel>(result.Value);
 			Assert.True(post is not null);
 		}
 
@@ -67,7 +67,7 @@ namespace ASPUnitTesting
 		{
 			int id = 1;
 			var result = (OkObjectResult)await _apiController.Entrada(id);
-			var post = Assert.IsType<PostApiModel>(result?.Value);
+			var post = Assert.IsType<ApiPostModel>(result?.Value);
 
 			Assert.True(post is not null);
 			Assert.Equal(post?.id, id);

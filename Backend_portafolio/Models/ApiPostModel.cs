@@ -1,6 +1,6 @@
 ﻿namespace Backend_portafolio.Models
 {
-	public class PostApiModel
+	public class ApiPostModel
 	{
         public int id { get; set; }
         public string title { get; set; }
