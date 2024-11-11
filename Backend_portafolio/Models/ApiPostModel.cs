@@ -8,7 +8,7 @@
         public string cover { get; set; }
         public string Format{ get; set; }
         public List<ApiMediaModel> images { get; set; }
-        public string category { get; set; }
         public List<ApiLinkModel> links { get; set; }
+        public List<ApiCategoryModel> categories { get; set; }
     }
 }
