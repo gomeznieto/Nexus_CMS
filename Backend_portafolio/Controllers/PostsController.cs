@@ -5,220 +5,257 @@ using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Text.Json;
 
 namespace Backend_portafolio.Controllers
 {
     public class PostsController : Controller
-	{
-		private readonly IUsersService _usersService;
-		private readonly IRepositoryCategorias _repositoryCategorias;
-		private readonly IRepositoryFormat _repositoryFormat;
-		private readonly IRepositoryPosts _repositoryPosts;
+    {
+        private readonly IUsersService _usersService;
+        private readonly IRepositoryCategorias _repositoryCategorias;
+        private readonly IRepositoryFormat _repositoryFormat;
+        private readonly IRepositoryPosts _repositoryPosts;
         private readonly IRepositoryMedia _repositoryMedia;
         private readonly IRepositoryMediatype _repositoryMediatype;
         private readonly IRepositorySource _repositorySource;
         private readonly IRepositoryLink _repositoryLink;
         private readonly IMapper _mapper;
 
-		public PostsController(
-			IUsersService usersService,
-			IRepositoryCategorias repositoryCategorias, 
-			IRepositoryFormat repositoryFormat,
-			IRepositoryPosts repositoryPosts,
-			IRepositoryMedia repositoryMedia,
-			IRepositoryMediatype repositoryMediatype,
-			IRepositorySource repositorySource,
-			IRepositoryLink repositoryLink,
+        public PostsController(
+            IUsersService usersService,
+            IRepositoryCategorias repositoryCategorias,
+            IRepositoryFormat repositoryFormat,
+            IRepositoryPosts repositoryPosts,
+            IRepositoryMedia repositoryMedia,
+            IRepositoryMediatype repositoryMediatype,
+            IRepositorySource repositorySource,
+            IRepositoryLink repositoryLink,
             IMapper mapper)
         {
-			_repositoryCategorias = repositoryCategorias;
-			_repositoryFormat = repositoryFormat;
-			_repositoryPosts = repositoryPosts;
+            _repositoryCategorias = repositoryCategorias;
+            _repositoryFormat = repositoryFormat;
+            _repositoryPosts = repositoryPosts;
             _repositoryMedia = repositoryMedia;
             _repositoryMediatype = repositoryMediatype;
-			_repositorySource = repositorySource;
-			_repositoryLink = repositoryLink;
+            _repositorySource = repositorySource;
+            _repositoryLink = repositoryLink;
             _usersService = usersService;
             _mapper = mapper;
-		}
+        }
 
 
-		/***********/
-		/*  INDEX  */
-		/***********/
+        //--------------------------------------
+        // INDEX
+        //--------------------------------------
 
-		[HttpGet]
+        [HttpGet]
 
-		public async Task<IActionResult> Index(string format, int page = 1)
-		{
-			try
-			{
+        public async Task<IActionResult> Index(string format, int page = 1)
+        {
+            try
+            {
 
-				//crear session de cantidad de post en caso de no haber sido ya creada
-				if (Session.GeCantidadPostsSession(HttpContext) == -1)
-				{
-					Session.CantidadPostsSession(HttpContext, 10);
-				}
+                //crear session de cantidad de post en caso de no haber sido ya creada
+                if (Session.GetCantidadPostsSession(HttpContext) == -1)
+                {
+                    Session.CantidadPostsSession(HttpContext, 10);
+                }
 
-				//Obtener cantidades para generar paginación
-				var cantidadPorPagina = Session.GeCantidadPostsSession(HttpContext);
-				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);
+                //Obtener cantidades para generar paginación
+                var cantidadPorPagina = Session.GetCantidadPostsSession(HttpContext);
+                IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);
 
-				//Obtenemos categorias para mostrar en lista
-				foreach (var post in posts)
-				{
-					post.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(post.id);
-				}
+                //Obtenemos categorias para mostrar en lista
+                foreach (var post in posts)
+                {
+                    post.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(post.id);
+                }
 
                 //Formato para retornar al listado correspondiente
                 ViewBag.Format = format;
-				ViewBag.Cantidad = await _repositoryPosts.ObtenerCantidadPorFormato(format);
-				ViewBag.Message = "No hay entradas para mostrar";
+                ViewBag.Cantidad = await _repositoryPosts.ObtenerCantidadPorFormato(format);
+                ViewBag.Message = "No hay entradas para mostrar";
 
-				return View(posts);
-			}
-			catch (Exception)
-			{
-				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
-				Session.ErrorSession(HttpContext, errorModal);
+                return View(posts);
+            }
+            catch (Exception)
+            {
+                //Crear mensaje de error para modal
+                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
+                Session.ErrorSession(HttpContext, errorModal);
 
                 return RedirectToAction("Index", "Home");
             }
-		}
-
-
-		// Lógica para el buscador
-		[HttpPost]
-		public async Task<IActionResult> Index(string format, string buscar, int page = 1)
-		{
-			try
-			{
-				var cantidadPorPagina = Session.GeCantidadPostsSession(HttpContext);
-
-				IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);
-				
-				if (!buscar.IsNullOrEmpty())
-				{
-					posts = posts.Where(p => p.title.ToUpper().Contains(buscar.ToUpper()));
-				}
-
-				//Formato para retornar al listado correspondiente
-				ViewBag.Format = format;
-				ViewBag.Cantidad = posts.Count();
-				ViewBag.Message = $"Sin resultados para \"{buscar}\".";
-
-				return View(posts);
-			}
-			catch (Exception)
-			{
-				//Crear mensaje de error para modal
-				Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Se ha producido un error. Intente más tarde!", type = true, path = "Posts" });
-				return RedirectToAction("Index", "Posts", new { format = format });
-			}
-		}
-
-
-		/***********/
-		/*  CREAR  */
-		/***********/
-
-		[HttpGet]
-        public async Task <IActionResult> Crear(string format)
-        {
-			try
-			{
-				var usuarioID = _usersService.ObtenerUsuario();
-
-				var model = new PostViewModel();
-
-				model.user_id = usuarioID;
-				model.format = format;
-
-				//Obtenemos el formato de la entrada creada
-				var formats = await _repositoryFormat.Obtener();
-				model.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
-				model.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
-
-				//Obtenemos Categorias Select List
-				model.categories = await ObtenerCategorias();
-
-				//Obtenemos Media Types Select List
-				model.mediaTypes = await ObtenerMediaTypes();
-
-				//Obtener fuente de los links
-				model.sources = await ObtenerSource();
-
-                return View(model);
-			}
-			catch(Exception)
-			{
-				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
-				Session.ErrorSession(HttpContext, errorModal);
-
-				return RedirectToAction("Index", "Home");
-			}
         }
 
-		[HttpPost]
-		public async Task<IActionResult> Crear(PostViewModel viewModel)
-		{
-			try
-			{
-				//verificamos que el model state sea valido antes de continuar
+
+        // Lógica para el buscador
+        [HttpPost]
+        public async Task<IActionResult> Index(string format, string buscar, int page = 1)
+        {
+            try
+            {
+                var cantidadPorPagina = Session.GetCantidadPostsSession(HttpContext);
+
+                IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);
+
+                if (!buscar.IsNullOrEmpty())
+                {
+                    posts = posts.Where(p => p.title.ToUpper().Contains(buscar.ToUpper()));
+                }
+
+                //Formato para retornar al listado correspondiente
+                ViewBag.Format = format;
+                ViewBag.Cantidad = posts.Count();
+                ViewBag.Message = $"Sin resultados para \"{buscar}\".";
+
+                return View(posts);
+            }
+            catch (Exception)
+            {
+                //Crear mensaje de error para modal
+                Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Se ha producido un error. Intente más tarde!", type = true, path = "Posts" });
+                return RedirectToAction("Index", "Posts", new { format = format });
+            }
+        }
+
+
+        //--------------------------------------
+        /// CREATE
+        //--------------------------------------
+
+        [HttpGet]
+        public async Task<IActionResult> Crear(string format)
+        {
+            try
+            {
+                var usuarioID = _usersService.ObtenerUsuario();
+
+                var model = new PostViewModel();
+
+                model.user_id = usuarioID;
+                model.format = format;
+
+                //Obtenemos el formato de la entrada creada
+                var formats = await _repositoryFormat.Obtener();
+                model.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
+                model.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
+
+                //Obtenemos Categorias Select List
+                model.categories = await ObtenerCategorias();
+
+                //Obtenemos Media Types Select List
+                model.mediaTypes = await ObtenerMediaTypes();
+
+                //Obtener fuente de los links
+                model.sources = await ObtenerSource();
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                //Crear mensaje de error para modal
+                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
+                Session.ErrorSession(HttpContext, errorModal);
+
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Crear(PostViewModel viewModel)
+        {
+            try
+            {
+                //verificamos que el model state sea valido antes de continuar
                 if (!ModelState.IsValid)
-				{
-					viewModel.categories = await ObtenerCategorias();
-					return View(viewModel);
-				}
+                {
+                    viewModel.categories = await ObtenerCategorias();
+                    viewModel.mediaTypes = await ObtenerMediaTypes();
+                    viewModel.sources = await ObtenerSource();
 
-				//Verificamos que la categoria que nos mandan exista
-				var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
+                    // Agregar categorias, link y multimedia
+                    if (!viewModel.sourceListString.IsNullOrEmpty())
+                    {
+                        //Deserializamos string de media
+                        List<CategoryForm> categoriesForms = JsonSerializer.Deserialize<List<CategoryForm>>(viewModel.categoryListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-				if (categoria is null)
-				{
-					//Crear mensaje de error para modal
-					Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
-					return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-				}
+                        List<Category_Post> categoryPostList = new List<Category_Post>();
 
-				//Verificamos que el formato que nos mandan exista
-				var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
+                        foreach (var category in categoriesForms)
+                        {
+                            // Validar que cada categoría exista
+                            var categorySearched = await _repositoryCategorias.ObtenerPorId(category.category_id);
+                            categorySearched.id = category.category_id;
 
-				if (Formato is null)
-				{
-					//Crear mensaje de error para modal
-					Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
-					return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-				}
+                            if (categorySearched == null)
+                            {
+                                //Crear mensaje de error para modal
+                                Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+                                return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                            }
+                            else
+                            {
+                                Category_Post aux = new Category_Post();
+                                aux.Categoria = categorySearched;
+                                categoryPostList.Add(aux);
 
-				//Colocamos fecha actual
-				viewModel.created_at = DateTime.Now;
+                            }
 
-				await _repositoryPosts.Crear(viewModel);
+                        }
 
-				//Subir Media
-				if (!viewModel.mediaListString.IsNullOrEmpty())
-				{
-					//Deserializamos string de media
-					List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        viewModel.categoryList = categoryPostList;
+                    }
 
-					//Mappeamos de MediaForm a Media
-					List<Media> medias = _mapper.Map<List<Media>>(mediaForms);
+                    return View(viewModel);
+                }
 
-					//Agregamos el numero de post creado a cada Media
-					foreach (var media in medias)
-					{
-						media.post_id = viewModel.id;
-					}
+                //Verificamos que la categoria que nos mandan exista
+                var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
 
-					//Subimos MeiaLinks
-					await _repositoryMedia.Crear(medias);
-				}
+                if (categoria is null)
+                {
+                    //Crear mensaje de error para modal
+                    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+                    return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                }
 
-				//Subir Links
+                //Verificamos que el formato que nos mandan exista
+                var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
+
+                if (Formato is null)
+                {
+                    //Crear mensaje de error para modal
+                    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+                    return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                }
+
+                //Colocamos fecha actual
+                viewModel.created_at = DateTime.Now;
+
+                await _repositoryPosts.Crear(viewModel);
+
+                //Subir Media
+                if (!viewModel.mediaListString.IsNullOrEmpty())
+                {
+                    //Deserializamos string de media
+                    List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    //Mappeamos de MediaForm a Media
+                    List<Media> medias = _mapper.Map<List<Media>>(mediaForms);
+
+                    //Agregamos el numero de post creado a cada Media
+                    foreach (var media in medias)
+                    {
+                        media.post_id = viewModel.id;
+                    }
+
+                    //Subimos MeiaLinks
+                    await _repositoryMedia.Crear(medias);
+                }
+
+                //Subir Links
                 if (!viewModel.sourceListString.IsNullOrEmpty())
                 {
                     //Deserializamos string de media
@@ -239,136 +276,156 @@ namespace Backend_portafolio.Controllers
 
                 //Subir Categorias
                 if (!viewModel.sourceListString.IsNullOrEmpty())
-				{
+                {
+                    //Deserializamos string de media
+                    List<CategoryForm> categoriesForms = JsonSerializer.Deserialize<List<CategoryForm>>(viewModel.categoryListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-				}
+                    foreach (var category in categoriesForms)
+                    {
+                        // Validar que cada categoría exista
+                        var categorySearched = _repositoryCategorias.ObtenerPorId(category.category_id);
+
+                        if (categorySearched == null)
+                        {
+                            //Crear mensaje de error para modal
+                            Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+                            return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                        }
+
+                        // Agregarle el número del post a CategoriaForm
+                        category.post_id = viewModel.id;
+                    }
+
+                    //Subimos Las categorias del Post
+                    await _repositoryCategorias.CrearCategoriaPorPost(categoriesForms);
+                }
 
                 return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-			} 
-			catch (Exception)
-			{
-				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Posts" };
-				Session.ErrorSession(HttpContext, errorModal);
+            }
+            catch (Exception)
+            {
+                //Crear mensaje de error para modal
+                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Posts" };
+                Session.ErrorSession(HttpContext, errorModal);
 
-				//Redirect a la página anterior
-				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                //Redirect a la página anterior
+                return RedirectToAction("Index", "Posts", new { format = viewModel.format });
 
-			}
-		}
+            }
+        }
 
 
-		/************/
-		/*  EDITAR  */
-		/************/
-		[HttpGet]
-		public async Task<IActionResult> Editar(int id, string format)
-		{
-			try
-			{
-				var model = await _repositoryPosts.ObtenerPorId(id);
+        //--------------------------------------
+        // EDIT
+        //--------------------------------------
+        [HttpGet]
+        public async Task<IActionResult> Editar(int id, string format)
+        {
+            try
+            {
+                var model = await _repositoryPosts.ObtenerPorId(id);
 
-				//Mapeamos de Post a PostViewModel
-				var modelView = _mapper.Map<PostViewModel>(model);
+                //Mapeamos de Post a PostViewModel
+                var modelView = _mapper.Map<PostViewModel>(model);
 
-				modelView.user_id = _usersService.ObtenerUsuario();
-				modelView.categories = await ObtenerCategorias();
-				modelView.mediaTypes = await ObtenerMediaTypes();
-				modelView.sources = await ObtenerSource();
+                modelView.user_id = _usersService.ObtenerUsuario();
+                modelView.categories = await ObtenerCategorias();
+                modelView.mediaTypes = await ObtenerMediaTypes();
+                modelView.sources = await ObtenerSource();
 
                 modelView.mediaList = await _repositoryMedia.ObtenerPorPost(modelView.id);
                 modelView.linkList = await _repositoryLink.ObtenerPorPost(modelView.id);
-				modelView.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(modelView.id);
+                modelView.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(modelView.id);
 
                 var formats = await _repositoryFormat.Obtener();
-				modelView.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
-				modelView.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
+                modelView.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
+                modelView.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
 
-				return View(modelView);
-			}
-			catch (Exception)
-			{
-				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
-				Session.ErrorSession(HttpContext, errorModal);
+                return View(modelView);
+            }
+            catch (Exception)
+            {
+                //Crear mensaje de error para modal
+                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
+                Session.ErrorSession(HttpContext, errorModal);
 
-				return RedirectToAction("Index", "Home");
-			}
-		}
+                return RedirectToAction("Index", "Home");
+            }
+        }
 
-		[HttpPost]
-		public async Task<IActionResult>Editar(PostViewModel viewModel)
-		{
-			try
-			{
-				/***** POST *****/
+        [HttpPost]
+        public async Task<IActionResult> Editar(PostViewModel viewModel)
+        {
+            try
+            {
+                /***** POST *****/
 
-				if (!ModelState.IsValid)
-				{
-					viewModel.categories = await ObtenerCategorias();
-					viewModel.formats = await ObtenerCategorias();
-					return View(viewModel);
-				}
+                if (!ModelState.IsValid)
+                {
+                    viewModel.categories = await ObtenerCategorias();
+                    viewModel.formats = await ObtenerCategorias();
+                    return View(viewModel);
+                }
 
-				//Verificamos que la categoria que nos mandan exista
-				var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
+                //Verificamos que la categoria que nos mandan exista
+                var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
 
-				if (categoria is null)
-				{
-					//Crear mensaje de error para modal
-					Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
-					return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-				}
+                if (categoria is null)
+                {
+                    //Crear mensaje de error para modal
+                    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+                    return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                }
 
-				//Verificamos que el formato que nos mandan exista
-				var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
+                //Verificamos que el formato que nos mandan exista
+                var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
 
-				if (Formato is null)
-				{
-					//Crear mensaje de error para modal
-					Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
-					return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-				}
+                if (Formato is null)
+                {
+                    //Crear mensaje de error para modal
+                    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+                    return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                }
 
-				viewModel.modify_at = DateTime.Now;
+                viewModel.modify_at = DateTime.Now;
 
-				await _repositoryPosts.Editar(viewModel);
+                await _repositoryPosts.Editar(viewModel);
 
 
-				/***** METAS *****/
+                /***** METAS *****/
 
-				if (!viewModel.mediaListString.IsNullOrEmpty() && viewModel.mediaListString != "[]")
-				{
-					//Deserializamos string de media
-					List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString);
-					List<Media> medias = new List<Media>();
+                if (!viewModel.mediaListString.IsNullOrEmpty() && viewModel.mediaListString != "[]")
+                {
+                    //Deserializamos string de media
+                    List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString);
+                    List<Media> medias = new List<Media>();
 
-					//Verificamos si entre los datos tenemos que actualizar algunos
-					foreach (var mediaForm in mediaForms)
-					{
-						Media aux = _mapper.Map<Media>(mediaForm);
-						aux.post_id = viewModel.id;
+                    //Verificamos si entre los datos tenemos que actualizar algunos
+                    foreach (var mediaForm in mediaForms)
+                    {
+                        Media aux = _mapper.Map<Media>(mediaForm);
+                        aux.post_id = viewModel.id;
 
-						if (aux?.id is 0)
-						{
-							//NUEVO
-							medias.Add(aux);
-						}
-						else if (aux?.id is not 0 && aux?.url is not null)
-						{
-							//ACTUALIZAMOS
-							await _repositoryMedia.Editar(aux);
-						}
-						else
-						{
-							//ELIMINAMOS
-							await _repositoryMedia.Borrar(aux.id);
-						}
-					}
+                        if (aux?.id is 0)
+                        {
+                            //NUEVO
+                            medias.Add(aux);
+                        }
+                        else if (aux?.id is not 0 && aux?.url is not null)
+                        {
+                            //ACTUALIZAMOS
+                            await _repositoryMedia.Editar(aux);
+                        }
+                        else
+                        {
+                            //ELIMINAMOS
+                            await _repositoryMedia.Borrar(aux.id);
+                        }
+                    }
 
-					//Subimos MeiaLinks
-					await _repositoryMedia.Crear(medias);
-				}
+                    //Subimos MeiaLinks
+                    await _repositoryMedia.Crear(medias);
+                }
 
 
                 /***** LINKS *****/
@@ -411,31 +468,31 @@ namespace Backend_portafolio.Controllers
 
             }
             catch (Exception ex)
-			{
+            {
 
-				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = ex.Message, type = true, path = "Posts" };
-				Session.ErrorSession(HttpContext, errorModal);
+                //Crear mensaje de error para modal
+                var errorModal = new ModalViewModel { message = ex.Message, type = true, path = "Posts" };
+                Session.ErrorSession(HttpContext, errorModal);
 
-				//Redirige a la página anterior
-				return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-			}
-            
+                //Redirige a la página anterior
+                return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+            }
+
         }
 
-		[HttpPost]
-		public async Task<IActionResult> EditarBorrador(int id, bool draft)
-		{
-			try
-			{
+        [HttpPost]
+        public async Task<IActionResult> EditarBorrador(int id, bool draft)
+        {
+            try
+            {
                 var mensaje = draft ? $"La entrada se ha colocado como borrador exitosamente" : $"La entrada se ha publicado exitosamente";
 
                 await _repositoryPosts.EditarBorrador(id, draft);
 
                 return Json(new { error = false, mensaje = mensaje });
             }
-			catch (Exception ex)
-			{
+            catch (Exception ex)
+            {
 
                 return Json(new { error = true, mensaje = ex.Message });
             }
@@ -443,53 +500,52 @@ namespace Backend_portafolio.Controllers
         }
 
 
-		/************/
-		/*  BORRAR  */
-		/************/
-		[HttpPost]
-		public async Task<IActionResult>Borrar(int id)
-		{
-			try
-			{
-				//Verificar si existe
-				var post = await _repositoryPosts.ObtenerPorId(id);
+        //--------------------------------------
+        // DELTE
+        //--------------------------------------
+        [HttpPost]
+        public async Task<IActionResult> Borrar(int id)
+        {
+            try
+            {
+                //Verificar si existe
+                var post = await _repositoryPosts.ObtenerPorId(id);
 
-				if(post is null)
-					return View("NoEncontrado", "Home");
+                if (post is null)
+                    return View("NoEncontrado", "Home");
 
-				await _repositoryPosts.Borrar(id);
+                await _repositoryPosts.Borrar(id);
 
-				return Json(new { error = false, mensaje = "¡La entrada ha sido borrada correctamente!" });
-			}
-			catch(Exception)
-			{
-				return Json(new { error = true, mensaje = "La entrada no se pudo borrar.\n¡Se ha producido un error!" });
+                return Json(new { error = false, mensaje = "¡La entrada ha sido borrada correctamente!" });
+            }
+            catch (Exception)
+            {
+                return Json(new { error = true, mensaje = "La entrada no se pudo borrar.\n¡Se ha producido un error!" });
 
-			}
-		}
-
-		/*****************/
-		/*   FUNCIONES   */
-		/*****************/
+            }
+        }
 
 
-		private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
-		{
-			var categories = await _repositoryCategorias.Obtener();
-			return categories.Select(category => new SelectListItem(category.name, category.id.ToString()));
-		}
+        //--------------------------------------
+        // FUNCTIONS
+        //--------------------------------------
+        private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
+        {
+            var categories = await _repositoryCategorias.Obtener();
+            return categories.Select(category => new SelectListItem(category.name, category.id.ToString()));
+        }
 
-		private async Task<IEnumerable<SelectListItem>> ObtenerFormatos()
-		{
-			var formats = await _repositoryFormat.Obtener();
-			return formats.Select(format => new SelectListItem(format.name, format.id.ToString()));
-		}
+        private async Task<IEnumerable<SelectListItem>> ObtenerFormatos()
+        {
+            var formats = await _repositoryFormat.Obtener();
+            return formats.Select(format => new SelectListItem(format.name, format.id.ToString()));
+        }
 
         private async Task<IEnumerable<SelectListItem>> ObtenerMediaTypes()
         {
             var mediaTypes = await _repositoryMediatype.Obtener();
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
-		}
+        }
 
         private async Task<IEnumerable<SelectListItem>> ObtenerSource()
         {
@@ -497,5 +553,5 @@ namespace Backend_portafolio.Controllers
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
         }
 
-	}
+    }
 }
