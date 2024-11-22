@@ -23,10 +23,13 @@ namespace Backend_portafolio.Sevices
 	{
 		Task Editar(Categoria categoria);
 		Task Crear(Categoria categoria);
+		Task CrearCategoriaPorPost(IEnumerable<CategoryForm> categorias);
 		Task<bool> Existe(string name);
 		Task<IEnumerable<Categoria>> Obtener();
 		Task<Categoria> ObtenerPorId(int id);
-		Task Borrar(int id);
+		Task<IEnumerable<Categoria>> ObtenerPorPost(int post_id);
+
+        Task Borrar(int id);
 		Task<bool> sePuedeBorrar(int category_id);
 		Task<IEnumerable<Category_Post>> ObtenerCategoriaPostPorId(int id);
 	}
@@ -49,8 +52,22 @@ namespace Backend_portafolio.Sevices
 			categoria.id = id;
 		}
 
-		// OBTENER CATEGORIA POR LA ID
-		public async Task<Categoria> ObtenerPorId(int id)
+        public async Task CrearCategoriaPorPost(IEnumerable<CategoryForm> categorias)
+		{
+            using var connection = new SqlConnection(_connectionString);
+
+            foreach (var category in categorias)
+            {
+                await connection.ExecuteAsync(
+                    $@"INSERT INTO {CATEGORIA_POST.TABLA} ({CATEGORIA_POST.POST_ID}, {CATEGORIA_POST.CATEGORY_ID}) VALUES (@{CATEGORIA_POST.POST_ID}, @{CATEGORIA_POST.CATEGORY_ID});",
+                    category
+                );
+            }
+        }
+
+
+        // OBTENER CATEGORIA POR LA ID
+        public async Task<Categoria> ObtenerPorId(int id)
 		{
 			using var connection = new SqlConnection(_connectionString);
 			Categoria categoria = await connection.QueryFirstOrDefaultAsync<Categoria>(
@@ -89,8 +106,26 @@ namespace Backend_portafolio.Sevices
 
 		}
 
-		// VERIFICAR SI EXISTE EL NOMBRE DE LA CATEGORIA
-		public async Task<bool> Existe(string name)
+        public async Task<IEnumerable<Categoria>> ObtenerPorPost(int id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            return await connection.QueryAsync<Categoria>(
+                        $@"SELECT C.{CATEGORIA.ID}, C.{CATEGORIA.NOMBRE}
+                        FROM {POST.TABLA} P
+                        INNER JOIN {CATEGORIA_POST.TABLA} CP
+                        ON P.{POST.ID} = CP.{CATEGORIA_POST.POST_ID}
+						INNER JOIN {CATEGORIA.TABLA} C
+						ON C.{CATEGORIA.ID} = CP.{CATEGORIA_POST.CATEGORY_ID}
+                        WHERE CP.{CATEGORIA_POST.POST_ID} = @{POST.ID};",
+                        new
+                        {
+                            id
+                        });
+        }
+
+        // VERIFICAR SI EXISTE EL NOMBRE DE LA CATEGORIA
+        public async Task<bool> Existe(string name)
 		{
 			using var connection = new SqlConnection(_connectionString);
 			var existe = await connection.QueryFirstOrDefaultAsync<bool>(

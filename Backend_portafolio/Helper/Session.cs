@@ -49,7 +49,7 @@ namespace Backend_portafolio.Helper
             httpContext.Session.SetString("CantidadPosts", formatsJson);
         }
 
-        public static int GeCantidadPostsSession(HttpContext httpContext)
+        public static int GetCantidadPostsSession(HttpContext httpContext)
         {
             var errorModal = httpContext.Session.GetString("CantidadPosts");
 

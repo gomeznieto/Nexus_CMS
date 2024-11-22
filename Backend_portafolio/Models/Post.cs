@@ -18,14 +18,14 @@ namespace Backend_portafolio.Models
 		[Display(Name = "Formato")]
 		public int format_id { get; set; }
 
-		[Required(ErrorMessage = "El campo {0} es requerido")]
 		public string userName { get; set; }
+		//[Required(ErrorMessage = "El campo {0} es requerido")]
 		public int user_id { get; set; }
 
 		public bool draft { get; set; }
 		public string format { get; set; }
 
-		[Required(ErrorMessage = "El campo {0} es requerido")]
+		//[Required(ErrorMessage = "El campo {0} es requerido")]
 		[Display(Name = "Fecha de creación")]
 		public DateTime created_at { get; set; }
 		public DateTime modify_at { get; set; }
@@ -38,9 +38,9 @@ namespace Backend_portafolio.Models
 
 
 		// A BORRAR
-		[Display(Name = "Categoria")]
-		public int category_id { get; set; } //BORRAR
-		public string category { get; set; } //BORRAR
+		//[Display(Name = "Categoria")]
+		//public int category_id { get; set; } //BORRAR
+		//public string category { get; set; } //BORRAR
 
     }
 }

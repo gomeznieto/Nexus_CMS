@@ -16,7 +16,7 @@
 	ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
 
 	//Cantidad de entradas por post
-	var cantidadPorPost = Session.GeCantidadPostsSession(HttpContextAccessor.HttpContext);
+	var cantidadPorPost = Session.GetCantidadPostsSession(HttpContextAccessor.HttpContext);
 
 	//Paginas de entradas
 	var paginas = (ViewBag.Cantidad / cantidadPorPost) + 1;

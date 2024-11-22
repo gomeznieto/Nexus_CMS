@@ -49,8 +49,8 @@ namespace Backend_portafolio.Sevices
 		{
 			using var connection = new SqlConnection(_connectionString);
 			var id = await connection.QuerySingleAsync<int>($@"
-				INSERT INTO {POST.TABLA} ({POST.TITULO}, {POST.DESCRIPCION}, {POST.COVER}, {POST.CATEGORIA_ID}, P.{POST.USER_ID}, P.{POST.FORMAT_ID}, P.{POST.CREADO}, P.{POST.BORRADOR})
-				VALUES (@{POST.TITULO}, @{POST.DESCRIPCION}, @{POST.COVER}, @{POST.CATEGORIA_ID}, @{POST.USER_ID}, @{POST.FORMAT_ID}, @{POST.CREADO}, @{POST.BORRADOR});
+				INSERT INTO {POST.TABLA} ({POST.TITULO}, {POST.DESCRIPCION}, {POST.COVER}, P.{POST.USER_ID}, P.{POST.FORMAT_ID}, P.{POST.CREADO}, P.{POST.BORRADOR})
+				VALUES (@{POST.TITULO}, @{POST.DESCRIPCION}, @{POST.COVER}, @{POST.USER_ID}, @{POST.FORMAT_ID}, @{POST.CREADO}, @{POST.BORRADOR});
 				SELECT SCOPE_IDENTITY();",
 				post);
 
@@ -81,10 +81,8 @@ namespace Backend_portafolio.Sevices
 			using var connection = new SqlConnection(_connectionString);
 
 			var query = $@"SELECT P.{POST.ID}, P.{POST.TITULO}, P.{POST.DESCRIPCION}, P.{POST.COVER}, P.{POST.CREADO}, P.{POST.BORRADOR}, P.{POST.MODIFICADO},
-						U.{POST.NOMBRE} as {POST.USER}, F.{FORMAT.NOMBRE} as {POST.FORMAT}, C.{CATEGORIA.NOMBRE} as {POST.CATEGORIA}
+						U.{POST.NOMBRE} as {POST.USER}, F.{FORMAT.NOMBRE} as {POST.FORMAT}
 						FROM {POST.TABLA} P
-						INNER JOIN {CATEGORIA.TABLA} C
-						ON P.{POST.CATEGORIA_ID} = C.id
 						INNER JOIN users U 
 						ON P.{POST.USER_ID} = U.id
 						INNER JOIN {FORMAT.TABLA}
@@ -103,10 +101,8 @@ namespace Backend_portafolio.Sevices
 			using var connection = new SqlConnection(_connectionString);
 			return await connection.QueryFirstOrDefaultAsync<Post>($@"
 								SELECT P.{POST.ID}, P.{POST.TITULO}, P.{POST.DESCRIPCION}, P.{POST.COVER}, P.{POST.CREADO}, P.{POST.BORRADOR}, P.{POST.MODIFICADO},
-								U.{POST.NOMBRE} as {POST.USER}, F.{FORMAT.NOMBRE} as {POST.FORMAT}, C.{CATEGORIA.NOMBRE} as {POST.CATEGORIA}
+								U.{POST.NOMBRE} as {POST.USER}, F.{FORMAT.NOMBRE} as {POST.FORMAT}
 								FROM {POST.TABLA} P
-								INNER JOIN {CATEGORIA.TABLA} C
-								ON P.{POST.CATEGORIA_ID} = C.id
 								INNER JOIN users U ON P.{POST.USER_ID} = U.id
 								INNER JOIN {FORMAT.TABLA}
 								F ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}

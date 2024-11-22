@@ -211,15 +211,15 @@ namespace Backend_portafolio.Controllers
                     return View(viewModel);
                 }
 
-                //Verificamos que la categoria que nos mandan exista
-                var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
+                ////Verificamos que la categoria que nos mandan exista
+                //var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
 
-                if (categoria is null)
-                {
-                    //Crear mensaje de error para modal
-                    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
-                    return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-                }
+                //if (categoria is null)
+                //{
+                //    //Crear mensaje de error para modal
+                //    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+                //    return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                //}
 
                 //Verificamos que el formato que nos mandan exista
                 var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
@@ -367,15 +367,15 @@ namespace Backend_portafolio.Controllers
                     return View(viewModel);
                 }
 
-                //Verificamos que la categoria que nos mandan exista
-                var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
+                ////Verificamos que la categoria que nos mandan exista
+                //var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
 
-                if (categoria is null)
-                {
-                    //Crear mensaje de error para modal
-                    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
-                    return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-                }
+                //if (categoria is null)
+                //{
+                //    //Crear mensaje de error para modal
+                //    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+                //    return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                //}
 
                 //Verificamos que el formato que nos mandan exista
                 var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
