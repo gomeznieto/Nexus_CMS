@@ -1,16 +1,17 @@
-﻿// MODAL
+﻿
+// MODAL
 function openModal(obj) {
-	const modal = document.getElementById("modal");
-	const inputModal = document.getElementsByName("id")[0];
-	modal.classList.remove("closeModal")
-	inputModal.value = obj.id;
-	const modalMsg = document.getElementById("modalMsg");
-	modalMsg.innerHTML = `¿Está seguro que quiere borrar ${obj.name}?`;
+    const modal = document.getElementById("modal");
+    const inputModal = document.getElementsByName("id")[0];
+    modal.classList.remove("closeModal")
+    inputModal.value = obj.id;
+    const modalMsg = document.getElementById("modalMsg");
+    modalMsg.innerHTML = `¿Está seguro que quiere borrar ${obj.name}?`;
 }
 
 function closeModal() {
-	const modal = document.getElementById("modal");
-	modal.classList.add("closeModal");
+    const modal = document.getElementById("modal");
+    modal.classList.add("closeModal");
 }
 
 async function closeModalError() {
@@ -28,7 +29,7 @@ async function closeModalError() {
 
 //MENU COLLAPSE
 $('.btn-expand-collapse').click(function (e) {
-	$('.navbar-primary').toggleClass('collapsed');
+    $('.navbar-primary').toggleClass('collapsed');
 });
 
 //MODEL RESPUESTA
@@ -69,8 +70,7 @@ var sourceLinks = [];
 /*
  * Limpia los elementos que son saltos de líneas '\n'
  */
-function cleanNodes(element)
-{
+function cleanNodes(element) {
     let nodeElements = element.parentNode.childNodes;
     let nodeElementsClean = [];
 
@@ -89,7 +89,7 @@ function cleanNodes(element)
  * Agregamos select e inputl al array
  */
 function addList(element, type) {
-    console.log({element, type})
+    console.log({ element, type })
     //Agregamos elemento al array
     let nodeElementsClean = cleanNodes(element)
 
@@ -101,7 +101,7 @@ function addList(element, type) {
     let valueInput = input.value;
 
     //previousMedia Meta. Si no es prevous, es nuevo, se coloca undefined
-    let valueId = input.id|| undefined;
+    let valueId = input.id || undefined;
 
     if (valueId == undefined) {
         if (type == "post") {
@@ -118,9 +118,6 @@ function addList(element, type) {
             sourceLinks.push({ id: valueId, source_id: valueSelect, url: valueInput })
         }
     }
-
-    console.log(imageLinks)
-    console.log(sourceLinks)
 
     //Modificamos la función del botón
     element.classList.remove('btn-primary');
@@ -246,6 +243,7 @@ function removeInput(element, type) {
 //Agregar categorias
 let categoryList = [];
 function addCategory(element) {
+    console.log("Entramos 2")
     const categoryId = element.options[element.selectedIndex].value;
     const categoryName = element.options[element.selectedIndex].text;
     const postId = element.getAttribute("postId");
@@ -253,33 +251,33 @@ function addCategory(element) {
     //Objeto
     let obj = {
         post_id: parseInt(postId),
-        catedgory_id: parseInt(categoryId)
+        category_id: parseInt(categoryId)
     }
 
     if (postId == 0) {
 
         //Post Nuevo
-        if (!categoryList.find(c => c.catedgory_id == categoryId))
-        {
+        if (!categoryList.find(c => c.category_id == categoryId)) {
             //El elemento no se encuentra en la lista
             categoryList.push(obj);
 
-            addCategoryTag(categoryName, categoryId) 
+            addCategoryTag(categoryName, categoryId)
         }
     } else {
         //Post edicion
-        if (!categoryList.find(c => c.catedgory_id == categoryId))
-        {
+        if (!categoryList.find(c => c.category_id == categoryId)) {
             //El elemento no se encuentra en la lista
             categoryList.push(obj);
 
-            addCategoryTag(categoryName, categoryId) 
+            addCategoryTag(categoryName, categoryId)
         }
     }
+
 
     //Colocamos el selected en la opción inicial
     element.selectedIndex = 0;
 }
+
 
 //Renderizar tag de la categoria en la página
 function addCategoryTag(categoryName, categoryId) {
@@ -306,10 +304,33 @@ function addCategoryTag(categoryName, categoryId) {
     categoryContainer.appendChild(categoria);
 }
 
+//Agregar categoria si hay errores
+function addCategoryRefresh(element) {
+    const categoryId = element?.id;
+    const categoryName = element?.name;
+    const postId = element?.postId;
+
+    //Objeto
+    let obj = {
+        post_id: parseInt(postId),
+        category_id: parseInt(categoryId)
+    }
+
+    if (!categoryList.find(c => c.category_id == categoryId)) {
+        //El elemento no se encuentra en la lista
+        categoryList.push(obj);
+
+        addCategoryTag(categoryName, categoryId)
+    }
+
+    //Colocamos el selected en la opción inicial
+    element.selectedIndex = 0;
+}
+
 //Borrar categoria del tag
 function deleteCategory(categoria, categoryId) {
 
-    categoryList = categoryList.filter(c => c.catedgory_id != categoryId);
+    categoryList = categoryList.filter(c => c.category_id != categoryId);
 
     const categoryContainer = document.getElementById("categoryContainer")
     categoryContainer.removeChild(categoria)
@@ -321,13 +342,15 @@ function enviarDatosAlServidor() {
     // Actualiza el valor del campo oculto con los datos del array
     document.getElementById('imageLinksField').value = JSON.stringify(imageLinks);
     document.getElementById('sourceLinksField').value = JSON.stringify(sourceLinks);
+    document.getElementById('categoryListField').value = JSON.stringify(categoryList);
+
     imageLinks = [];
     sourceLinks = [];
+    categoryList = [];
 }
 
 //Colocamos draft como true
 function Borrador() {
-    console.log("Borrador")
     const inputDraft = document.getElementById("inputDraft");
     inputDraft.value = true;
 }
@@ -386,7 +409,7 @@ function addTextFormat(style) {
 
     txtarea.value = before + `${styleFormat} ` + after.substring(selectedText.length);
     txtarea.selectionStart = txtarea.selectionEnd = startPos + styleFormat.length;
-    txtarea.focus(); 
+    txtarea.focus();
 }
 
 function textFormat(format, text) {
@@ -422,7 +445,7 @@ function textFormat(format, text) {
 /* SELECCIONAR CANTIDAD DE ENTRADAS*/
 async function cambiarCantidadEntradas(cantidadEntradas) {
     //Mandar por fetch para guardar session con nueva cantidad por entrada
-    const url = `/Modals/ChangeNumberPosts/?cantidad=${cantidadEntradas}` 
+    const url = `/Modals/ChangeNumberPosts/?cantidad=${cantidadEntradas}`
     const response = await fetch(url);
     const result = await response.json();
 
