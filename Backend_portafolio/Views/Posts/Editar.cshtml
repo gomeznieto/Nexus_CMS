@@ -17,6 +17,7 @@
         <input type="hidden" asp-for="draft" id="draftCheckBox" />
         <input type="hidden" asp-for="mediaListString" id="imageLinksField" />
         <input type="hidden" asp-for="sourceListString" id="sourceLinksField" />
+        <input type="hidden" asp-for="categoryListString" id="categoryListField" />
 
         <div class="mb-3">
             <input asp-for="title" class="form-control fs-2 fw-bolder" placeholder="Agregar titulo" />
@@ -38,17 +39,20 @@
             <span asp-validation-for="cover" class="form-error"></span>
         </div>
 
-        <!-- CATEGORIA -->
-        <div class="mb-3">
-            <select  asp-items="Model.categories" class="form-select select-style"></select>
-        </div>
 
-       <div class="mb-3 d-flex gap-2">
-            @foreach (var category in Model.categoryList)
-            {
-                <a class="btn btn-add"><i class="fa-solid fa-tag me-1"></i>@category.Categoria.name</a>
-            }
-       </div>
+        <!-- EDITAR CATEGORIAS -->
+        <div class="mb-3">
+            <h3 class="fs-5">Categorias</h3>
+            <select class="form-select select-style" id="selectCategory" postId="@Model.id" onchange="addCategory(this)">
+                <option disabled selected>Seleccione categorías</option>
+                @foreach (var category in Model.categories)
+                {
+                    <option value="@category.Value">@category.Text</option>
+                }
+            </select>
+
+            <div class="mb-3 d-flex" id="categoryContainer"></div>
+        </div>
 
         <h3 class="fs-5">Multi Media</h3>
 
@@ -110,6 +114,30 @@
     <partial name="_Modal" model='new { url = "/Posts" }' />
 
     <script>
+
+        function agregarCategorias() {
+            let objs = []; // Eliminamos la anotación de tipo porque no es válida en JavaScript
+
+        @if (Model?.categoryList != null)
+        {
+            @foreach (var item in Model.categoryList)
+            {
+                <text>
+                        objs.push({
+                            id: @item.Categoria.id,
+                            postId: @Model.id,
+                            name: "@item.Categoria.name"
+                        });
+                </text>
+            }
+        }
+
+                objs.forEach(x => addCategoryRefresh(x));
+        }
+
+        // Llama automáticamente a la función después de definirla
+        agregarCategorias();
+
         function addInputMedia() {
             //Agregamos elemento nuevo para agragar nuevo medias
             var container = document.getElementById('inputContainerMedia');

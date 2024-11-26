@@ -211,16 +211,6 @@ namespace Backend_portafolio.Controllers
                     return View(viewModel);
                 }
 
-                ////Verificamos que la categoria que nos mandan exista
-                //var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
-
-                //if (categoria is null)
-                //{
-                //    //Crear mensaje de error para modal
-                //    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
-                //    return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-                //}
-
                 //Verificamos que el formato que nos mandan exista
                 var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
 
@@ -236,7 +226,7 @@ namespace Backend_portafolio.Controllers
 
                 await _repositoryPosts.Crear(viewModel);
 
-                //Subir Media
+                // SUBIR MEDIA
                 if (!viewModel.mediaListString.IsNullOrEmpty())
                 {
                     //Deserializamos string de media
@@ -255,7 +245,7 @@ namespace Backend_portafolio.Controllers
                     await _repositoryMedia.Crear(medias);
                 }
 
-                //Subir Links
+                //SUBIR LINKS
                 if (!viewModel.sourceListString.IsNullOrEmpty())
                 {
                     //Deserializamos string de media
@@ -274,7 +264,7 @@ namespace Backend_portafolio.Controllers
                     await _repositoryLink.Crear(links);
                 }
 
-                //Subir Categorias
+                //SUBIR CATEGORIAS
                 if (!viewModel.sourceListString.IsNullOrEmpty())
                 {
                     //Deserializamos string de media
@@ -367,16 +357,6 @@ namespace Backend_portafolio.Controllers
                     return View(viewModel);
                 }
 
-                ////Verificamos que la categoria que nos mandan exista
-                //var categoria = await _repositoryCategorias.ObtenerPorId(viewModel.category_id);
-
-                //if (categoria is null)
-                //{
-                //    //Crear mensaje de error para modal
-                //    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
-                //    return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-                //}
-
                 //Verificamos que el formato que nos mandan exista
                 var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
 
@@ -462,6 +442,48 @@ namespace Backend_portafolio.Controllers
 
                     //Subimos Links
                     await _repositoryLink.Crear(links);
+                }
+
+                // CATEGOIRIAS
+                //SUBIR CATEGORIAS
+                if (!viewModel.sourceListString.IsNullOrEmpty())
+                {
+                    //Deserializamos string de media
+                    List<CategoryForm> categoriesForms = JsonSerializer.Deserialize<List<CategoryForm>>(viewModel.categoryListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    List<Category_Post> categoriesPosts = (await _repositoryCategorias.ObtenerCategoriaPostPorId(viewModel.id)).ToList();
+
+                    foreach (var categoryForm in categoriesForms)
+                    {
+                        // Validar que cada categoría exista
+                        var categorySearched = _repositoryCategorias.ObtenerPorId(categoryForm.category_id);
+
+                        if (categorySearched == null)
+                        {
+                            //Crear mensaje de error para modal
+                            Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+                            return RedirectToAction("Index", "Posts", new { format = viewModel.format });
+                        }
+
+                        // Agregarle el número del post a CategoriaForm
+                        //categoryForm.post_id = viewModel.id;
+
+                        //Si la categoria no se encuentra en el listado ya subido, se agrega
+                        if (categoriesPosts.All(x => x.Categoria.id != categoryForm.category_id))
+                        {
+                            await _repositoryCategorias.CrearCategoriaPorPost(categoryForm);
+                        }
+                    }
+
+                    //Buscamos entre las categorias que ya están subidas por aquellas que no están en las que nos llegan
+                    foreach(var categoryPost in categoriesPosts)
+                    {
+                        if (categoriesForms.All(x => x.category_id != categoryPost.Categoria.id))
+                        {
+                            await _repositoryCategorias.BorrarCatergoriaPorPost(categoryPost.post_id, categoryPost.Categoria.id);
+                        }
+                    }
+
+                    //Subimos Las categorias del Post
                 }
 
                 return RedirectToAction("Index", "Posts", new { format = viewModel.format });

@@ -126,7 +126,6 @@ namespace Backend_portafolio.Sevices
 											SET {POST.TITULO} = @{POST.TITULO}, 
 											{POST.DESCRIPCION} = @{POST.DESCRIPCION}, 
 											{POST.COVER} = @{POST.COVER}, 
-											{POST.CATEGORIA_ID} = @{POST.CATEGORIA_ID}, 
 											{POST.USER_ID} = @{POST.USER_ID}, 
 											{POST.BORRADOR} = @{POST.BORRADOR},											
 											{POST.FORMAT_ID} = @{POST.FORMAT_ID},
