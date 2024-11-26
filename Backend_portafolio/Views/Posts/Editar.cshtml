@@ -126,7 +126,7 @@
                         objs.push({
                             id: @item.Categoria.id,
                             postId: @Model.id,
-                            name: "@item.Categoria.name"
+                            name: "@Html.Raw(item.Categoria.name)"
                         });
                 </text>
             }

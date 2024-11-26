@@ -398,7 +398,7 @@ namespace Backend_portafolio.Controllers
                         }
                         else
                         {
-                            //ELIMINAMOS
+                            //ELIMINAMOS AL ESTAR URL NULL
                             await _repositoryMedia.Borrar(aux.id);
                         }
                     }
@@ -435,7 +435,7 @@ namespace Backend_portafolio.Controllers
                         }
                         else
                         {
-                            //ELIMINAMOS
+                            //ELIMINAMOS AL ESTAR URL NULL
                             await _repositoryLink.Borrar(aux.id);
                         }
                     }

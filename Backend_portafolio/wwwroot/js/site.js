@@ -88,8 +88,9 @@ function cleanNodes(element) {
 /*
  * Agregamos select e inputl al array
  */
+let id_aux = 1;
+
 function addList(element, type) {
-    console.log({ element, type })
     //Agregamos elemento al array
     let nodeElementsClean = cleanNodes(element)
 
@@ -103,12 +104,16 @@ function addList(element, type) {
     //previousMedia Meta. Si no es prevous, es nuevo, se coloca undefined
     let valueId = input.id || undefined;
 
+
     if (valueId == undefined) {
         if (type == "post") {
-            imageLinks.push({ mediatype_id: valueSelect, url: valueInput });
+            imageLinks.push({ id_aux: id_aux, mediatype_id: valueSelect, url: valueInput });
+            id_aux++;
+
         }
         else {
-            sourceLinks.push({ source_id: valueSelect, url: valueInput });
+            sourceLinks.push({ id_aux: id_aux, source_id: valueSelect, url: valueInput });
+            id_aux++;
         }
     } else {
 
@@ -123,7 +128,7 @@ function addList(element, type) {
     element.classList.remove('btn-primary');
     element.classList.add('btn-secondary');
     element.innerHTML = "Editar";
-    element.onclick = function () { editInput(element); }
+    element.onclick = function () { editInput(element, type); }
 
     //Deshabilitamos los cambios en el input
     input.disabled = true;
@@ -139,21 +144,18 @@ function addList(element, type) {
  * habilitamos select e input para poder editar. Si aceptamos agregamos al array.
  */
 function editInput(element, type) {
-
     let nodeElementsClean = cleanNodes(element)
-
+    console.log("----------\nENTRAMOS\n--------------")
     let select = nodeElementsClean[0];
     let input = nodeElementsClean[1];
     let btnCancelar = nodeElementsClean[3];
 
-    let valueSelect = select.value;
-    let valueInput = input.value;
+    let valueId = input.id;
 
-    //Eliminamos elemento
     if (type == "post") {
-        imageLinks = imageLinks.filter(x => x.valueSelect != valueSelect && x.valueInput != valueInput);
+        imageLinks = imageLinks.filter(x => x.id != valueId);
     } else {
-        sourceLinks = sourceLinks.filter(x => x.valueSelect != valueSelect && x.valueInput != valueInput);
+        sourceLinks = sourceLinks.filter(x => x.id != valueId);
     }
 
     //Habilitamos input para edición
@@ -178,8 +180,8 @@ function editInput(element, type) {
     btnCancelar.innerHTML = "Cancelar";
     btnCancelar.onclick = function () { cancelInput(element); }
 
-
 }
+
 
 /*
  * Regresamos botones previos a Editar
@@ -243,7 +245,6 @@ function removeInput(element, type) {
 //Agregar categorias
 let categoryList = [];
 function addCategory(element) {
-    console.log("Entramos 2")
     const categoryId = element.options[element.selectedIndex].value;
     const categoryName = element.options[element.selectedIndex].text;
     const postId = element.getAttribute("postId");
