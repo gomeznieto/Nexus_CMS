@@ -11,26 +11,38 @@ namespace Backend_portafolio.Controllers
 	{
 		private readonly ILogger<HomeController> _logger;
         private readonly IRepositoryFormat _repositoriyFormat;
+        private readonly IRepositoryPosts _repositoriyPosts;
 
-        public HomeController(ILogger<HomeController> logger, IRepositoryFormat repositoriyFormat)
+        public HomeController(ILogger<HomeController> logger, IRepositoryFormat repositoriyFormat, IRepositoryPosts repositoryPosts)
 		{
 			_logger = logger;
             _repositoriyFormat = repositoriyFormat;
+            _repositoriyPosts = repositoryPosts;
         }
 
-		public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
 		{
 			try
 			{
+				HomeViewModel viewModel = new HomeViewModel();
 				await Session.UpdateSession(HttpContext, _repositoriyFormat);
+                viewModel.formatList = (await _repositoriyFormat.Obtener()).ToList();
+				viewModel.ultimosPosts = (await _repositoriyPosts.Obtener()).ToList();
 
-				return View();
+                return View(viewModel);
 			}
 			catch (Exception)
 			{
 
 				return View();
 			}
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Index(Categoria viewModel)
+		{
+			return View();
 		}
 
 		public IActionResult NoEncontrado()

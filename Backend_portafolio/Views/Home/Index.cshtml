@@ -1,6 +1,7 @@
 ﻿@using Backend_portafolio.Helper
 @using Microsoft.AspNetCore.Http;
 @using System.Text.Json;
+@model HomeViewModel;
 
 @inject IHttpContextAccessor HttpContextAccessor
 
@@ -9,10 +10,35 @@
 
     // Error modal
     ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
+
 }
 
 <div class="text-center">
     <h1 class="display-4">Panel de Control</h1>
+
+    <!-- RESUMEN -->
+    <p>Cantidad de posts: @Model.ultimosPosts.Count()</p>
+    @foreach(var format in Model.formatList)
+    {
+        <p>@format.name: @Model.ultimosPosts.Count(x => x.format_id == format.id)</p>
+    }
+
+    <!-- ULTIMAS ENTRADAS-->
+    <p>Último post</p>
+    @foreach (var format in Model.formatList)
+    {
+        var ultimoPost = Model.ultimosPosts
+        .Where(x => x.format_id == format.id)
+        .OrderByDescending(x => x.id)        
+        .FirstOrDefault();
+        <p>@format.name: </p>
+        <a href="/posts/Editar/@ultimoPost.id?format=@format.name">@(ultimoPost != null ? ultimoPost.title : "--")</a>
+
+        <i class="fas fa-edit"></i>
+    }
+
+    <!-- BORRADOR RAPIDO -->
+
 </div>
 
 <!-- MODAL ERROR -->
