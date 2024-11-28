@@ -10,32 +10,102 @@
 
     // Error modal
     ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
+    ModalViewModel successModal = Session.GetSuccessSession(HttpContextAccessor.HttpContext);
 
 }
 
-<div class="text-center">
-    <h1 class="display-4">Panel de Control</h1>
+<div>
+    <h1 class="display-6 fw-light">Panel de Control</h1>
+    <div class="d-flex w-100">
+        <!-- COLUMAN 1 -->
+        <div class=" w-50 d-flex flex-column gap-2 me-4">
+            <div class="border-section">
+                <!-- RESUMEN -->
+                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Resumen</p>
+                <ul class="list-group list-unstyled">
+                    <li><p><i class="fa-solid fa-file "></i><span class="fw-bold">Cantidad de posts: </span>@Model.ultimosPosts.Count()</p></li>
 
-    <!-- RESUMEN -->
-    <p>Cantidad de posts: @Model.ultimosPosts.Count()</p>
-    @foreach(var format in Model.formatList)
-    {
-        <p>@format.name: @Model.ultimosPosts.Count(x => x.format_id == format.id)</p>
-    }
+                    @foreach (var format in Model.formatList)
+                    {
+                        <li><p><i class="fa-solid fa-thumbtack iconos_home me-3"></i><span class="fw-bold">@format.name:</span> @Model.ultimosPosts.Count(x => x.format_id == format.id)</p></li>
+                    }
+                </ul>
+            </div>
 
-    <!-- ULTIMAS ENTRADAS-->
-    <p>Último post</p>
-    @foreach (var format in Model.formatList)
-    {
-        var ultimoPost = Model.ultimosPosts
-        .Where(x => x.format_id == format.id)
-        .OrderByDescending(x => x.id)        
-        .FirstOrDefault();
-        <p>@format.name: </p>
-        <a href="/posts/Editar/@ultimoPost.id?format=@format.name">@(ultimoPost != null ? ultimoPost.title : "--")</a>
+            <div class="border-section">
+                <!-- ULTIMAS ENTRADAS-->
+                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Último post</p>
+                <ul class="list-group list-unstyled">
+                    @foreach (var format in Model.formatList)
+                    {
+                        var ultimoPost = Model.ultimosPosts
+                        .Where(x => x.format_id == format.id)
+                        .OrderByDescending(x => x.id)
+                        .FirstOrDefault();
+                        <li class="d-flex flex-column ">
+                            <p class="fw-bold">@format.name</p>
+                            <p>
+                                <i class="fas fa-edit iconos_home me-1">
+                                </i>
+                                <a href="/posts/Editar/@ultimoPost.id?format=@format.name" class="link_home">@(ultimoPost != null ? ultimoPost.title : "--")</a>
+                            </p>
+                                <span class="date_home "> (@ultimoPost.created_at.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES")) - @ultimoPost.created_at.ToShortTimeString())</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <!-- COLUMAN 2 -->
+        <div class=" w-50 d-flex flex-column gap-2">
+            <!-- ENTRADA RAPIDA -->
+            <div class="border-section">
+                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Entrada rápida</p>
+                <form asp-action="Index" method="post" class="mt-2">
 
-        <i class="fas fa-edit"></i>
-    }
+                    <!-- VALIDATION -->
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <!-- HIDDEN -->
+                    <input type="hidden" asp-for="user_id" />
+
+                    <!-- CREACION DE ENTRADA -->
+                    <div class="mb-3">
+                        <input asp-for="title" class="form-control fs-2 fw-bolder" placeholder="Agregar titulo" />
+                        <span asp-validation-for="title" class="form-error"></span>
+                    </div>
+
+                    <!-- POST -->
+                    <div class="mb-3">
+                        <!-- STYLES -->
+                        <partial name="_TextControl" />
+
+                        <!-- TEXT -->
+                        <textarea asp-for="description" class="form-control textarea-style" rows="10" placeholder="Agregar contenido de la entrada" id="post_text"></textarea>
+                        <span asp-validation-for="description" class="form-error"></span>
+                    </div>
+
+                    <!-- AGREGAR FORMAR -->
+                    <div class="mb-3">
+                        <h3 class="fs-5">Categorias</h3>
+                        <select class="form-select select-style" asp-for="format_id">
+                            <option disabled selected>Seleccione Formato</option>
+                            @foreach (var formato in Model.formatList)
+                            {
+                                <option value="@formato.id">@formato.name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- BUTTON -->
+                    <button type="submit" class="btn btn-action" onclick="BorradorHome();">Borrador</button>
+                    <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-trash"></i> Limpiar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <!-- BORRADOR RAPIDO -->
 
@@ -47,4 +117,8 @@
     <partial name="_ErrorModal" model=errorModal />
 }
 
+@if (successModal is not null)
+{
+    <partial name="_SuccessModal" model=successModal />
+}
 

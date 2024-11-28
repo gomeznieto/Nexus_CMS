@@ -7,5 +7,6 @@
 
         // Última actividad
         public List<Post> ultimosPosts { get; set; }
+
     }
 }

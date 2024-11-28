@@ -23,8 +23,17 @@ async function closeModalError() {
         const modal = document.getElementById("generalErrorModal");
         modal.classList.add("closeModal");
     }
+}
 
+async function closeModalSuccess() {
+    const url = `/Modals/DeleteSuccessModal`;
+    const response = await fetch(url);
+    const result = await response.json();
 
+    if (result) {
+        const modal = document.getElementById("generalSuccessModal");
+        modal.classList.add("closeModal");
+    }
 }
 
 //MENU COLLAPSE
@@ -58,6 +67,7 @@ async function verificarRespuestaModal(urlPath) {
     // Cerrar modal de borrado
     closeModal();
 }
+
 
 function closeModalResult(modalId) {
     document.getElementById(modalId).style.display = 'none';
@@ -396,6 +406,7 @@ async function borrador() {
     }
 
 }
+
 
 /* POST */
 

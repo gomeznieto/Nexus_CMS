@@ -21,7 +21,22 @@ namespace Backend_portafolio.Controllers
 			return Json(true);
 		}
 
-		public IActionResult ChangeNumberPosts(int cantidad)
+        public IActionResult DeleteSuccessModal()
+        {
+            try
+            {
+                Session.DeleteSuccessSession(HttpContext);
+
+            }
+            catch (Exception)
+            {
+                return Json(false);
+            }
+
+            return Json(true);
+        }
+
+        public IActionResult ChangeNumberPosts(int cantidad)
 		{
 			try
 			{

@@ -1,0 +1,18 @@
+﻿@model ModalViewModel
+
+<div id="generalSuccessModal">
+	<div class="bgModal" onclick="closeModalSuccess()">
+		<div class="modalAlert">
+			<div class="d-flex justify-content-end p-3">
+				<a class="btn-close-modal" onclick="closeModalSuccess()">&times;</a>
+			</div>
+			<div class="modal-body mb-3 d-flex flex-column justify-content-center align-items-center gap-4">
+					<i class="fa-solid fa-circle-check text-gray modal-success"></i>
+				<div>
+					<p class="fs-6 text-center">¡Éxito!</p>
+					<p id="mensajeModalError" class="fs-6 text-center">@Model.message</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

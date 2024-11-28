@@ -1,6 +1,7 @@
 :root {
     --bg-red: rgb(252, 129, 129);
     --bg-red-hover: rgb(254, 178, 178);
+    --bg-green: rgb(34, 196, 95);
     --bg-color-primary: #1a202c;
     --bg-color-menu-primary: #181c27;
     --text-color-primary: white;
@@ -26,7 +27,7 @@
     --bg-btn-borrador-hover: rgb(83, 88, 98);
     --bg-modal-close: rgb(57, 67, 83);
     --bg-modal: rgb(45, 55, 72);
-    --bg-tag: rgb(49, 151, 149); 
+    --bg-tag: rgb(49, 151, 149);
     --text-color-action: #81E6D9;
     color-scheme: dark;
 }
@@ -58,7 +59,6 @@ body {
 
 
 /* MENU */
-
 .menu_width {
     width: 70px;
     transition: all ease-in-out 0.3s;
@@ -76,6 +76,11 @@ body {
     border: 1px solid var(--color-border-icons);
     padding: 4px;
     border-radius: 5px;
+}
+
+.iconos_home {
+    font-size: 16px;
+    color: var(--text-color-menu);
 }
 
 
@@ -225,6 +230,13 @@ form label {
     width: 80px
 }
 
+.modal-success {
+    text-align: center;
+    font-size: 5rem;
+    color: var(--bg-green);
+    width: 80px
+}
+
 #modalError,
 #modalSuccess{
     display: none;
@@ -295,9 +307,36 @@ form label {
     border-bottom: 1px solid var(--text-color-disabled) !important;
 }
 
+/* HOME */
+.border-section {
+    color: var(--text-color-primary);
+    background: var(--color-border-icons);
+    margin-top: 1rem;
+    padding: 1rem 2rem;
+    border: 2px solid var(--color-border-icons);
+    border-radius: 5px;
+}
+
+.link_home
+{
+    text-decoration: none;
+    color: var(--text-color-menu)
+}
+
+    .link_home:hover {
+        border-bottom: 2px groove;
+        color: var(--text-colot-menu-hover)
+    }
+
+.date_home {
+    color: var(--text-color-menu);
+    font-size: 14px;
+    font-style: italic;
+    font-weight:200;
+}
 
 /* BUTTOM */
-.btn-font{
+.btn-font {
     font-weight: 600;
 }
 
@@ -380,9 +419,8 @@ form label {
     border-color: var(--color-border-icons);
 }
 
+
 /* PUBLICADO - BORRADOR */
-
-
 .text-publicado{
     color: var(--text-color-action);
     font-style: italic;
@@ -404,7 +442,7 @@ form label {
     }
 
 
-    /* Tags */
+/* TAGS */
 .close-btn{
     color: var(--text-color-primary);
     font-size: 10px;
