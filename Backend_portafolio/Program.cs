@@ -1,4 +1,6 @@
+using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,9 @@ builder.Services.AddTransient<IRepositoryMedia, RepositoryMedia>();
 builder.Services.AddTransient<IRepositoryMediatype, RepositoryMediatype>();
 builder.Services.AddTransient<IRepositorySource, RepositorySource>();
 builder.Services.AddTransient<IRepositoryLink, RepositoryLink>();
+builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
+builder.Services.AddTransient<IUserStore<User>, UsersStore>();
+builder.Services.AddIdentityCore<User>();
 builder.Services.AddHttpContextAccessor();
 
 //Auto Mapper

@@ -23,7 +23,7 @@
                 <!-- RESUMEN -->
                 <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Resumen</p>
                 <ul class="list-group list-unstyled">
-                    <li><p><i class="fa-solid fa-file "></i><span class="fw-bold">Cantidad de posts: </span>@Model.ultimosPosts.Count()</p></li>
+                    <li><p><i class="fa-solid fa-file iconos_home me-3"></i><span class="fw-bold">Cantidad de posts: </span>@Model.ultimosPosts.Count()</p></li>
 
                     @foreach (var format in Model.formatList)
                     {
@@ -43,13 +43,13 @@
                         .OrderByDescending(x => x.id)
                         .FirstOrDefault();
                         <li class="d-flex flex-column ">
-                            <p class="fw-bold">@format.name</p>
+                            <p class="fw-bold fst-italic"><i class="fa-solid fa-layer-group iconos_home me-1"></i>@format.name</p>
                             <p>
                                 <i class="fas fa-edit iconos_home me-1">
                                 </i>
                                 <a href="/posts/Editar/@ultimoPost.id?format=@format.name" class="link_home">@(ultimoPost != null ? ultimoPost.title : "--")</a>
-                            </p>
                                 <span class="date_home "> (@ultimoPost.created_at.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES")) - @ultimoPost.created_at.ToShortTimeString())</span>
+                            </p>
                         </li>
                     }
                 </ul>
@@ -84,9 +84,9 @@
                         <span asp-validation-for="description" class="form-error"></span>
                     </div>
 
-                    <!-- AGREGAR FORMAR -->
+                    <!-- AGREGAR FORMATO -->
                     <div class="mb-3">
-                        <h3 class="fs-5">Categorias</h3>
+                        <h3 class="fs-5">Formato</h3>
                         <select class="form-select select-style" asp-for="format_id">
                             <option disabled selected>Seleccione Formato</option>
                             @foreach (var formato in Model.formatList)
@@ -100,6 +100,9 @@
                     <button type="submit" class="btn btn-action" onclick="BorradorHome();">Borrador</button>
                     <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-trash"></i> Limpiar</a>
                 </form>
+            </div>
+            <div class="border-section">
+                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Buscador</p>
             </div>
         </div>
     </div>
