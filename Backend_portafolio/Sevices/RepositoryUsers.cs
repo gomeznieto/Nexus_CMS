@@ -15,7 +15,7 @@ namespace Backend_portafolio.Sevices
         private readonly string _connectionString;
         public RepositoryUsers(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DevConnection");
         }
 
         // CREAR USUARIO
@@ -26,7 +26,8 @@ namespace Backend_portafolio.Sevices
 
             var id = await connection.QuerySingleAsync<int>(@"
             INSERT INTO users (name, email, emailNormalizado, password, role) 
-            VALUES (@name, @email, @emailNormalizado, @password, @role);
+            VALUES (@name, @email, @emailNormalizado, @passwordHash, @role);
+            SELECT SCOPE_IDENTITY();
             ", user);
 
             return id;
@@ -39,7 +40,6 @@ namespace Backend_portafolio.Sevices
             return await connection.QuerySingleOrDefaultAsync<User>(
                 "SELECT * FROM users WHERE emailNormalizado = @emailNormalizado", 
                 new { emailNormalizado });
-
         }
 
     }

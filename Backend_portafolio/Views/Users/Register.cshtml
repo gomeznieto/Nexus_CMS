@@ -7,7 +7,11 @@
 <h1>Registro</h1>
 <form asp-action="Register">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
     <div class="mb-3">
         <label asp-for="Email" class="form-label"></label>
         <input asp-for="Email" class="form-control"/>
@@ -17,6 +21,16 @@
         <label asp-for="Password" class="form-label"></label>
         <input asp-for="Password" class="form-control" />
         <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <h3 class="fs-5">Rol</h3>
+        <select class="form-select select-style" asp-for="role">
+            <option disabled selected>Seleccione rol</option>
+            @foreach (var role in Model.roles)
+            {
+                <option value="@role.id">@role.name</option>
+            }
+        </select>
     </div>
     <button class="btn btn-action">Registrar</button>
 </form>

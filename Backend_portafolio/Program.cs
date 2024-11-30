@@ -17,6 +17,7 @@ builder.Services.AddTransient<IRepositoryMedia, RepositoryMedia>();
 builder.Services.AddTransient<IRepositoryMediatype, RepositoryMediatype>();
 builder.Services.AddTransient<IRepositorySource, RepositorySource>();
 builder.Services.AddTransient<IRepositoryLink, RepositoryLink>();
+builder.Services.AddTransient<IRepositoryRole, RepositoryRole>();
 builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
 builder.Services.AddTransient<IUserStore<User>, UsersStore>();
 builder.Services.AddIdentityCore<User>();
