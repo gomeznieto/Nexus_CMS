@@ -20,7 +20,27 @@ builder.Services.AddTransient<IRepositoryLink, RepositoryLink>();
 builder.Services.AddTransient<IRepositoryRole, RepositoryRole>();
 builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
 builder.Services.AddTransient<IUserStore<User>, UsersStore>();
-builder.Services.AddIdentityCore<User>();
+builder.Services.AddTransient<SignInManager<User>>();
+
+// AUTENTICACION
+builder.Services.AddIdentityCore<User>(opciones =>
+{
+	opciones.Password.RequireUppercase = false;
+	opciones.Password.RequireLowercase = false;
+	opciones.Password.RequireDigit = false;
+	opciones.Password.RequireNonAlphanumeric = false;
+	opciones.SignIn.RequireConfirmedAccount = true;
+});
+
+
+// COOKIES
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+	options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+	options.DefaultSignOutScheme = IdentityConstants.ApplicationScheme;
+}).AddCookie(IdentityConstants.ApplicationScheme);
+
 builder.Services.AddHttpContextAccessor();
 
 //Auto Mapper
@@ -41,6 +61,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseSession();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

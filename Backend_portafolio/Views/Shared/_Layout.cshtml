@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Http
 @using System.Text.Json;
-
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> MySignInManager
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
@@ -30,7 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 </head>
 
-<body >
+<body>
     <div class="container-fluid">
         <div class="row flex-nowrap">
             <div class="menu_width px-sm-2 px-0 menu-color">
@@ -82,13 +83,15 @@
                                     <a asp-action="Index" asp-controller="Categorias" class="nav-link px-3 item_subNav">
                                         <span class="item_size">
                                             <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Listado</span>
-                                    </span></a>
+                                        </span>
+                                    </a>
                                 </li>
                                 <li>
                                     <a asp-action="Crear" asp-controller="Categorias" class="nav-link px-3 item_subNav">
                                         <span class="item_size">
                                             <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Crear</span>
-                                    </span></a>
+                                        </span>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
@@ -103,13 +106,15 @@
                                     <a asp-action="Index" asp-controller="Formats" class="nav-link px-3 item_subNav">
                                         <span class="item_size">
                                             <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Listado</span>
-                                    </span></a>
+                                        </span>
+                                    </a>
                                 </li>
                                 <li>
                                     <a asp-action="Crear" asp-controller="Formats" class="nav-link px-3 item_subNav">
                                         <span class="item_size">
                                             <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Crear</span>
-                                    </span></a>
+                                        </span>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
@@ -162,22 +167,40 @@
 
                     </ul>
                     <hr>
-
                     <!-- * PROFILE -->
-                    <div class="dropdown pb-4">
-                        <a href="#" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle">
-                            <span class="px-4 item_subNav fs-6">Francisco</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                            <li><a class="dropdown-item" href="#">Configuración</a></li>
-                            <li><a class="dropdown-item" href="#">Perfil</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
+                    @if (MySignInManager.IsSignedIn(User))
+                    {
+                        <div class="dropdown pb-4">
+                            <a href="#" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle">
+                                <span class="px-4 item_subNav fs-6">@User.Identity.Name</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                                <li><a class="dropdown-item" href="#">Configuración</a></li>
+                                <li><a class="dropdown-item" href="#">Perfil</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <form class="form-inline" asp-action="logout" asp-controller="Users">
+                                        <a class="dropdown-item" href="#">Salir</a>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-action="Register" asp-controller="Users">
+                                    registro
+                                </a>
                             </li>
-                            <li><a class="dropdown-item" href="#">Salir</a></li>
                         </ul>
-                    </div>
+
+                    }
                 </div>
             </div>
 

@@ -1,5 +1,6 @@
 ﻿using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +10,17 @@ namespace Backend_portafolio.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly IRepositoryRole _repositoryRole;
+        private readonly SignInManager<User> _signInManager;
 
-        public UsersController(UserManager<User> userManager, IRepositoryRole repositoryRole)
+        public UsersController(
+            UserManager<User> userManager, 
+            IRepositoryRole repositoryRole,
+            SignInManager<User> signInManager
+            )
         {
             _userManager = userManager;
             _repositoryRole = repositoryRole;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
@@ -43,6 +50,7 @@ namespace Backend_portafolio.Controllers
 
             if(result.Succeeded)
             {
+                await _signInManager.SignInAsync(usuario, isPersistent: true);
                 return RedirectToAction("index", "home");
             }
             else
@@ -55,6 +63,13 @@ namespace Backend_portafolio.Controllers
                 return View(viewModel);
             }
 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            return RedirectToAction("Index", "Home");
         }
     }
 }

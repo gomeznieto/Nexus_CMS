@@ -1,4 +1,6 @@
-﻿namespace Backend_portafolio.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace Backend_portafolio.Models
 {
     public class User
     {

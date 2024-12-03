@@ -142,7 +142,7 @@ namespace Backend_portafolio.Sevices
 
         Task<string> IUserStore<User>.GetUserIdAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.Id.ToString());
         }
 
         Task<string> IUserStore<User>.GetUserNameAsync(User user, CancellationToken cancellationToken)

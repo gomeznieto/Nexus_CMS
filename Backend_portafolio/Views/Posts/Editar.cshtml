@@ -5,9 +5,8 @@
 }
 
 <div class="mt-5">
-    <h1>Editar @Model.title</h1>
-    <h3>En esta sección puede crear cualquier tipo de entrada, por ejemplo proyectos, blog, tutoriales, etc...</h3>
-
+    <h1>Editar @Model.title <span class="@(Model.draft ? "text-borrador": "text-publicado") date_post">@(Model.draft ? "Borrador" : "Publicado")</span></h1>
+    <span class="date_post mb-3"> @Model.created_at.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES")) - @Model.created_at.ToShortTimeString()</span>
     <form asp-action="Editar" method="post" class="mt-5">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
         <input type="hidden" asp-for="user_id" />
