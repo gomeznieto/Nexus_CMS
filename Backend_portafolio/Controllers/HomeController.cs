@@ -1,6 +1,7 @@
 ﻿using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text.Json;

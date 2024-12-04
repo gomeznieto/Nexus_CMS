@@ -1,11 +1,21 @@
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Politica de seguridad
+var politicaUsuarioAutenticado = new AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build();
+
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+	options.Filters.Add(new AuthorizeFilter(politicaUsuarioAutenticado));
+});
 builder.Services.AddSession();
 
 //Modelos
@@ -39,7 +49,10 @@ builder.Services.AddAuthentication(options =>
 	options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
 	options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
 	options.DefaultSignOutScheme = IdentityConstants.ApplicationScheme;
-}).AddCookie(IdentityConstants.ApplicationScheme);
+}).AddCookie(IdentityConstants.ApplicationScheme, options =>
+{
+	options.LoginPath = "/users/login";
+});
 
 builder.Services.AddHttpContextAccessor();
 

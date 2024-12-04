@@ -6,6 +6,7 @@ namespace Backend_portafolio.Sevices
 {
     public interface IRepositoryUsers
     {
+        Task<User> BuscarPorId(int id);
         Task<User> BuscarUsuarioPorEmail(string emailNormalizado);
         Task<int> CrearUsuario(User user);
     }
@@ -43,6 +44,17 @@ namespace Backend_portafolio.Sevices
 
             return user;
         }
+
+        public async Task<User> BuscarPorId(int id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            var user = await connection.QuerySingleOrDefaultAsync<User>(
+               "SELECT * FROM users WHERE id = @id",
+               new { id });
+
+            return user;
+        }
+
 
     }
 }

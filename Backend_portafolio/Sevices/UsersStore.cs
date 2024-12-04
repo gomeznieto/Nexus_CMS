@@ -120,9 +120,9 @@ namespace Backend_portafolio.Sevices
 
         }
 
-        Task<User> IUserStore<User>.FindByIdAsync(string userId, CancellationToken cancellationToken)
+        async Task<User> IUserStore<User>.FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _repositoryUsers.BuscarPorId(Int32.Parse(userId));
         }
 
         async Task<User> IUserStore<User>.FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)

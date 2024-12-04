@@ -1,6 +1,7 @@
 ﻿using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,7 @@ namespace Backend_portafolio.Controllers
             _signInManager = signInManager;
         }
 
+        // REGISTER
         [HttpGet]
         public async Task<IActionResult> Register() {
 
@@ -66,12 +68,14 @@ namespace Backend_portafolio.Controllers
         }
 
         // LOGIN
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult>Login(LoginViewModel viewModel)
         {
