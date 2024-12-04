@@ -48,9 +48,9 @@ namespace Backend_portafolio.Sevices
             return Task.FromResult(user.email);
         }
 
-        public Task<bool> GetEmailConfirmedAsync(User user, CancellationToken cancellationToken)
+        public async Task<bool> GetEmailConfirmedAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public Task<string> GetNormalizedEmailAsync(User user, CancellationToken cancellationToken)

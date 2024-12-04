@@ -65,6 +65,35 @@ namespace Backend_portafolio.Controllers
 
         }
 
+        // LOGIN
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult>Login(LoginViewModel viewModel)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(viewModel.Email, viewModel.Password, viewModel.RememberMe, lockoutOnFailure: false);
+
+            if(result.Succeeded)
+            {
+                return RedirectToAction("index", "home");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Nombre del usuario o password incorrectos");
+                return View(viewModel);
+            }
+        }
+
+        // LOGOUT
         [HttpPost]
         public async Task<IActionResult> Logout()
         {

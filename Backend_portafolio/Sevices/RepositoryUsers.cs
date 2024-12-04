@@ -25,7 +25,7 @@ namespace Backend_portafolio.Sevices
             using var connection = new SqlConnection(_connectionString);
 
             var id = await connection.QuerySingleAsync<int>(@"
-            INSERT INTO users (name, email, emailNormalizado, password, role) 
+            INSERT INTO users (name, email, emailNormalizado, passwordHash, role) 
             VALUES (@name, @email, @emailNormalizado, @passwordHash, @role);
             SELECT SCOPE_IDENTITY();
             ", user);
@@ -37,9 +37,11 @@ namespace Backend_portafolio.Sevices
         public async Task<User> BuscarUsuarioPorEmail(string emailNormalizado)
         {
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QuerySingleOrDefaultAsync<User>(
+             var user = await connection.QuerySingleOrDefaultAsync<User>(
                 "SELECT * FROM users WHERE emailNormalizado = @emailNormalizado", 
                 new { emailNormalizado });
+
+            return user;
         }
 
     }
