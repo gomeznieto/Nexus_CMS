@@ -212,7 +212,8 @@
                                 <span class="px-4 item_subNav fs-6">@currentUser.name</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                                <li><a class="dropdown-item" href="#">Perfil</a></li>
+                                <li><a class="dropdown-item" asp-action="perfil" asp-controller="users">Perfil</a></li>
+                                <li><a class="dropdown-item" asp-action="configuracion" asp-controller="users">Configuración</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>

@@ -18,7 +18,6 @@ namespace Backend_portafolio.Sevices
             _connectionString = configuration.GetConnectionString("DevConnection");
         }
 
-
         // Obtener
         public async Task<IEnumerable<Role>> Obtener()
         {

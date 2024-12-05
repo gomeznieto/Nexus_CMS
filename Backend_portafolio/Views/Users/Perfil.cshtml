@@ -1,0 +1,83 @@
+﻿@model UserViewModel
+
+@{
+    ViewData["Title"] = "Perfil";
+}
+
+<div class="w-100 p-5">
+    <h3>Mi Perfil</h3>
+    <form action="/" method="post" class="mt-5 w-50">
+
+        <!-- Nombre -->
+        <div class="d-flex  align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Nombre</p>
+            </div>
+            <div class="w-75">
+                <input asp-for="@Model.Name" class="form-control"/>
+            </div>
+        </div>
+
+        <!-- Email -->
+        <div class="d-flex  align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Email</p>
+            </div>
+            <div class="w-75">
+                <input asp-for="@Model.Email" class="form-control" />
+            </div>
+        </div>
+
+        <!-- Imagen de perfil -->
+        <div class="d-flex align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Imagen Perfil</p>
+            </div>
+            <div class="w-75">
+                <img src="@Model.Image" class="profile-picture-perfil">
+            </div>
+        </div>
+
+        <!-- BIO -->
+        <div class="d-flex align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Bio</p>
+            </div>
+            <div class="w-75">
+                <span>AÑO</span><input type="text" />
+            </div>
+        </div>
+        <!-- Agregar campos con año para poder guardar en la BIO de la base de datos -->
+
+        <!-- HOBBIES-->
+        <div class="d-flex align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Hobbies</p>
+            </div>
+            <div class="w-75">
+                <textarea asp-for="Hobbies" class="form-control textarea-style" rows="10" placeholder="Agregar hobbies al perfil"></textarea>
+            </div>
+        </div>
+
+        <!-- CV -->
+        <div class="d-flex  align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Curriculum Vitae</p>
+            </div>
+            <div class="w-75">
+                <input asp-for="@Model.CV" class="form-control" />
+            </div>
+        </div>
+
+        <!-- CAMBIAR CONTRASEÑA -->
+        <div class="d-flex  align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Password</p>
+            </div>
+            <div class="w-75">
+                <input asp-for="@Model.Name" class="form-control" />
+            </div>
+        </div>
+        <button></button>
+    </form>
+</div>

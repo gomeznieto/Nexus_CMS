@@ -104,5 +104,39 @@ namespace Backend_portafolio.Controllers
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
             return RedirectToAction("Index", "Home");
         }
+
+        // Configuración
+        [HttpGet]
+        public async Task<IActionResult> Configuracion()
+        {
+            User user = await _signInManager.UserManager.GetUserAsync(User);
+
+            UserViewModel viewModel = new UserViewModel();
+            viewModel.CV = user.cv; 
+            viewModel.Email = user.email;
+            viewModel.Name = user.name;
+            viewModel.Image = user.img;
+            viewModel.RoleName = (await _repositoryRole.Obtener()).Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
+
+            return View(viewModel);
+        }
+
+        // PERFIL
+
+        // Configuración
+        [HttpGet]
+        public async Task<IActionResult> Perfil()
+        {
+            User user = await _signInManager.UserManager.GetUserAsync(User);
+
+            UserViewModel viewModel = new UserViewModel();
+            viewModel.CV = user.cv;
+            viewModel.Email = user.email;
+            viewModel.Name = user.name;
+            viewModel.Image = user.img;
+            viewModel.RoleName = (await _repositoryRole.Obtener()).Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
+
+            return View(viewModel);
+        }
     }
 }
