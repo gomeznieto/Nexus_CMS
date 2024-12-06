@@ -148,13 +148,13 @@ namespace Backend_portafolio.Controllers
                 model.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
 
                 //Obtenemos Categorias Select List
-                model.categories = await ObtenerCategorias();
+                model.categories = await ObtenerCategorias(usuarioID);
 
                 //Obtenemos Media Types Select List
-                model.mediaTypes = await ObtenerMediaTypes();
+                model.mediaTypes = await ObtenerMediaTypes(usuarioID);
 
                 //Obtener fuente de los links
-                model.sources = await ObtenerSource();
+                model.sources = await ObtenerSource(usuarioID);
 
                 return View(model);
             }
@@ -173,12 +173,14 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
+                var userID = _usersService.ObtenerUsuario();
+
                 //verificamos que el model state sea valido antes de continuar
                 if (!ModelState.IsValid)
                 {
-                    viewModel.categories = await ObtenerCategorias();
-                    viewModel.mediaTypes = await ObtenerMediaTypes();
-                    viewModel.sources = await ObtenerSource();
+                    viewModel.categories = await ObtenerCategorias(userID);
+                    viewModel.mediaTypes = await ObtenerMediaTypes(userID);
+                    viewModel.sources = await ObtenerSource(userID);
 
                     // Agregar categorias, link y multimedia
                     if (!viewModel.sourceListString.IsNullOrEmpty())
@@ -325,9 +327,9 @@ namespace Backend_portafolio.Controllers
                 var userID = _usersService.ObtenerUsuario();
 
                 modelView.user_id = userID;
-                modelView.categories = await ObtenerCategorias();
-                modelView.mediaTypes = await ObtenerMediaTypes();
-                modelView.sources = await ObtenerSource();
+                modelView.categories = await ObtenerCategorias(userID);
+                modelView.mediaTypes = await ObtenerMediaTypes(userID);
+                modelView.sources = await ObtenerSource(userID);
 
                 modelView.mediaList = await _repositoryMedia.ObtenerPorPost(modelView.id);
                 modelView.linkList = await _repositoryLink.ObtenerPorPost(modelView.id);
@@ -355,11 +357,12 @@ namespace Backend_portafolio.Controllers
             try
             {
                 /***** POST *****/
+                var userID = _usersService.ObtenerUsuario();
 
-                if (!ModelState.IsValid)
+                if (!ModelState.IsValid || viewModel.user_id != userID)
                 {
-                    viewModel.categories = await ObtenerCategorias();
-                    viewModel.formats = await ObtenerCategorias();
+                    viewModel.categories = await ObtenerCategorias(userID);
+                    viewModel.formats = await ObtenerFormatos();
                     return View(viewModel);
                 }
 
@@ -557,9 +560,9 @@ namespace Backend_portafolio.Controllers
         //--------------------------------------
         // FUNCTIONS
         //--------------------------------------
-        private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
+        private async Task<IEnumerable<SelectListItem>> ObtenerCategorias(int user_id)
         {
-            var categories = await _repositoryCategorias.Obtener();
+            var categories = await _repositoryCategorias.Obtener(user_id);
             return categories.Select(category => new SelectListItem(category.name, category.id.ToString()));
         }
 
@@ -570,15 +573,15 @@ namespace Backend_portafolio.Controllers
             return formats.Select(format => new SelectListItem(format.name, format.id.ToString()));
         }
 
-        private async Task<IEnumerable<SelectListItem>> ObtenerMediaTypes()
+        private async Task<IEnumerable<SelectListItem>> ObtenerMediaTypes(int user_id)
         {
-            var mediaTypes = await _repositoryMediatype.Obtener();
+            var mediaTypes = await _repositoryMediatype.Obtener(user_id);
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
         }
 
-        private async Task<IEnumerable<SelectListItem>> ObtenerSource()
+        private async Task<IEnumerable<SelectListItem>> ObtenerSource(int user_id)
         {
-            var mediaTypes = await _repositorySource.Obtener();
+            var mediaTypes = await _repositorySource.Obtener(user_id);
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
         }
 

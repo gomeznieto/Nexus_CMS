@@ -9,10 +9,12 @@ namespace Backend_portafolio.Controllers
     public class SourcesController : Controller
     {
         private readonly IRepositorySource _repositorySource;
+        private readonly IUsersService _usersService;
 
-        public SourcesController(IRepositorySource repositorySource)
+        public SourcesController(IRepositorySource repositorySource, IUsersService usersService)
         {
             _repositorySource = repositorySource;
+            _usersService = usersService;
         }
 
 
@@ -23,7 +25,9 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-				var mediTypes = await _repositorySource.Obtener();
+				var userID = _usersService.ObtenerUsuario();
+
+				var mediTypes = await _repositorySource.Obtener(userID);
 
 				return View(mediTypes);
 			}
@@ -45,30 +49,36 @@ namespace Backend_portafolio.Controllers
         [HttpGet]
         public  IActionResult Crear()
         {
-            return View();
+			var userID = _usersService.ObtenerUsuario();
+			var viewModel = new Source();
+			viewModel.user_id = userID;
+
+            return View(viewModel);
         }
 
 		[HttpPost]
-		public async Task<IActionResult> Crear(Source mediaType)
+		public async Task<IActionResult> Crear(Source viewModel)
 		{
             try
             {
+				var userID = _usersService.ObtenerUsuario();
+
 				//Validar Model
-				if (!ModelState.IsValid)
+				if (!ModelState.IsValid || viewModel.user_id != userID)
 				{
-					return View(mediaType);
+					return View(viewModel);
 				}
 
 				//Validar que exista
-				var existe = await _repositorySource.Existe(mediaType.name);
+				var existe = await _repositorySource.Existe(viewModel.name, userID);
 
 				if (existe)
 				{
 					ModelState.AddModelError(null, "El media type ya existe");
-					return View(mediaType);
+					return View(viewModel);
 				}
 
-				await _repositorySource.Crear(mediaType);
+				await _repositorySource.Crear(viewModel);
 
 				return RedirectToAction("Index");
 			}
@@ -90,16 +100,16 @@ namespace Backend_portafolio.Controllers
 		{
 			try
 			{
-				var mediaType = await _repositorySource.ObtenerPorId(id);
+				var viewModel = await _repositorySource.ObtenerPorId(id);
 
-				if (mediaType == null)
+				if (viewModel == null)
 				{
 					//Crear mensaje de error para modal
 					Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡La Fuente que intenta editar no existe!", type = true, path = "Sources" });
 					return RedirectToAction("Index");
 				}
 
-				return View(mediaType);
+				return View(viewModel);
 			}
 			catch (Exception)
 			{
@@ -152,6 +162,8 @@ namespace Backend_portafolio.Controllers
         {
 			try
 			{
+				var userID = _usersService.ObtenerUsuario();
+
 				//Verificamos si existe
 				var existe = await _repositorySource.ObtenerPorId(id);
 
@@ -169,7 +181,7 @@ namespace Backend_portafolio.Controllers
 					return Json(new { error = true, mensaje = "No se puede borrar porque el tipo de fuente se encuentra en uso" });
 
 				//Borrar
-				await _repositorySource.Borrar(id);
+				await _repositorySource.Borrar(id, userID);
 
 				return Json(new { error = false, mensaje = "Borrado con Éxito" });
 			}
@@ -185,11 +197,11 @@ namespace Backend_portafolio.Controllers
 		/***************/
 
 		[HttpGet]
-		public async Task<IActionResult> VerificarExisteCategoria(string name)
+		public async Task<IActionResult> VerificarExisteCategoria(string name, int user_id)
 		{
 			try
 			{
-				var existeCategoria = await _repositorySource.Existe(name);
+				var existeCategoria = await _repositorySource.Existe(name, user_id);
 
 				if (existeCategoria)
 					return Json($"El nombre {name} ya existe!");

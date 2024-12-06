@@ -35,10 +35,10 @@ namespace Backend_portafolio.Controllers
         [HttpGet]
         public async Task<IActionResult> Categoria()
         {
-            //TODO: Validar Token
+			//TODO: Validar Token
 
-
-            var categorias = await _repositoryCateogorias.Obtener();
+			var userID = _usersService.ObtenerUsuario();
+            var categorias = await _repositoryCateogorias.Obtener(userID);
 
             return Ok(categorias);
         }
@@ -57,9 +57,9 @@ namespace Backend_portafolio.Controllers
 		public async Task<IActionResult> Usuario()
 		{
 			//TODO: Validar Token
+			var userID = _usersService.ObtenerUsuario();
 
-
-			var categorias = await _repositoryCateogorias.Obtener();
+			var categorias = await _repositoryCateogorias.Obtener(userID);
 
 			return Ok(categorias);
 		}

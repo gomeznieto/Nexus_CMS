@@ -7,11 +7,13 @@ namespace Backend_portafolio.Controllers
     public class MediatypeController : Controller
     {
         private readonly IRepositoryMediatype _repositoryMediatype;
+		private readonly IUsersService _usersService;
 
-        public MediatypeController(IRepositoryMediatype repositoryMediatype)
+		public MediatypeController(IRepositoryMediatype repositoryMediatype, IUsersService usersService)
         {
             _repositoryMediatype = repositoryMediatype;
-        }
+			_usersService = usersService;
+		}
 
 
         /***************/
@@ -21,7 +23,9 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-				var mediTypes = await _repositoryMediatype.Obtener();
+				var userID = _usersService.ObtenerUsuario();
+
+				var mediTypes = await _repositoryMediatype.Obtener(userID);
 
 				return View(mediTypes);
 			}
@@ -40,30 +44,37 @@ namespace Backend_portafolio.Controllers
         [HttpGet]
         public  IActionResult Crear()
         {
-            return View();
+			var userID = _usersService.ObtenerUsuario();
+
+			var viewModel = new MediaType();
+			viewModel.user_id = userID;
+
+			return View(viewModel);
         }
 
 		[HttpPost]
-		public async Task<IActionResult> Crear(MediaType mediaType)
+		public async Task<IActionResult> Crear(MediaType viewModel)
 		{
             try
             {
+				var userID = _usersService.ObtenerUsuario();
+
 				//Validar Model
-				if (!ModelState.IsValid)
+				if (!ModelState.IsValid || viewModel.user_id != userID)
 				{
-					return View(mediaType);
+					return View(viewModel);
 				}
 
 				//Validar que exista
-				var existe = await _repositoryMediatype.Existe(mediaType.name);
+				var existe = await _repositoryMediatype.Existe(viewModel.name, userID);
 
 				if (existe)
 				{
 					ModelState.AddModelError(null, "El media type ya existe");
-					return View(mediaType);
+					return View(viewModel);
 				}
 
-				await _repositoryMediatype.Crear(mediaType);
+				await _repositoryMediatype.Crear(viewModel);
 
 				return RedirectToAction("Index");
 			}
@@ -100,18 +111,19 @@ namespace Backend_portafolio.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Editar(MediaType mediaType)
+		public async Task<IActionResult> Editar(MediaType viewModel)
 		{
 			try
 			{
+				var userID = _usersService.ObtenerUsuario();
 				//Verificamos model state
-				if (!ModelState.IsValid)
+				if (!ModelState.IsValid || userID != viewModel.user_id)
 				{
-					return View(mediaType);
+					return View(viewModel);
 				}
 
 				//Verificamos si existe
-				var existe = await _repositoryMediatype.ObtenerPorId(mediaType.id);
+				var existe = await _repositoryMediatype.ObtenerPorId(viewModel.id);
 
 				if (existe is null)
 				{
@@ -119,7 +131,7 @@ namespace Backend_portafolio.Controllers
 				}
 
 				//Crear
-				await _repositoryMediatype.Editar(mediaType);
+				await _repositoryMediatype.Editar(viewModel);
 
 				return RedirectToAction("Index");
 			}
@@ -172,7 +184,9 @@ namespace Backend_portafolio.Controllers
 		{
 			try
 			{
-				var existeCategoria = await _repositoryMediatype.Existe(name);
+				var userID = _usersService.ObtenerUsuario();
+
+				var existeCategoria = await _repositoryMediatype.Existe(name, userID);
 
 				if (existeCategoria)
 					return Json($"El nombre {name} ya existe!");

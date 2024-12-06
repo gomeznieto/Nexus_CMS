@@ -9,6 +9,7 @@
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 @* FORMULARIO *@
 <form asp-controller="Mediatype" asp-action="Crear">
+	<input type="hidden" asp-for="user_id" />
 	<div class="mb-3">
 		<div class="flex-column">
 			<input type="text" asp-for="name" class="form-control" placeholder="Indique el nombre del tipo de media" />

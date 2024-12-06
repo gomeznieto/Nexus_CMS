@@ -12,5 +12,6 @@ namespace Backend_portafolio.Models
         [StringLength(maximumLength: 50, MinimumLength = 2, ErrorMessage = "La longitud del campo {0} debe estar entre {2} y {1}")]
         [Remote(action: "VerificarExisteCategoria", controller: "Categorias")]
         public string name { get; set; }
+        public int user_id { get; set; }
     }
 }

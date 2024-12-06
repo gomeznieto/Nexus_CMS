@@ -9,10 +9,12 @@ namespace Backend_portafolio.Controllers
 	public class CategoriasController : Controller
 	{
 		private readonly IRepositoryCategorias _repositoryCategorias;
+		private readonly IUsersService _usersService;
 
-		public CategoriasController(IRepositoryCategorias repositoryCategorias)
+		public CategoriasController(IRepositoryCategorias repositoryCategorias, IUsersService usersService)
         {
 			_repositoryCategorias = repositoryCategorias;
+			_usersService = usersService;
 		}
 
 		/************/
@@ -23,7 +25,9 @@ namespace Backend_portafolio.Controllers
 		{
 			try
 			{
-				var categorias = await _repositoryCategorias.Obtener();
+				var userID = _usersService.ObtenerUsuario();
+
+				var categorias = await _repositoryCategorias.Obtener(userID);
 
 				ViewBag.Cantidad = categorias.Count();
 				ViewBag.Message = $"No hay categorias para mostrar.";
@@ -45,7 +49,8 @@ namespace Backend_portafolio.Controllers
 		{
 			try
 			{
-				var categorias = await _repositoryCategorias.Obtener();
+				var userID = _usersService.ObtenerUsuario();
+				var categorias = await _repositoryCategorias.Obtener(userID);
 
 				if (!buscar.IsNullOrEmpty())
 				{
@@ -76,20 +81,27 @@ namespace Backend_portafolio.Controllers
 		[HttpGet]
 		public IActionResult Crear()
 		{
-			return View() ;
+			var userID = _usersService.ObtenerUsuario();
+
+			var viewModel = new Categoria();
+			viewModel.user_id = userID;
+
+			return View(viewModel);
 		}
 
 		[HttpPost]
 		public async Task <IActionResult> Crear(Categoria categoria)
 		{
 			//Validamos los datos que nos llegan del formulario
-			if(!ModelState.IsValid)
+			var userID = _usersService.ObtenerUsuario();
+
+			if(!ModelState.IsValid || categoria.user_id != userID)
 			{
 				return View(categoria);
 			}
 
 			//Validar que la categoria no exista en la base de datos
-			var existe = await _repositoryCategorias.Existe(categoria.name);
+			var existe = await _repositoryCategorias.Existe(categoria.name, userID);
 
 			if(existe)
 			{
@@ -124,12 +136,14 @@ namespace Backend_portafolio.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Editar(Categoria categoria)
 		{
+			var userID = _usersService.ObtenerUsuario();
+
 			//Validar errores del Model
-			if(!ModelState.IsValid)
+			if(!ModelState.IsValid || userID != categoria.user_id)
 				return View(categoria);
 
 			//Validar que la categoria no exista en la base de datos
-			var existe = await _repositoryCategorias.Existe(categoria.name);
+			var existe = await _repositoryCategorias.Existe(categoria.name, userID);
 
 			if (existe)
 			{
@@ -175,9 +189,9 @@ namespace Backend_portafolio.Controllers
 		/*  FUNCIONES  */
 		/***************/
 		[HttpGet]
-		public async Task<IActionResult> VerificarExisteCategoria(string name)
+		public async Task<IActionResult> VerificarExisteCategoria(string name, int userID)
 		{
-			var existeCategoria = await _repositoryCategorias.Existe(name);
+			var existeCategoria = await _repositoryCategorias.Existe(name, userID);
 
 			if (existeCategoria)
 				return Json($"El nombre {name} ya existe!");

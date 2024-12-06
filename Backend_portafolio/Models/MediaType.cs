@@ -10,5 +10,6 @@ namespace Backend_portafolio.Models
 		[Required(ErrorMessage = "El campo {0} es requerido")]
 		[Remote(action: "VerificarExisteCategoria", controller: "Mediatype")]
 		public string name { get; set; }
+        public int user_id { get; set; }
     }
 }

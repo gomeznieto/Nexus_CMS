@@ -10,6 +10,7 @@ namespace Backend_portafolio.Sevices
         public const string TABLA = "category";
         public const string ID = "id";
         public const string NOMBRE = "name";
+        public const string USER_ID = "user_id";
     }
 
     struct CATEGORIA_POST
@@ -25,8 +26,8 @@ namespace Backend_portafolio.Sevices
         Task Crear(Categoria categoria);
         Task CrearCategoriaPorPost(IEnumerable<CategoryForm> categorias);
         Task CrearCategoriaPorPost(CategoryForm categorias);
-        Task<bool> Existe(string name);
-        Task<IEnumerable<Categoria>> Obtener();
+        Task<bool> Existe(string name, int user_id);
+        Task<IEnumerable<Categoria>> Obtener(int user_id);
         Task<Categoria> ObtenerPorId(int id);
         Task<IEnumerable<Categoria>> ObtenerPorPost(int post_id);
         Task BorrarCatergoriaPorPost(int idPost, int idCategoria);
@@ -48,7 +49,7 @@ namespace Backend_portafolio.Sevices
         public async Task Crear(Categoria categoria)
         {
             using var connection = new SqlConnection(_connectionString);
-            var id = await connection.ExecuteScalarAsync<int>($@"INSERT INTO {CATEGORIA.TABLA} ({CATEGORIA.NOMBRE}) VALUES (@{CATEGORIA.NOMBRE}) 
+            var id = await connection.ExecuteScalarAsync<int>($@"INSERT INTO {CATEGORIA.TABLA} ({CATEGORIA.NOMBRE}, {CATEGORIA.USER_ID}) VALUES (@{CATEGORIA.NOMBRE}, @{CATEGORIA.USER_ID}) 
 												SELECT SCOPE_IDENTITY()", categoria);
             categoria.id = id;
         }
@@ -82,7 +83,7 @@ namespace Backend_portafolio.Sevices
         {
             using var connection = new SqlConnection(_connectionString);
             Categoria categoria = await connection.QueryFirstOrDefaultAsync<Categoria>(
-                    $@"SELECT {CATEGORIA.NOMBRE} FROM {CATEGORIA.TABLA} WHERE {CATEGORIA.ID} = @{CATEGORIA.ID} ",
+                    $@"SELECT {CATEGORIA.ID}, {CATEGORIA.NOMBRE}, {CATEGORIA.USER_ID} FROM {CATEGORIA.TABLA} WHERE {CATEGORIA.ID} = @{CATEGORIA.ID} ",
                     new { id }
                 );
 
@@ -90,10 +91,10 @@ namespace Backend_portafolio.Sevices
         }
 
         // OBTENER TODAS LAS CATEGORIAS
-        public async Task<IEnumerable<Categoria>> Obtener()
+        public async Task<IEnumerable<Categoria>> Obtener(int user_id)
         {
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QueryAsync<Categoria>($@"SELECT {CATEGORIA.ID}, {CATEGORIA.NOMBRE} FROM {CATEGORIA.TABLA}");
+            return await connection.QueryAsync<Categoria>($@"SELECT {CATEGORIA.ID}, {CATEGORIA.NOMBRE}, {CATEGORIA.USER_ID} FROM {CATEGORIA.TABLA} WHERE {CATEGORIA.USER_ID} = @{CATEGORIA.USER_ID}", new { user_id});
 
         }
 
@@ -122,7 +123,7 @@ namespace Backend_portafolio.Sevices
             using var connection = new SqlConnection(_connectionString);
 
             return await connection.QueryAsync<Categoria>(
-                        $@"SELECT C.{CATEGORIA.ID}, C.{CATEGORIA.NOMBRE}
+                        $@"SELECT C.{CATEGORIA.ID}, C.{CATEGORIA.NOMBRE}, C{CATEGORIA.USER_ID}
                         FROM {POST.TABLA} P
                         INNER JOIN {CATEGORIA_POST.TABLA} CP
                         ON P.{POST.ID} = CP.{CATEGORIA_POST.POST_ID}
@@ -136,18 +137,18 @@ namespace Backend_portafolio.Sevices
         }
 
         // VERIFICAR SI EXISTE EL NOMBRE DE LA CATEGORIA
-        public async Task<bool> Existe(string name)
+        public async Task<bool> Existe(string name, int user_id)
         {
             using var connection = new SqlConnection(_connectionString);
             var existe = await connection.QueryFirstOrDefaultAsync<bool>(
                     $@"IF EXISTS (
                     SELECT 1 FROM {CATEGORIA.TABLA}
-                    WHERE UPPER({CATEGORIA.NOMBRE}) = UPPER(@{CATEGORIA.NOMBRE})
+                    WHERE UPPER({CATEGORIA.NOMBRE}) = UPPER(@{CATEGORIA.NOMBRE}) AND {CATEGORIA.USER_ID} = @{CATEGORIA.USER_ID}
 						)
 						SELECT 1
 					ELSE
 						SELECT 0"
-                            , new { name }
+                            , new { name, user_id }
                         );
 
             return existe;

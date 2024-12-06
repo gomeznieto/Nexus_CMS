@@ -13,5 +13,7 @@ namespace Backend_portafolio.Models
         [Display(Name = "Icono")]
 		[Required(ErrorMessage = "El campo {0} es requerido")]
 		public string icon { get; set; }
+
+        public int user_id { get; set; }
     }
 }
