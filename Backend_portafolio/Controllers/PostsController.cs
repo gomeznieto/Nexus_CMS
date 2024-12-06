@@ -5,7 +5,6 @@ using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
-using System.Reflection;
 using System.Text.Json;
 
 namespace Backend_portafolio.Controllers
@@ -55,6 +54,8 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
+                // Usuario registrado
+                var usuarioID = _usersService.ObtenerUsuario();
 
                 //crear session de cantidad de post en caso de no haber sido ya creada
                 if (Session.GetCantidadPostsSession(HttpContext) == -1)
@@ -64,7 +65,7 @@ namespace Backend_portafolio.Controllers
 
                 //Obtener cantidades para generar paginación
                 var cantidadPorPagina = Session.GetCantidadPostsSession(HttpContext);
-                IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);
+                IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page, usuarioID);
 
                 //Obtenemos categorias para mostrar en lista
                 foreach (var post in posts)
@@ -96,9 +97,13 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
+
+                // Usuario registrado
+                var usuarioID = _usersService.ObtenerUsuario();
+
                 var cantidadPorPagina = Session.GetCantidadPostsSession(HttpContext);
 
-                IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page);
+                IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page, usuarioID);
 
                 if (!buscar.IsNullOrEmpty())
                 {
@@ -138,7 +143,7 @@ namespace Backend_portafolio.Controllers
                 model.format = format;
 
                 //Obtenemos el formato de la entrada creada
-                var formats = await _repositoryFormat.Obtener();
+                var formats = await _repositoryFormat.Obtener(usuarioID);
                 model.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
                 model.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
 
@@ -317,8 +322,9 @@ namespace Backend_portafolio.Controllers
 
                 //Mapeamos de Post a PostViewModel
                 var modelView = _mapper.Map<PostViewModel>(model);
+                var userID = _usersService.ObtenerUsuario();
 
-                modelView.user_id = _usersService.ObtenerUsuario();
+                modelView.user_id = userID;
                 modelView.categories = await ObtenerCategorias();
                 modelView.mediaTypes = await ObtenerMediaTypes();
                 modelView.sources = await ObtenerSource();
@@ -327,7 +333,7 @@ namespace Backend_portafolio.Controllers
                 modelView.linkList = await _repositoryLink.ObtenerPorPost(modelView.id);
                 modelView.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(modelView.id);
 
-                var formats = await _repositoryFormat.Obtener();
+                var formats = await _repositoryFormat.Obtener(userID);
                 modelView.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
                 modelView.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
 
@@ -559,7 +565,8 @@ namespace Backend_portafolio.Controllers
 
         private async Task<IEnumerable<SelectListItem>> ObtenerFormatos()
         {
-            var formats = await _repositoryFormat.Obtener();
+            var userID = _usersService.ObtenerUsuario();
+            var formats = await _repositoryFormat.Obtener(userID);
             return formats.Select(format => new SelectListItem(format.name, format.id.ToString()));
         }
 

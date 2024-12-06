@@ -7,10 +7,12 @@ namespace Backend_portafolio.Controllers
     public class FormatsController : Controller
     {
         private readonly IRepositoryFormat _repositoryFormat;
+        private readonly IUsersService _usersService;
 
-        public FormatsController(IRepositoryFormat repositoryFormat)
+        public FormatsController(IRepositoryFormat repositoryFormat, IUsersService usersService)
         {
             _repositoryFormat = repositoryFormat;
+            _usersService = usersService;
         }
 
 		/***********/
@@ -21,7 +23,8 @@ namespace Backend_portafolio.Controllers
         {
 			try
 			{
-				var formats = await _repositoryFormat.Obtener();
+				var userID =  _usersService.ObtenerUsuario();
+				var formats = await _repositoryFormat.Obtener(userID);
 
 				return View(formats);
 			}
@@ -40,16 +43,24 @@ namespace Backend_portafolio.Controllers
 		[HttpGet]
         public IActionResult Crear()
         {
-            return View();
+			var viewModel = new Format();
+
+            var userId = _usersService.ObtenerUsuario();
+
+			viewModel.user_id = userId;
+			
+			return View(viewModel);
         }
 
         [HttpPost]
         public async Task<IActionResult> Crear(Format model)
         {
+			var userId = _usersService.ObtenerUsuario();
+
 			try
 			{
 				//Validamos Model
-				if (!ModelState.IsValid)
+				if (!ModelState.IsValid || model.user_id != userId) //Si el formato no corresponde o el usuario logueado no es el mismo que la información del formulario
 				{
 					return View(model);
 				}
@@ -58,7 +69,7 @@ namespace Backend_portafolio.Controllers
 				await _repositoryFormat.Crear(model);
 
 				//Actualizar Session de Formatos para barra de navegacion
-				await Helper.Session.UpdateSession(HttpContext, _repositoryFormat);
+				await Helper.Session.UpdateSession(HttpContext, _repositoryFormat, userId);
 
 				return RedirectToAction("Index");
 			}
@@ -97,8 +108,10 @@ namespace Backend_portafolio.Controllers
         {
 			try
 			{
+				var userID = _usersService.ObtenerUsuario();
+
 				//Verificamos Model
-				if (!ModelState.IsValid)
+				if (!ModelState.IsValid || userID != model.user_id)
 					return View(model);
 
 				//Verificamos si existe
@@ -126,6 +139,8 @@ namespace Backend_portafolio.Controllers
 		{
 			try
 			{
+				var userID = _usersService.ObtenerUsuario();
+
 				var existe = await _repositoryFormat.ObtenerPorId(id);
 
 				if (existe is null)
@@ -139,7 +154,7 @@ namespace Backend_portafolio.Controllers
 				await _repositoryFormat.Borrar(id);
 
 				//Actualizar Session de Formatos para barra de navegacion
-				await Helper.Session.UpdateSession(HttpContext, _repositoryFormat);
+				await Helper.Session.UpdateSession(HttpContext, _repositoryFormat, userID);
 
 				return Json(new { error = false, mensaje = "Borrado con Éxito" });
 			}
@@ -159,7 +174,9 @@ namespace Backend_portafolio.Controllers
 		{
 			try
 			{
-				var existeCategoria = await _repositoryFormat.Existe(name);
+				var userID = _usersService.ObtenerUsuario();
+
+				var existeCategoria = await _repositoryFormat.Existe(name, userID);
 
 				if (existeCategoria)
 					return Json($"El nombre {name} ya existe!");
@@ -180,7 +197,9 @@ namespace Backend_portafolio.Controllers
         {
 			try
 			{
-				var formatos = await _repositoryFormat.Obtener();
+                var userID = _usersService.ObtenerUsuario();
+
+                var formatos = await _repositoryFormat.Obtener(userID);
 				return Json(formatos);
 			}
 			catch (Exception)

@@ -40,15 +40,16 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                HomeViewModel viewModel = new HomeViewModel();
-                await Session.UpdateSession(HttpContext, _repositoriyFormat);
+                var userID = _usersService.ObtenerUsuario();
 
-                var usuarioID = _usersService.ObtenerUsuario();
+                HomeViewModel viewModel = new HomeViewModel();
+                await Session.UpdateSession(HttpContext, _repositoriyFormat, userID);
+
                 var model = new PostViewModel();
 
-                viewModel.formatList = (await _repositoriyFormat.Obtener()).ToList();
-                viewModel.ultimosPosts = (await _repositoriyPosts.Obtener()).ToList();
-                viewModel.user_id = usuarioID;
+                viewModel.formatList = (await _repositoriyFormat.Obtener(userID)).ToList();
+                viewModel.ultimosPosts = (await _repositoriyPosts.Obtener(userID)).ToList();
+                viewModel.user_id = userID;
 
                 return View(viewModel);
             }
@@ -65,16 +66,18 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
+                var userID = _usersService.ObtenerUsuario();
+
                 //verificamos que el model state sea valido antes de continuar
                 if (!ModelState.IsValid)
                 {
-                    await Session.UpdateSession(HttpContext, _repositoriyFormat);
+                    await Session.UpdateSession(HttpContext, _repositoriyFormat, userID);
 
                     var usuarioID = _usersService.ObtenerUsuario();
                     var model = new PostViewModel();
 
-                    viewModel.formatList = (await _repositoriyFormat.Obtener()).ToList();
-                    viewModel.ultimosPosts = (await _repositoriyPosts.Obtener()).ToList();
+                    viewModel.formatList = (await _repositoriyFormat.Obtener(usuarioID)).ToList();
+                    viewModel.ultimosPosts = (await _repositoriyPosts.Obtener(usuarioID)).ToList();
                     viewModel.user_id = usuarioID;
 
                     return View(viewModel);

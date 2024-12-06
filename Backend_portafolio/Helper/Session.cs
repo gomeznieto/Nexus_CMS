@@ -7,11 +7,11 @@ namespace Backend_portafolio.Helper
 {
     public static class Session
     {
-        public static async Task UpdateSession(HttpContext httpContext, IRepositoryFormat repositoryFormat)
+        public static async Task UpdateSession(HttpContext httpContext, IRepositoryFormat repositoryFormat, int user_id)
         {
 			try
 			{
-				var formats = await repositoryFormat.Obtener();
+				var formats = await repositoryFormat.Obtener(user_id);
 				var formatsJson = JsonSerializer.Serialize(formats.ToList());
 				httpContext.Session.SetString("Formats", formatsJson);
 			}

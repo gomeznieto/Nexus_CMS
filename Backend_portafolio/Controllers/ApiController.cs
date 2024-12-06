@@ -13,13 +13,15 @@ namespace Backend_portafolio.Controllers
 		private readonly IRepositoryLink _repositoryLink;
 		private readonly IRepositoryMedia _repositoryMedia;
 		private readonly IRepositoryFormat _repositoryFormat;
+        private readonly IUsersService _usersService;
 
-		public ApiController(
+        public ApiController(
 			IRepositoryCategorias repositoryCateogorias,
 			IRepositoryPosts repositoryPost,
 			IRepositoryLink repositoryLink,
 			IRepositoryMedia repositoryMedia,
-			IRepositoryFormat repositoryFormat
+			IRepositoryFormat repositoryFormat,
+            IUsersService usersService
 			)
         {
             _repositoryCateogorias = repositoryCateogorias;
@@ -27,7 +29,8 @@ namespace Backend_portafolio.Controllers
 			_repositoryLink = repositoryLink;
 			_repositoryMedia = repositoryMedia;
 			_repositoryFormat = repositoryFormat;
-		}
+           _usersService = usersService;
+        }
 
         [HttpGet]
         public async Task<IActionResult> Categoria()
@@ -44,8 +47,8 @@ namespace Backend_portafolio.Controllers
 		{
 			//TODO: Validar Token
 
-
-			var formatos = await _repositoryFormat.Obtener();
+			var userID = _usersService.ObtenerUsuario();
+			var formatos = await _repositoryFormat.Obtener(userID);
 
 			return Ok(formatos);
 		}
@@ -64,9 +67,11 @@ namespace Backend_portafolio.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Entrada()
 		{
-			//TODO: Validar Token
+            //TODO: Validar Token
 
-			var posts = await _repositoryPosts.Obtener();
+            var usuarioID = _usersService.ObtenerUsuario();
+
+            var posts = await _repositoryPosts.Obtener(usuarioID);
 
 			if(posts is null)
 				return NotFound();
