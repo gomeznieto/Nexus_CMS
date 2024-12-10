@@ -2,23 +2,31 @@
 
 @{
     ViewData["Title"] = "Perfil";
+    int anios = DateTime.Now.Year - 1900;
 }
 
-<div class="w-100 p-5">
-    <h3>Mi Perfil</h3>
-    <form action="/" method="post" class="mt-5 w-50">
-
-        <!-- Nombre -->
+<h3>Mi Perfil</h3>
+<div class="w-100 p-1 row gap-3">
+    <form action="/" method="post" class="mt-2 col-6 p-2">
+        <!-- IMAGEN -->
+        <div class="d-flex align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Imagen Perfil</p>
+            </div>
+            <div class="w-75">
+                <img src="@Model.Image" class="profile-picture-perfil rounded-2">
+            </div>
+        </div> <!-- FIN IMAGEN -->
+        <!-- NOMBRE -->
         <div class="d-flex  align-items-center mt-2">
             <div class="w-25">
                 <p class="fw-bold">Nombre</p>
             </div>
             <div class="w-75">
-                <input asp-for="@Model.Name" class="form-control"/>
+                <input asp-for="@Model.Name" class="form-control" />
             </div>
-        </div>
-
-        <!-- Email -->
+        </div> <!-- FIN NOMBRE-->
+        <!-- EMAIL -->
         <div class="d-flex  align-items-center mt-2">
             <div class="w-25">
                 <p class="fw-bold">Email</p>
@@ -26,29 +34,8 @@
             <div class="w-75">
                 <input asp-for="@Model.Email" class="form-control" />
             </div>
-        </div>
-
-        <!-- Imagen de perfil -->
-        <div class="d-flex align-items-center mt-2">
-            <div class="w-25">
-                <p class="fw-bold">Imagen Perfil</p>
-            </div>
-            <div class="w-75">
-                <img src="@Model.Image" class="profile-picture-perfil">
-            </div>
-        </div>
-
-        <!-- BIO -->
-        <div class="d-flex align-items-center mt-2">
-            <div class="w-25">
-                <p class="fw-bold">Bio</p>
-            </div>
-            <div class="w-75">
-                <span>AÑO</span><input type="text" />
-            </div>
-        </div>
+        </div> <!-- FIN EMAIL -->
         <!-- Agregar campos con año para poder guardar en la BIO de la base de datos -->
-
         <!-- HOBBIES-->
         <div class="d-flex align-items-center mt-2">
             <div class="w-25">
@@ -57,8 +44,7 @@
             <div class="w-75">
                 <textarea asp-for="Hobbies" class="form-control textarea-style" rows="10" placeholder="Agregar hobbies al perfil"></textarea>
             </div>
-        </div>
-
+        </div> <!-- FIN BIOS -->
         <!-- CV -->
         <div class="d-flex  align-items-center mt-2">
             <div class="w-25">
@@ -67,21 +53,72 @@
             <div class="w-75">
                 <input asp-for="@Model.CV" class="form-control" />
             </div>
-        </div>
-
+        </div> <!-- FIN CV -->
         <!-- CAMBIAR CONTRASEÑA -->
         <div class="d-flex  align-items-center mt-2">
             <div class="w-25">
                 <p class="fw-bold">Password</p>
             </div>
             <div class="w-75">
-                <input asp-for="@Model.Name" class="form-control" />
+                <input type="password" asp-for="@Model.password" class="form-control" placeholder="Ingrese contraseña actual" />
+                <input type="password" asp-for="@Model.passwordNuevo" class="form-control mt-2" placeholder="Ingrese contraseña nueva" />
             </div>
-        </div>
-
+        </div> <!-- FIN CAMBIAR CONSTRASEÑA -->
         <!-- REDES -->
         <!-- Todas las redes sociales -->
-
-        <button></button>
+        <div class="mt-4 row col-12">
+            <div class="col-4"></div>
+            <div class="col-8 row justify-content-center gap-2">
+                <button class="btn btn-edit col-5">Editar</button>
+                <button class="btn btn-delete col-5">Cancelar</button>
+            </div>
+        </div>
     </form>
+    <!-- BIO -->
+    <form class="mt-2 border-start border-1 p-2 border-info col-5">
+        <div class="d-flex align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Bio</p>
+            </div>
+            <div class="w-75">
+                @if (Model?.Bios.Count() > 0)
+                {
+                    @foreach (var bio in Model.Bios)
+                    {
+                        <div class="d-flex mt-2 gap-1">
+                            <select>
+                                @for (int i = 50; i <= anios; i++)
+                                {
+                                    if (i + 1900 == bio.year)
+                                    {
+                                        <option asp-for="@bio.year" selected>@bio.year</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@(i+900)">@(i + 1900)</option>
+
+                                    }
+                                }
+                            </select>
+                            <input type="text" asp-for="@bio.work" class="form-control" />
+                            <button class="btn btn-action">Editar</button>
+                            <button class="btn btn-delete">Borrar</button>
+                        </div>
+                    }
+                }
+                <button class="btn btn-action mt-2">Agregar Bio</button>
+                <div class="d-flex mt-2 gap-1">
+                    <select>
+                        @for (int i = 50; i <= anios; i++)
+                        {
+                            <option value="@(i+900)">@(i + 1900)</option>
+                        }
+                    </select>
+                    <input type="text" class="form-control" />
+                    <button class="btn btn-action">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- FIN BIOS-->
 </div>

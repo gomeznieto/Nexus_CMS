@@ -11,16 +11,19 @@ namespace Backend_portafolio.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly IRepositoryRole _repositoryRole;
+        private readonly IRepositoryBio _repositoryBio;
         private readonly SignInManager<User> _signInManager;
 
         public UsersController(
             UserManager<User> userManager, 
             IRepositoryRole repositoryRole,
+            IRepositoryBio repositoryBio,
             SignInManager<User> signInManager
             )
         {
             _userManager = userManager;
             _repositoryRole = repositoryRole;
+            _repositoryBio = repositoryBio;
             _signInManager = signInManager;
         }
 
@@ -134,6 +137,7 @@ namespace Backend_portafolio.Controllers
             viewModel.Email = user.email;
             viewModel.Name = user.name;
             viewModel.Image = user.img;
+            viewModel.Bios = (await _repositoryBio.Obtener(user.Id)).ToList();
             viewModel.RoleName = (await _repositoryRole.Obtener()).Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
 
             return View(viewModel);

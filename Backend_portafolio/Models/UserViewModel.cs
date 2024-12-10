@@ -20,5 +20,9 @@ namespace Backend_portafolio.Models
         public string About { get; set; }
         [Display(Name = "Hobbies")]
         public string Hobbies { get; set; }
+        public List<Bio> Bios { get; set; }
+        public List<SocialNetwork> Networks { get; set; }
+        public string password { get; set; }
+        public string passwordNuevo { get; set; }
     }
 }
