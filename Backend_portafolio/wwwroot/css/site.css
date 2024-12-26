@@ -509,3 +509,13 @@ form label {
     object-position: center;
     overflow: hidden;
 }
+
+/* BIO */
+.hide{
+    display: none;
+}
+
+.show
+{
+    display: block;
+}

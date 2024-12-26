@@ -1,8 +1,7 @@
 ﻿@model UserViewModel
 
 @{
-    ViewData["Title"] = "Perfil";
-    int anios = DateTime.Now.Year - 1900;
+    ViewData["Title"] = "Perfil"; 
 }
 
 <h3>Mi Perfil</h3>
@@ -74,51 +73,5 @@
             </div>
         </div>
     </form>
-    <!-- BIO -->
-    <form class="mt-2 border-start border-1 p-2 border-info col-5">
-        <div class="d-flex align-items-center mt-2">
-            <div class="w-25">
-                <p class="fw-bold">Bio</p>
-            </div>
-            <div class="w-75">
-                @if (Model?.Bios.Count() > 0)
-                {
-                    @foreach (var bio in Model.Bios)
-                    {
-                        <div class="d-flex mt-2 gap-1">
-                            <select>
-                                @for (int i = 50; i <= anios; i++)
-                                {
-                                    if (i + 1900 == bio.year)
-                                    {
-                                        <option asp-for="@bio.year" selected>@bio.year</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@(i+900)">@(i + 1900)</option>
-
-                                    }
-                                }
-                            </select>
-                            <input type="text" asp-for="@bio.work" class="form-control" />
-                            <button class="btn btn-action">Editar</button>
-                            <button class="btn btn-delete">Borrar</button>
-                        </div>
-                    }
-                }
-                <button class="btn btn-action mt-2">Agregar Bio</button>
-                <div class="d-flex mt-2 gap-1">
-                    <select>
-                        @for (int i = 50; i <= anios; i++)
-                        {
-                            <option value="@(i+900)">@(i + 1900)</option>
-                        }
-                    </select>
-                    <input type="text" class="form-control" />
-                    <button class="btn btn-action">Guardar</button>
-                </div>
-            </div>
-        </div>
-    </form>
-    <!-- FIN BIOS-->
+    
 </div>
