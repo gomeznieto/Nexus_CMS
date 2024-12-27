@@ -1,12 +1,13 @@
 ﻿@model RegisterViewModel
 
 @{
-    ViewData["title"] = "Registro";
+    ViewData["title"] = "Registro de usuarios";
 }
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 <h1>Registro</h1>
 <form asp-action="Register">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="mb-3">
         <label asp-for="Name" class="form-label"></label>
         <input asp-for="Name" class="form-control" />

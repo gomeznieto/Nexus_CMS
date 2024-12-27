@@ -9,6 +9,7 @@ namespace Backend_portafolio.Sevices
         Task<User> BuscarPorId(int id);
         Task<User> BuscarUsuarioPorEmail(string emailNormalizado);
         Task<int> CrearUsuario(User user);
+        Task<bool> Existe(string emailNormalizado);
     }
 
     public class RepositoryUsers : IRepositoryUsers
@@ -38,9 +39,9 @@ namespace Backend_portafolio.Sevices
         public async Task<User> BuscarUsuarioPorEmail(string emailNormalizado)
         {
             using var connection = new SqlConnection(_connectionString);
-             var user = await connection.QuerySingleOrDefaultAsync<User>(
-                "SELECT * FROM users WHERE emailNormalizado = @emailNormalizado", 
-                new { emailNormalizado });
+            var user = await connection.QuerySingleOrDefaultAsync<User>(
+               "SELECT * FROM users WHERE emailNormalizado = @emailNormalizado",
+               new { emailNormalizado });
 
             return user;
         }
@@ -55,6 +56,18 @@ namespace Backend_portafolio.Sevices
             return user;
         }
 
+        public async Task<bool> Existe(string emailNormalizado)
+        {
+            using var connection = new SqlConnection(_connectionString);
 
+            emailNormalizado = emailNormalizado.ToUpper();
+
+            var user = await connection.QuerySingleOrDefaultAsync<User>(
+               "SELECT * FROM users WHERE emailNormalizado = @emailNormalizado",
+               new { emailNormalizado });
+
+            return user != null;
+
+        }
     }
 }

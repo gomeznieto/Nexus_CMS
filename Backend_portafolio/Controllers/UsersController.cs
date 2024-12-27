@@ -15,13 +15,15 @@ namespace Backend_portafolio.Controllers
         private readonly IRepositoryBio _repositoryBio;
         private readonly SignInManager<User> _signInManager;
         private readonly IUsersService _usersService;
+        private readonly IRepositoryUsers _repositoryUsers;
 
         public UsersController(
             UserManager<User> userManager,
             IRepositoryRole repositoryRole,
             IRepositoryBio repositoryBio,
             SignInManager<User> signInManager,
-            IUsersService usersService
+            IUsersService usersService,
+            IRepositoryUsers repositoryUsers
             )
         {
             _userManager = userManager;
@@ -29,6 +31,7 @@ namespace Backend_portafolio.Controllers
             _repositoryBio = repositoryBio;
             _signInManager = signInManager;
             _usersService = usersService;
+            _repositoryUsers = repositoryUsers;
         }
 
         // REGISTER
@@ -54,13 +57,25 @@ namespace Backend_portafolio.Controllers
                 return View(viewModel);
             }
 
+
+            User user = await _signInManager.UserManager.GetUserAsync(User);
+            Role adminRole = (await _repositoryRole.Obtener()).FirstOrDefault(x => x.name == "admin");
+
+            // Verificamos que el Rol sea de Admin para que pueda registrar un nuevo cliente
+            if(adminRole != null && user.role != adminRole.id)
+            {
+                viewModel.roles = (await _repositoryRole.Obtener()).ToList();
+
+                return View(viewModel);
+            }
+
             var usuario = new User() { email = viewModel.Email, name = viewModel.Name, role = viewModel.role };
 
             var result = await _userManager.CreateAsync(usuario, password: viewModel.Password);
 
             if (result.Succeeded)
             {
-                await _signInManager.SignInAsync(usuario, isPersistent: true);
+                //await _signInManager.SignInAsync(usuario, isPersistent: true); //Línea de código para loggearse con el user recién creado. Al ser creado solo por el admin esto no serí necesario
                 return RedirectToAction("index", "home");
             }
             else
@@ -153,26 +168,48 @@ namespace Backend_portafolio.Controllers
         [HttpGet]
         public async Task<IActionResult> Bio()
         {
-            var usuarioID = _usersService.ObtenerUsuario();
-            BioViewModel viewModel = new BioViewModel();
-            viewModel.Bios = (await _repositoryBio.Obtener(usuarioID)).OrderByDescending(x => x.year).ToList();
+           try
+            {
+                var usuarioID = _usersService.ObtenerUsuario();
+                BioViewModel viewModel = new BioViewModel();
+                viewModel.Bios = (await _repositoryBio.Obtener(usuarioID)).OrderByDescending(x => x.year).ToList();
 
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch(Exception)
+            {
+                //Crear mensaje de error para modal
+                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Users" };
+                Session.ErrorSession(HttpContext, errorModal);
+
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Bio(Bio bio)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return View(bio);
+                if (!ModelState.IsValid)
+                {
+                    return View(bio);
+                }
+
+                var usuarioID = _usersService.ObtenerUsuario();
+
+                bio.user_id = usuarioID;
+                await _repositoryBio.Agregar(bio);
+                return RedirectToAction("Bio");
             }
+            catch (Exception)
+            {
+                //Crear mensaje de error para modal
+                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Users" };
+                Session.ErrorSession(HttpContext, errorModal);
 
-            var usuarioID = _usersService.ObtenerUsuario();
-
-            bio.user_id = usuarioID;
-            await _repositoryBio.Agregar(bio);
-            return RedirectToAction("Bio");
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpPost]
@@ -184,12 +221,13 @@ namespace Backend_portafolio.Controllers
 
                 var bio = await _repositoryBio.ObtenerPorId(id, usuarioID);
 
-                if (bio == null)
+                if (bio == null || usuarioID != bio.user_id)
                 {
                     return Json(new { error = true, mensaje = "La bio no se pudo borrar.\n¡Se ha producido un error!" });
                 }
 
                 await _repositoryBio.Borrar(id, usuarioID);
+
                 return Json(new { error = false, mensaje = "¡La bio ha sido borrada correctamente!" });
             }
             catch (Exception)
@@ -244,6 +282,25 @@ namespace Backend_portafolio.Controllers
             return Json(new { error = false, bio });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> VerificarExisteEmail(string email)
+        {
+            try
+            {
+                var existeEmail = await _repositoryUsers.Existe(email);
+
+                if (existeEmail)
+                    return Json($"El nombre {email} ya existe!");
+
+                return Json(true);
+            }
+            catch (Exception)
+            {
+
+                return Json($"Se produjo un error al intentear validar {email}. Intente con otro nombre o en otro momento!");
+            }
+
+        }
 
     }
 }
