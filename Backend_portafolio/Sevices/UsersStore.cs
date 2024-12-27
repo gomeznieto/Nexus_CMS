@@ -13,7 +13,7 @@ namespace Backend_portafolio.Sevices
 
         public async Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
         {
-            user.Id = await _repositoryUsers.CrearUsuario(user);
+            user.id = await _repositoryUsers.CrearUsuario(user);
 
             return IdentityResult.Success;
         }
@@ -65,7 +65,7 @@ namespace Backend_portafolio.Sevices
 
         public Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(user.Id.ToString());
+            return Task.FromResult(user.id.ToString());
         }
 
         public Task<string> GetUserNameAsync(User user, CancellationToken cancellationToken)
@@ -106,7 +106,7 @@ namespace Backend_portafolio.Sevices
 
         async Task<IdentityResult> IUserStore<User>.CreateAsync(User user, CancellationToken cancellationToken)
         {
-            user.Id = await _repositoryUsers.CrearUsuario(user);
+            user.id = await _repositoryUsers.CrearUsuario(user);
             return IdentityResult.Success;
         }
 
@@ -142,7 +142,7 @@ namespace Backend_portafolio.Sevices
 
         Task<string> IUserStore<User>.GetUserIdAsync(User user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(user.Id.ToString());
+            return Task.FromResult(user.id.ToString());
         }
 
         Task<string> IUserStore<User>.GetUserNameAsync(User user, CancellationToken cancellationToken)
@@ -172,9 +172,11 @@ namespace Backend_portafolio.Sevices
             throw new NotImplementedException();
         }
 
-        Task<IdentityResult> IUserStore<User>.UpdateAsync(User user, CancellationToken cancellationToken)
+        async Task<IdentityResult> IUserStore<User>.UpdateAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await _repositoryUsers.EditarUsuario(user);
+
+            return IdentityResult.Success;
         }
     }
 }

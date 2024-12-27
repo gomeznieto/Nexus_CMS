@@ -9,6 +9,7 @@ namespace Backend_portafolio.Sevices
         Task<User> BuscarPorId(int id);
         Task<User> BuscarUsuarioPorEmail(string emailNormalizado);
         Task<int> CrearUsuario(User user);
+        Task EditarUsuario(User user);
         Task<bool> Existe(string emailNormalizado);
     }
 
@@ -35,6 +36,16 @@ namespace Backend_portafolio.Sevices
             return id;
         }
 
+        //EDITAR USUARIO
+        public async Task EditarUsuario(User user)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.ExecuteAsync(@"
+            UPDATE users SET name = @name, email = @email, emailNormalizado = @emailNormalizado, passwordHash = @passwordHash, cv = @cv, about = @about, hobbies = @hobbies, img = @img, role = @role
+            WHERE id = @id
+            ", user);
+        }
+
         // BUSCAR USUARIO POR EMAIL
         public async Task<User> BuscarUsuarioPorEmail(string emailNormalizado)
         {
@@ -46,6 +57,7 @@ namespace Backend_portafolio.Sevices
             return user;
         }
 
+        // BUSCAR POR ID
         public async Task<User> BuscarPorId(int id)
         {
             using var connection = new SqlConnection(_connectionString);
@@ -56,6 +68,7 @@ namespace Backend_portafolio.Sevices
             return user;
         }
 
+        // EXISTE
         public async Task<bool> Existe(string emailNormalizado)
         {
             using var connection = new SqlConnection(_connectionString);

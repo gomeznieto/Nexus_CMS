@@ -29,5 +29,7 @@ namespace Backend_portafolio.Sevices
                 throw new ApplicationException("El usuario no está autenticado");
             }
         }
+
+
     }
 }

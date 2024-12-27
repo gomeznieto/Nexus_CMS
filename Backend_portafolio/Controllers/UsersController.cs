@@ -1,4 +1,5 @@
-﻿using Backend_portafolio.Helper;
+﻿using AutoMapper;
+using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Authentication;
@@ -16,6 +17,8 @@ namespace Backend_portafolio.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IUsersService _usersService;
         private readonly IRepositoryUsers _repositoryUsers;
+        private readonly IImageService _imageService;
+        private readonly IMapper _mapper;
 
         public UsersController(
             UserManager<User> userManager,
@@ -23,7 +26,9 @@ namespace Backend_portafolio.Controllers
             IRepositoryBio repositoryBio,
             SignInManager<User> signInManager,
             IUsersService usersService,
-            IRepositoryUsers repositoryUsers
+            IRepositoryUsers repositoryUsers,
+            IImageService imageService,
+            IMapper mapper
             )
         {
             _userManager = userManager;
@@ -32,6 +37,8 @@ namespace Backend_portafolio.Controllers
             _signInManager = signInManager;
             _usersService = usersService;
             _repositoryUsers = repositoryUsers;
+            _imageService = imageService;
+            _mapper = mapper;
         }
 
         // REGISTER
@@ -62,7 +69,7 @@ namespace Backend_portafolio.Controllers
             Role adminRole = (await _repositoryRole.Obtener()).FirstOrDefault(x => x.name == "admin");
 
             // Verificamos que el Rol sea de Admin para que pueda registrar un nuevo cliente
-            if(adminRole != null && user.role != adminRole.id)
+            if (adminRole != null && user.role != adminRole.id)
             {
                 viewModel.roles = (await _repositoryRole.Obtener()).ToList();
 
@@ -134,11 +141,14 @@ namespace Backend_portafolio.Controllers
         {
             User user = await _signInManager.UserManager.GetUserAsync(User);
 
-            UserViewModel viewModel = new UserViewModel();
-            viewModel.CV = user.cv;
-            viewModel.Email = user.email;
-            viewModel.Name = user.name;
-            viewModel.Image = user.img;
+
+            UserViewModel viewModel = _mapper.Map<UserViewModel>(user);
+
+            //UserViewModel viewModel = new UserViewModel();
+            //viewModel.CV = user.cv;
+            //viewModel.Email = user.email;
+            //viewModel.Name = user.name;
+            //viewModel.Image = user.img;
             viewModel.RoleName = (await _repositoryRole.Obtener()).Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
 
             return View(viewModel);
@@ -151,13 +161,7 @@ namespace Backend_portafolio.Controllers
         public async Task<IActionResult> Perfil()
         {
             User user = await _signInManager.UserManager.GetUserAsync(User);
-
-            UserViewModel viewModel = new UserViewModel();
-            viewModel.CV = user.cv;
-            viewModel.Email = user.email;
-            viewModel.Name = user.name;
-            viewModel.Image = user.img;
-            viewModel.Bios = (await _repositoryBio.Obtener(user.Id)).ToList();
+            UserViewModel viewModel = _mapper.Map<User, UserViewModel>(user);
             viewModel.RoleName = (await _repositoryRole.Obtener()).Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
 
             return View(viewModel);
@@ -168,7 +172,7 @@ namespace Backend_portafolio.Controllers
         [HttpGet]
         public async Task<IActionResult> Bio()
         {
-           try
+            try
             {
                 var usuarioID = _usersService.ObtenerUsuario();
                 BioViewModel viewModel = new BioViewModel();
@@ -176,7 +180,7 @@ namespace Backend_portafolio.Controllers
 
                 return View(viewModel);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 //Crear mensaje de error para modal
                 var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Users" };
@@ -280,6 +284,48 @@ namespace Backend_portafolio.Controllers
             }
 
             return Json(new { error = false, bio });
+        }
+
+        public async Task<IActionResult> EditarUser(UserViewModel ViewModel)
+        {
+            try
+            {
+                var usuarioID = _usersService.ObtenerUsuario();
+                var usuario = await _repositoryUsers.BuscarPorId(usuarioID);
+
+                User usuarioEdit = _mapper.Map<User>(ViewModel);
+
+                usuarioEdit.passwordHash = usuario.passwordHash;
+
+                if (ViewModel.ImageFile != null)
+                {
+                    usuarioEdit.img  = await _imageService.UploadImageAsync(ViewModel.ImageFile, usuario.email,"profile-images");
+                }
+                else
+                {
+                    usuarioEdit.img = usuario.img;
+                }
+
+                var result = await _userManager.UpdateAsync(usuarioEdit);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Perfil");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    return View(ViewModel);
+                }
+            }
+            catch (Exception)
+            {
+                return View(ViewModel);
+            }
         }
 
         [HttpGet]

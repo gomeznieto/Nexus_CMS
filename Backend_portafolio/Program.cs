@@ -31,6 +31,7 @@ builder.Services.AddTransient<IRepositoryRole, RepositoryRole>();
 builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
 builder.Services.AddTransient<IRepositoryBio, RepositoryBio>();
 builder.Services.AddTransient<IUserStore<User>, UsersStore>();
+builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddTransient<SignInManager<User>>();
 
 // AUTENTICACION
@@ -69,6 +70,8 @@ if (!app.Environment.IsDevelopment())
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
+
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

@@ -6,14 +6,17 @@
 
 <h3>Mi Perfil</h3>
 <div class="w-100 p-1 row gap-3">
-    <form action="/" method="post" class="mt-2 col-6 p-2">
+    <form method="post" asp-action="EditarUser" asp-controller="Users" class="mt-2 col-6 p-2" enctype="multipart/form-data">
+        <input type="hidden" asp-for="@Model.id" />
+        <input type="hidden" asp-for="@Model.role" />
         <!-- IMAGEN -->
         <div class="d-flex align-items-center mt-2">
             <div class="w-25">
                 <p class="fw-bold">Imagen Perfil</p>
             </div>
             <div class="w-75">
-                <img src="@Model.Image" class="profile-picture-perfil rounded-2">
+                <img src="@Model.img" class="profile-picture-perfil rounded-2">
+                <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="ImageFile" class="form-control mt-2">
             </div>
         </div> <!-- FIN IMAGEN -->
         <!-- NOMBRE -->
@@ -22,7 +25,7 @@
                 <p class="fw-bold">Nombre</p>
             </div>
             <div class="w-75">
-                <input asp-for="@Model.Name" class="form-control" />
+                <input asp-for="@Model.name" class="form-control" />
             </div>
         </div> <!-- FIN NOMBRE-->
         <!-- EMAIL -->
@@ -31,17 +34,25 @@
                 <p class="fw-bold">Email</p>
             </div>
             <div class="w-75">
-                <input asp-for="@Model.Email" class="form-control" />
+                <input asp-for="@Model.email" class="form-control" />
             </div>
         </div> <!-- FIN EMAIL -->
-        <!-- Agregar campos con año para poder guardar en la BIO de la base de datos -->
+        <!-- ABOUT-->
+        <div class="d-flex align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Acerca de</p>
+            </div>
+            <div class="w-75">
+                <textarea asp-for="@Model.about" class="form-control textarea-style" rows="5" placeholder="Agregar un resumen al perfil"></textarea>
+            </div>
+        </div> <!-- FIN ABOUT -->
         <!-- HOBBIES-->
         <div class="d-flex align-items-center mt-2">
             <div class="w-25">
                 <p class="fw-bold">Hobbies</p>
             </div>
             <div class="w-75">
-                <textarea asp-for="Hobbies" class="form-control textarea-style" rows="10" placeholder="Agregar hobbies al perfil"></textarea>
+                <textarea asp-for="@Model.hobbies" class="form-control textarea-style" rows="10" placeholder="Agregar hobbies al perfil"></textarea>
             </div>
         </div> <!-- FIN BIOS -->
         <!-- CV -->
@@ -50,19 +61,9 @@
                 <p class="fw-bold">Curriculum Vitae</p>
             </div>
             <div class="w-75">
-                <input asp-for="@Model.CV" class="form-control" />
+                <input asp-for="@Model.cv" class="form-control" />
             </div>
         </div> <!-- FIN CV -->
-        <!-- CAMBIAR CONTRASEÑA -->
-        <div class="d-flex  align-items-center mt-2">
-            <div class="w-25">
-                <p class="fw-bold">Password</p>
-            </div>
-            <div class="w-75">
-                <input type="password" asp-for="@Model.password" class="form-control" placeholder="Ingrese contraseña actual" />
-                <input type="password" asp-for="@Model.passwordNuevo" class="form-control mt-2" placeholder="Ingrese contraseña nueva" />
-            </div>
-        </div> <!-- FIN CAMBIAR CONSTRASEÑA -->
         <!-- REDES -->
         <!-- Todas las redes sociales -->
         <div class="mt-4 row col-12">
