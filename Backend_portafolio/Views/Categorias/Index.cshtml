@@ -5,9 +5,6 @@
 
 @{
 	ViewData["Title"] = "Categorias";
-
-	// Error modal
-	ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
 }
 
 <h1 class="mb-3">Listado de Categorias</h1>
@@ -69,12 +66,5 @@ else
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Categorias" }' />
-
-<!-- MODAL ERROR -->
-@if (errorModal is not null)
-{
-	<partial name="_ErrorModal" model=errorModal />
-}
-
 
 

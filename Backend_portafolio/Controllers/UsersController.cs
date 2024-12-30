@@ -204,6 +204,9 @@ namespace Backend_portafolio.Controllers
 
                 bio.user_id = usuarioID;
                 await _repositoryBio.Agregar(bio);
+
+                Session.CrearModalSuccess("Se ha creado la bio con éxito", "Users", HttpContext);
+
                 return RedirectToAction("Bio");
             }
             catch (Exception)
@@ -260,13 +263,14 @@ namespace Backend_portafolio.Controllers
 
                 await _repositoryBio.Editar(bio);
 
+                Session.CrearModalSuccess("Se ha modificado la bio con éxito", "Users", HttpContext);
+
                 return RedirectToAction("Bio");
             }
             catch (Exception)
             {
                 //Crear mensaje de error para modal
-                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Users" };
-                Session.ErrorSession(HttpContext, errorModal);
+                Session.CrearModalError("Ha surgido un error. ¡Intente más tarde!", "Users", HttpContext);
 
                 return RedirectToAction("Bio");
             }
@@ -286,6 +290,7 @@ namespace Backend_portafolio.Controllers
             return Json(new { error = false, bio });
         }
 
+        [HttpPost]
         public async Task<IActionResult> EditarUser(UserViewModel ViewModel)
         {
             try
@@ -310,6 +315,10 @@ namespace Backend_portafolio.Controllers
 
                 if (result.Succeeded)
                 {
+                    //Crear mensaje de error para modal
+                    var successModal = new ModalViewModel { message = "El perfil ha sido guardado exitosamente", type = true, path = "Users" };
+                    Session.SuccessSession(HttpContext, successModal);
+
                     return RedirectToAction("Perfil");
                 }
                 else
@@ -319,12 +328,16 @@ namespace Backend_portafolio.Controllers
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
 
-                    return View(ViewModel);
                 }
+                    return View(ViewModel);
             }
-            catch (Exception)
+            catch (ArgumentException argument)
             {
-                return View(ViewModel);
+                //Crear mensaje de error para modal
+                var errorModal = new ModalViewModel { message = argument.Message, type = true, path = "Users" };
+                Session.ErrorSession(HttpContext, errorModal);
+
+                return RedirectToAction("Perfil");
             }
         }
 

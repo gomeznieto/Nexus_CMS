@@ -3,12 +3,10 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
+    ViewData["Title"] = "Bio";
+
     // Obtenemos el año actual
     int anios = DateTime.Now.Year - 1900;
-
-    // Error modal
-    ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
-    ViewData["Title"] = "Bio";
 }
 
 <h3>Bio</h3>
@@ -98,14 +96,6 @@
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Users" }' />
-
-<!-- MODAL ERROR -->
-@if (errorModal is not null)
-{
-    <partial name="_ErrorModal" model=errorModal />
-}
-
-
 
 @section Scripts
 {

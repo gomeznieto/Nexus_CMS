@@ -4,9 +4,6 @@
 @model IEnumerable<Source>
 @{
 	ViewData["Title"] = "Tipos de Media";
-
-	// Error modal
-	ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
 }
 
 <h1 class="mb-3">Listado de Fuentes</h1>
@@ -45,9 +42,3 @@
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Sources" }' />
-
-<!-- MODAL ERROR -->
-@if (errorModal is not null)
-{
-	<partial name="_ErrorModal" model=errorModal />
-}

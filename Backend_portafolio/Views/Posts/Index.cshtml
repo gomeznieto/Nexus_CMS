@@ -12,9 +12,6 @@
 		pageValue = 1;
 	}
 
-	// Error modal
-	ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
-
 	//Cantidad de entradas por post
 	var cantidadPorPost = Session.GetCantidadPostsSession(HttpContextAccessor.HttpContext);
 
@@ -154,11 +151,4 @@ else
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Posts" }' />
-
-<!-- MODAL ERROR -->
-@if (errorModal is not null)
-{
-	<partial name="_ErrorModal" model=errorModal />
-}
-
 

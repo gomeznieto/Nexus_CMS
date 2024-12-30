@@ -1,4 +1,6 @@
-﻿@model UserViewModel
+﻿@using Backend_portafolio.Helper
+@inject IHttpContextAccessor HttpContextAccessor
+@model UserViewModel
 
 @{
     ViewData["Title"] = "Perfil"; 
@@ -69,10 +71,11 @@
         <div class="mt-4 row col-12">
             <div class="col-4"></div>
             <div class="col-8 row justify-content-center gap-2">
-                <button class="btn btn-edit col-5">Editar</button>
+                <button class="btn btn-edit col-5" onclick="successModal({msg: 'El perfil ha sifo modificado con éxito'})">Editar</button>
                 <button class="btn btn-delete col-5">Cancelar</button>
             </div>
         </div>
     </form>
     
 </div>
+

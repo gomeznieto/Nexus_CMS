@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Http
+﻿@using Backend_portafolio.Helper
+@using Microsoft.AspNetCore.Http
 @using System.Text.Json;
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<User> MySignInManager
@@ -16,6 +17,10 @@
         formatsJson = HttpContextAccessor.HttpContext.Session.GetString("Formats");
         formats = JsonSerializer.Deserialize<List<Format>>(formatsJson);
     }
+
+    //  modal
+    ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
+    ModalViewModel successModal = Session.GetSuccessSession(HttpContextAccessor.HttpContext);
 
 }
 
@@ -234,8 +239,19 @@
             <main role="main" class="@(MySignInManager.IsSignedIn(User) ? "col" : "login-form-content") py-3">
                 <div class="@(MySignInManager.IsSignedIn(User) ? "container" : "login-width")">
                         @RenderBody()
-                    </div>
-                </main>
+
+                    <!-- MODALS -->
+                    @if (errorModal is not null)
+                    {
+                        <partial name="_ErrorModal" model=errorModal />
+                    }
+
+                    @if (successModal is not null)
+                    {
+                        <partial name="_SuccessModal" model=successModal />
+                    }
+                </div>
+            </main>
 
         </div><!-- FIN DIV FLEX -->
     </div> <!-- FIN DIV CONTAINER -->

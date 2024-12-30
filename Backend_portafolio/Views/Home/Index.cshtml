@@ -7,11 +7,6 @@
 
 @{
     ViewData["Title"] = "Home Page";
-
-    // Error modal
-    ModalViewModel errorModal = Session.GetErrorSession(HttpContextAccessor.HttpContext);
-    ModalViewModel successModal = Session.GetSuccessSession(HttpContextAccessor.HttpContext);
-
 }
 
 <div>
@@ -122,14 +117,4 @@
 
 </div>
 
-<!-- MODAL ERROR -->
-@if (errorModal is not null)
-{
-    <partial name="_ErrorModal" model=errorModal />
-}
-
-@if (successModal is not null)
-{
-    <partial name="_SuccessModal" model=successModal />
-}
 

@@ -65,6 +65,20 @@ namespace Backend_portafolio.Helper
             httpContext.Session.Remove("Exito");
         }
 
+        public static void CrearModalSuccess(string msg, string path, HttpContext httpContext)
+        {
+            //Crear mensaje de éxito para modal
+            var successModal = new ModalViewModel { message = msg, type = true, path = path};
+            SuccessSession(httpContext, successModal);
+        }
+
+        public static void CrearModalError(string msg, string path, HttpContext httpContext)
+        {
+            //Crear mensaje de éxito para modal
+            var errorModal = new ModalViewModel { message = msg, type = true, path = path };
+            ErrorSession(httpContext, errorModal);
+        }
+
         public static void CantidadPostsSession(HttpContext httpContext, int cantidad)
         {
             var formatsJson = JsonSerializer.Serialize(cantidad);
