@@ -512,10 +512,16 @@ form label {
 
 /* BIO */
 .hide{
-    display: none;
+    display: none !important;
 }
 
 .show
 {
     display: block;
+}
+
+/* INPUT GROUP */
+.input-background
+{
+    background-color: var(--bg-color-icon);
 }

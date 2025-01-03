@@ -1,6 +1,8 @@
 ﻿using Backend_portafolio.Models;
 using Dapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
+using System.ComponentModel;
 
 namespace Backend_portafolio.Sevices
 {
@@ -9,6 +11,7 @@ namespace Backend_portafolio.Sevices
         Task<User> BuscarPorId(int id);
         Task<User> BuscarUsuarioPorEmail(string emailNormalizado);
         Task<int> CrearUsuario(User user);
+        Task<bool> EditarPass(User user, string nuevaPass);
         Task EditarUsuario(User user);
         Task<bool> Existe(string emailNormalizado);
     }
@@ -66,6 +69,21 @@ namespace Backend_portafolio.Sevices
                new { id });
 
             return user;
+        }
+
+        // CAMBIAR PASS
+        public async Task<bool> EditarPass(User user, string nuevaPass)
+        {
+            var query = "UPDATE users SET passwordHash = @passwordHash WHERE Id = @id";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var hashedPassword = new PasswordHasher<User>().HashPassword(user, nuevaPass);
+
+               var modificado = await connection.ExecuteAsync(query, new { id = user.id, passwordHash = hashedPassword });
+
+                return modificado > 0;
+            }
         }
 
         // EXISTE

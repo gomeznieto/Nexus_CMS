@@ -13,7 +13,13 @@ namespace Backend_portafolio.Models
         public List<string> RolesName { get; set; }
         public List<Bio> Bios { get; set; }
         public List<SocialNetwork> Networks { get; set; }
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+        [Remote(action: "VerficarExistePass", controller: "Users")]
         public string password { get; set; }
+        [Required(ErrorMessage = "El campo {0} es requerido")]
         public string passwordNuevo { get; set; }
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+        [Remote(action: "VerificarPassNuevo", controller: "Users", AdditionalFields = nameof(passwordNuevo))]
+        public string repetirPasswordNuevo { get; set; }
     }
 }

@@ -392,6 +392,73 @@ namespace Backend_portafolio.Controllers
         /*
          ========================================
 
+        = MODIFICAR PASS
+
+         ========================================
+         */
+
+        [HttpPost]
+        public async Task<IActionResult> EditarPass(UserViewModel viewModel)
+        {
+
+           try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View(viewModel);
+                }
+
+                var usuarioID = _usersService.ObtenerUsuario();
+                var usuario = await _userManager.FindByIdAsync(usuarioID.ToString());
+
+                if (usuario == null)
+                {
+                    return RedirectToAction("Configuracion");
+                }
+
+                var isValidPassword = await _userManager.CheckPasswordAsync(usuario, viewModel.password);
+
+                if (!isValidPassword)
+                {
+                    Session.CrearModalError("La contraseña no pudo ser modificada. Intente más tarde!", "Users", HttpContext);
+
+                    return RedirectToAction("Configuracion");
+                }
+
+                 bool result = await _repositoryUsers.EditarPass(usuario, viewModel.passwordNuevo);
+
+                usuario = await _userManager.FindByIdAsync(usuarioID.ToString());
+
+                var isPasswordChanged = await _userManager.CheckPasswordAsync(usuario, viewModel.passwordNuevo);
+
+                if (!isPasswordChanged)
+                {
+                    Session.CrearModalError("La contraseña no pudo ser modificada. Intente más tarde!", "Users", HttpContext);
+
+                    return RedirectToAction("Configuracion");
+                }
+
+                if (result)
+                {
+                    Session.CrearModalSuccess("La contraseña ha sido cambiada exitosamente", "Users", HttpContext);
+
+                    return RedirectToAction("Configuracion");
+                }
+
+                return RedirectToAction("Configuracion");
+            }
+            catch(Exception)
+            {
+                Session.CrearModalError("La contraseña no pudo ser modificada. Intente más tarde!", "Users", HttpContext);
+
+                return RedirectToAction("Configuracion");
+            }
+        }
+
+
+        /*
+         ========================================
+
         = FUNCIONES
 
          ========================================
@@ -419,5 +486,59 @@ namespace Backend_portafolio.Controllers
 
         }
 
+        // Verificar si la contraseña actual es correcta
+        [HttpGet]
+        public async Task<IActionResult> VerficarExistePass(string password)
+        {
+
+            try
+            {
+                var usuarioID = _usersService.ObtenerUsuario();
+                var usuario = await _repositoryUsers.BuscarPorId(usuarioID);
+
+                var existePass = await _userManager.CheckPasswordAsync(usuario, password);
+
+                if (!existePass)
+                    return Json($"La contraseña es incorrecta");
+
+                return Json(true);
+
+            }
+            catch (Exception)
+            {
+                return Json($"La contraseña no es correcta");
+            }
+        }
+
+        // Verificar si la nueva contraseña es diferente a la actual
+        [AcceptVerbs("Get", "Post")]
+        public async Task<IActionResult> VerificarPassNuevo(string passwordNuevo, string repetirPasswordNuevo)
+        {
+
+            try
+            { 
+                if (passwordNuevo is null || repetirPasswordNuevo is null)
+                    return Json("Las constraseñas deben ser iguales");
+
+                var usuarioID = _usersService.ObtenerUsuario();
+                var usuario = await _repositoryUsers.BuscarPorId(usuarioID);
+
+                // Verificamos que las constraseñas sean iguales
+                if (passwordNuevo != repetirPasswordNuevo)
+                    return Json($"La contraseña deben ser iguales");
+
+                // Verificamos que la contraseña sea diferente a la actual
+                var existePass = await _userManager.CheckPasswordAsync(usuario, passwordNuevo);
+                if (existePass)
+                    return Json($"La contraseña debe ser diferente a la actual");
+
+                return Json(true);
+
+            }
+            catch (Exception)
+            {
+                return Json($"La contraseña no es correcta");
+            }
+        }
     }
 }

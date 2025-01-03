@@ -19,6 +19,7 @@ namespace Backend_portafolio.Models
         [Display(Name = "Hobbies")]
         public string hobbies { get; set; }
         [Display(Name = "E-Mail")]
+        [Remote(action: "VerificarExisteEmail", controller: "Users")]
         public string email { get; set; }
         public string emailNormalizado { get; set; }
         public string passwordHash { get; set; }
