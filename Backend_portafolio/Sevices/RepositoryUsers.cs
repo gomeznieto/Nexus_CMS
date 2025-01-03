@@ -41,7 +41,7 @@ namespace Backend_portafolio.Sevices
         {
             using var connection = new SqlConnection(_connectionString);
             await connection.ExecuteAsync(@"
-            UPDATE users SET name = @name, email = @email, emailNormalizado = @emailNormalizado, passwordHash = @passwordHash, cv = @cv, about = @about, hobbies = @hobbies, img = @img, role = @role
+            UPDATE users SET name = @name, email = @email, emailNormalizado = @emailNormalizado, cv = @cv, about = @about, hobbies = @hobbies, img = @img, role = @role
             WHERE id = @id
             ", user);
         }

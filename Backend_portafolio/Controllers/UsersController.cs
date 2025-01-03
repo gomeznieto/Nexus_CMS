@@ -41,7 +41,16 @@ namespace Backend_portafolio.Controllers
             _mapper = mapper;
         }
 
-        // REGISTER
+        /*
+         ========================================
+
+        = REGISTRO DE USUARIO
+
+        Unicamente el admin tiene la autorización para poder crear nuevos usuarios
+
+         ========================================
+         */
+
         [HttpGet]
         public async Task<IActionResult> Register()
         {
@@ -63,7 +72,6 @@ namespace Backend_portafolio.Controllers
 
                 return View(viewModel);
             }
-
 
             User user = await _signInManager.UserManager.GetUserAsync(User);
             Role adminRole = (await _repositoryRole.Obtener()).FirstOrDefault(x => x.name == "admin");
@@ -97,7 +105,14 @@ namespace Backend_portafolio.Controllers
 
         }
 
-        // LOGIN
+        /*
+         ========================================
+
+        = LOGIN
+
+         ========================================
+         */
+
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
@@ -127,7 +142,17 @@ namespace Backend_portafolio.Controllers
             }
         }
 
-        // LOGOUT
+
+        /*
+         ========================================
+
+        = LOGOUT
+
+        Método para salir del usuario
+
+         ========================================
+         */
+
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
@@ -135,7 +160,15 @@ namespace Backend_portafolio.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // Configuración
+
+        /*
+         ========================================
+
+        = CONFIGURACION
+
+         ========================================
+         */
+
         [HttpGet]
         public async Task<IActionResult> Configuracion()
         {
@@ -144,19 +177,19 @@ namespace Backend_portafolio.Controllers
 
             UserViewModel viewModel = _mapper.Map<UserViewModel>(user);
 
-            //UserViewModel viewModel = new UserViewModel();
-            //viewModel.CV = user.cv;
-            //viewModel.Email = user.email;
-            //viewModel.Name = user.name;
-            //viewModel.Image = user.img;
             viewModel.RoleName = (await _repositoryRole.Obtener()).Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
 
             return View(viewModel);
         }
 
-        // PERFIL
 
-        // Configuración
+        /*
+         ========================================
+
+        = PERFIL
+
+         ========================================
+         */
         [HttpGet]
         public async Task<IActionResult> Perfil()
         {
@@ -167,8 +200,14 @@ namespace Backend_portafolio.Controllers
             return View(viewModel);
         }
 
-        // BIO
 
+        /*
+         ========================================
+
+        = BIO
+
+         ========================================
+         */
         [HttpGet]
         public async Task<IActionResult> Bio()
         {
@@ -290,6 +329,17 @@ namespace Backend_portafolio.Controllers
             return Json(new { error = false, bio });
         }
 
+        /*
+        ========================================
+
+        = USER
+
+        Edición del perfil del usuario
+
+        ========================================
+        */
+
+
         [HttpPost]
         public async Task<IActionResult> EditarUser(UserViewModel ViewModel)
         {
@@ -300,11 +350,9 @@ namespace Backend_portafolio.Controllers
 
                 User usuarioEdit = _mapper.Map<User>(ViewModel);
 
-                usuarioEdit.passwordHash = usuario.passwordHash;
-
                 if (ViewModel.ImageFile != null)
                 {
-                    usuarioEdit.img  = await _imageService.UploadImageAsync(ViewModel.ImageFile, usuario.email,"profile-images");
+                    usuarioEdit.img = await _imageService.UploadImageAsync(ViewModel.ImageFile, usuario, "profile-images");
                 }
                 else
                 {
@@ -329,7 +377,7 @@ namespace Backend_portafolio.Controllers
                     }
 
                 }
-                    return View(ViewModel);
+                return View(ViewModel);
             }
             catch (ArgumentException argument)
             {
@@ -341,6 +389,16 @@ namespace Backend_portafolio.Controllers
             }
         }
 
+        /*
+         ========================================
+
+        = FUNCIONES
+
+         ========================================
+         */
+
+
+        // Verificar si el Email existe
         [HttpGet]
         public async Task<IActionResult> VerificarExisteEmail(string email)
         {
