@@ -401,21 +401,24 @@ namespace Backend_portafolio.Controllers
         public async Task<IActionResult> EditarPass(UserViewModel viewModel)
         {
 
-           try
+            try
             {
                 if (!ModelState.IsValid)
                 {
                     return View(viewModel);
                 }
 
+                // Obtenemos el usuario
                 var usuarioID = _usersService.ObtenerUsuario();
                 var usuario = await _userManager.FindByIdAsync(usuarioID.ToString());
 
+                // Si el usuario es nulo, redirigimos a la configuración
                 if (usuario == null)
                 {
                     return RedirectToAction("Configuracion");
                 }
 
+                // Verificamos que la contraseña actual sea correcta
                 var isValidPassword = await _userManager.CheckPasswordAsync(usuario, viewModel.password);
 
                 if (!isValidPassword)
@@ -425,12 +428,15 @@ namespace Backend_portafolio.Controllers
                     return RedirectToAction("Configuracion");
                 }
 
-                 bool result = await _repositoryUsers.EditarPass(usuario, viewModel.passwordNuevo);
+                // Cambiamos la contraseña
+                bool result = await _repositoryUsers.EditarPass(usuario, viewModel.passwordNuevo);
 
+                // Verificamos si la contraseña fue cambiada
                 usuario = await _userManager.FindByIdAsync(usuarioID.ToString());
 
                 var isPasswordChanged = await _userManager.CheckPasswordAsync(usuario, viewModel.passwordNuevo);
 
+                // Si la contraseña no fue cambiada, redirigimos a la configuración
                 if (!isPasswordChanged)
                 {
                     Session.CrearModalError("La contraseña no pudo ser modificada. Intente más tarde!", "Users", HttpContext);
@@ -438,21 +444,34 @@ namespace Backend_portafolio.Controllers
                     return RedirectToAction("Configuracion");
                 }
 
-                if (result)
-                {
-                    Session.CrearModalSuccess("La contraseña ha sido cambiada exitosamente", "Users", HttpContext);
-
-                    return RedirectToAction("Configuracion");
-                }
+                // Mensaje de éxito
+                Session.CrearModalSuccess("La contraseña ha sido cambiada exitosamente", "Users", HttpContext);
 
                 return RedirectToAction("Configuracion");
+
             }
-            catch(Exception)
+            catch (Exception)
             {
                 Session.CrearModalError("La contraseña no pudo ser modificada. Intente más tarde!", "Users", HttpContext);
 
                 return RedirectToAction("Configuracion");
             }
+        }
+
+        /*
+         ========================================
+
+        = REDES
+
+         ========================================
+         */
+        [HttpGet]
+        public async Task<IActionResult> Redes()
+        {
+            var viewModel = new SocialNetworkViewModel();
+            viewModel.Networks =  new List<SocialNetwork>();
+        
+            return View(viewModel);
         }
 
 
@@ -516,7 +535,7 @@ namespace Backend_portafolio.Controllers
         {
 
             try
-            { 
+            {
                 if (passwordNuevo is null || repetirPasswordNuevo is null)
                     return Json("Las constraseñas deben ser iguales");
 

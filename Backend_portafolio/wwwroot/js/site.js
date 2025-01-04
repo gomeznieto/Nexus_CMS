@@ -500,3 +500,39 @@ async function cargarBio(id) {
     let work = document.getElementById("inputFormBioEditar");
     work.value = result.bio.work;
 }
+
+/* REDES */
+
+// TODO: Revisar
+async function cargarRedes(id) {
+
+    // Fetch
+    const url = `/Users/ObtenerRedes/${id}`;
+    const response = await fetch(url);
+    const result = await response.json();
+
+    // Verificar error
+    if (result.error) {
+        // Mostrar mensaje de error en el modal correspondiente
+        document.getElementById('mensajeModalError').innerText = result.mensaje;
+        document.getElementById('modalError').style.display = 'block';
+    }
+
+    // Cargar ID
+    let inputId = document.getElementById("formIdEditar");
+    inputId.value = result.bio.id;
+
+    ////Cargar User
+    let user = document.getElementById("formuserEditar");
+    user.value = result.bio.user_id;
+
+    // Cargar año
+    let year = document.getElementById("formYearEditar");
+    let options = Object.entries(year.options);
+
+    options.forEach(x => x[1].value == result.bio.year ? x[1].selected = true : x[1].selected = false)
+
+    // Cargar trabajo
+    let work = document.getElementById("inputFormBioEditar");
+    work.value = result.bio.work;
+}

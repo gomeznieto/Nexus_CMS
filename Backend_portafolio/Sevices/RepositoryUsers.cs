@@ -74,7 +74,7 @@ namespace Backend_portafolio.Sevices
         // CAMBIAR PASS
         public async Task<bool> EditarPass(User user, string nuevaPass)
         {
-            var query = "UPDATE users SET passwordHash = @passwordHash WHERE Id = @id";
+            var query = "UPDATE users SET passwordHash = @passwordHash, securityStamp = NEWID() WHERE Id = @id";
 
             using (var connection = new SqlConnection(_connectionString))
             {
