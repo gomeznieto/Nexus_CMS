@@ -22,6 +22,8 @@ namespace Backend_portafolio.Sevices
             .ForMember(dest => dest.emailNormalizado, opt => opt.MapFrom(src => src.email.ToUpper()));
 
             CreateMap<User, UserViewModel>();
+
+            CreateMap<SocialNetworkViewModel, SocialNetwork>();
         }
     }
 }

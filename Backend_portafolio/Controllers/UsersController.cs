@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using static Backend_portafolio.Sevices.RepositorySocialNetwork;
 
 namespace Backend_portafolio.Controllers
 {
@@ -17,6 +18,7 @@ namespace Backend_portafolio.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IUsersService _usersService;
         private readonly IRepositoryUsers _repositoryUsers;
+        private readonly IRepositorySocialNetwork _repositorySocialNetwork;
         private readonly IImageService _imageService;
         private readonly IMapper _mapper;
 
@@ -27,6 +29,7 @@ namespace Backend_portafolio.Controllers
             SignInManager<User> signInManager,
             IUsersService usersService,
             IRepositoryUsers repositoryUsers,
+            IRepositorySocialNetwork repositorySocialNetwork,
             IImageService imageService,
             IMapper mapper
             )
@@ -37,6 +40,7 @@ namespace Backend_portafolio.Controllers
             _signInManager = signInManager;
             _usersService = usersService;
             _repositoryUsers = repositoryUsers;
+            _repositorySocialNetwork = repositorySocialNetwork;
             _imageService = imageService;
             _mapper = mapper;
         }
@@ -468,10 +472,97 @@ namespace Backend_portafolio.Controllers
         [HttpGet]
         public async Task<IActionResult> Redes()
         {
+            //Usuario
+            var usuarioID = _usersService.ObtenerUsuario();
+
+            // Redes
             var viewModel = new SocialNetworkViewModel();
-            viewModel.Networks =  new List<SocialNetwork>();
-        
+            viewModel.Networks = (await _repositorySocialNetwork.ObtenerPorUsuario(usuarioID)).ToList();
             return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Redes(SocialNetworkViewModel viewModel)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View(viewModel);
+                }
+
+                var usuarioID = _usersService.ObtenerUsuario();
+
+                viewModel.user_id = usuarioID;
+                await _repositorySocialNetwork.Agregar(viewModel);
+
+                Session.CrearModalSuccess("Se ha creado la Red Social con éxito", "Users", HttpContext);
+
+                return RedirectToAction("Redes");
+            }
+            catch (Exception)
+            {
+                //Crear mensaje de error para modal
+                Session.CrearModalError("Ha surgido un error. ¡Intente más tarde!", "Users", HttpContext);
+
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerRedes(int id)
+        {
+            var usuarioID = _usersService.ObtenerUsuario();
+            var bio = await _repositorySocialNetwork.ObtenerPorId(id, usuarioID);
+
+            if (bio == null)
+            {
+                return Json(new { error = true, mensaje = "La bio no se pudo obtener.\n¡Se ha producido un error!" });
+            }
+
+            return Json(new { error = false, bio });
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditarRedes(SocialNetworkViewModel viewModel)
+        {
+            Models.SocialNetwork socialNetwork = _mapper.Map(viewModel, new Models.SocialNetwork());
+
+           var editado =  await _repositorySocialNetwork.Editar(socialNetwork);
+
+            if (!editado)
+            {
+                Session.CrearModalError("La red social no pudo ser modificada. Intente más tarde!", "Users", HttpContext);
+                return RedirectToAction("Redes");
+            }
+            Session.CrearModalSuccess("La red social ha sido modificada exitosamente", "Users", HttpContext);
+            return RedirectToAction("Redes");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BorrarRedes(int id)
+        {
+            try
+            {
+                var usuarioID = _usersService.ObtenerUsuario();
+
+                var bio = await _repositorySocialNetwork.ObtenerPorId(id, usuarioID);
+
+                if (bio == null || usuarioID != bio.user_id)
+                {
+                    return Json(new { error = true, mensaje = "La bio no se pudo borrar.\n¡Se ha producido un error!" });
+                }
+
+                await _repositorySocialNetwork.Borrar(id, usuarioID);
+
+                return Json(new { error = false, mensaje = "¡La bio ha sido borrada correctamente!" });
+            }
+            catch (Exception)
+            {
+                return Json(new { error = true, mensaje = "La bio no se pudo borrar.\n¡Se ha producido un error!" });
+
+            }
         }
 
 

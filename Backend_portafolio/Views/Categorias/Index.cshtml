@@ -65,6 +65,10 @@ else
 }
 
 <!-- MODAL -->
-<partial name="_Modal" model='new { url = "/Categorias" }' />
+<partial name="_Modal" model='new { url = "/Categorias", action = "Borrar" }' />
 
 
+@section Scripts
+{
+	<partial name="_ValidationScriptsPartial" />
+}

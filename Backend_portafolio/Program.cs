@@ -30,6 +30,7 @@ builder.Services.AddTransient<IRepositoryLink, RepositoryLink>();
 builder.Services.AddTransient<IRepositoryRole, RepositoryRole>();
 builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
 builder.Services.AddTransient<IRepositoryBio, RepositoryBio>();
+builder.Services.AddTransient<IRepositorySocialNetwork, RepositorySocialNetwork>();
 builder.Services.AddTransient<IUserStore<User>, UsersStore>();
 builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddTransient<SignInManager<User>>();

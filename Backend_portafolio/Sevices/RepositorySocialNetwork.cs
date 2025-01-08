@@ -6,6 +6,10 @@ namespace Backend_portafolio.Sevices
 {
     public interface IRepositorySocialNetwork
     {
+        Task<int> Agregar(SocialNetwork socialNetwork);
+        Task<bool> Borrar(int id, int user_id);
+        Task<bool> Editar(SocialNetwork socialNetwork);
+        Task<SocialNetwork> ObtenerPorId(int id, int user_id);
         Task<IEnumerable<SocialNetwork>> ObtenerPorUsuario(int user_id);
     }
     public class RepositorySocialNetwork : IRepositorySocialNetwork
@@ -28,12 +32,40 @@ namespace Backend_portafolio.Sevices
             _connectionString = configuration.GetConnectionString("DevConnection");
         }
 
-        // OBTENER REDES SOCIALES POR ID
+        // OBTENER REDES SOCIALES POR USUARIO
         public async Task<IEnumerable<Models.SocialNetwork>> ObtenerPorUsuario(int user_id)
         {
             using var connection = new SqlConnection(_connectionString);
 
             return await connection.QueryAsync<Models.SocialNetwork>($@"SELECT * FROM {SocialNetwork.TABLE} WHERE {SocialNetwork.USERID} = @{SocialNetwork.USERID}", new { user_id });
+        }
+
+        // OBTENER POR ID
+        public async Task<Models.SocialNetwork> ObtenerPorId(int id, int user_id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QueryFirstOrDefaultAsync<Models.SocialNetwork>($@"SELECT * FROM {SocialNetwork.TABLE} WHERE {SocialNetwork.ID} = @{SocialNetwork.ID} AND {SocialNetwork.USERID} = @{SocialNetwork.USERID}", new { id, user_id });
+        }
+
+        // CREAR
+        public async Task<int> Agregar(Models.SocialNetwork socialNetwork)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.ExecuteAsync($@"INSERT INTO {SocialNetwork.TABLE} ({SocialNetwork.NAME}, {SocialNetwork.URL}, {SocialNetwork.USERNAME}, {SocialNetwork.ICON}, {SocialNetwork.USERID}) VALUES (@{SocialNetwork.NAME}, @{SocialNetwork.URL}, @{SocialNetwork.USERNAME}, @{SocialNetwork.ICON}, @{SocialNetwork.USERID}) SELECT SCOPE_IDENTITY()", socialNetwork);
+        }
+
+        // EDITAR
+        public async Task<bool> Editar(Models.SocialNetwork socialNetwork)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.ExecuteAsync($@"UPDATE {SocialNetwork.TABLE} SET {SocialNetwork.NAME} = @{SocialNetwork.NAME}, {SocialNetwork.URL} = @{SocialNetwork.URL}, {SocialNetwork.USERNAME} = @{SocialNetwork.USERNAME}, {SocialNetwork.ICON} = @{SocialNetwork.ICON} WHERE {SocialNetwork.ID} = @{SocialNetwork.ID} AND {SocialNetwork.USERID} = @{SocialNetwork.USERID}", socialNetwork) > 0;
+
+        }
+        // BORRAR
+        public async Task<bool> Borrar(int id, int user_id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.ExecuteAsync($@"DELETE FROM {SocialNetwork.TABLE} WHERE {SocialNetwork.ID} = @{SocialNetwork.ID} AND {SocialNetwork.USERID} = @{SocialNetwork.USERID}", new { id, user_id }) > 0;
         }
     }
 }

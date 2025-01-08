@@ -7,7 +7,7 @@
 			<p id="modalMsg" class="mb-4 text-center"></p>
 			<input type="hidden" name="id" />
 			<div class="d-flex gap-2 justify-content-center">
-				<button type="submit" class="btn btn-delete" id="btnModalBorrar" onclick="verificarRespuestaModal('@Model.url/Borrar/')">Borrar </button>
+				<button type="submit" class="btn btn-delete" id="btnModalBorrar" onclick="verificarRespuestaModal('@Model.url/@Model.action/')">Borrar </button>
 				<a class="btn btn-edit" onclick="closeModal()">Cancelar</a>
 			</div>
 		</div>

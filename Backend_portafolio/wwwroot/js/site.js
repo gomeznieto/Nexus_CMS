@@ -507,8 +507,8 @@ async function cargarBio(id) {
 async function cargarRedes(id) {
 
     // Fetch
-    const url = `/Users/ObtenerRedes/${id}`;
-    const response = await fetch(url);
+    const urlPost = `/Users/ObtenerRedes/${id}`;
+    const response = await fetch(urlPost);
     const result = await response.json();
 
     // Verificar error
@@ -523,16 +523,22 @@ async function cargarRedes(id) {
     inputId.value = result.bio.id;
 
     ////Cargar User
-    let user = document.getElementById("formuserEditar");
+    let user = document.getElementById("formUserEditar");
     user.value = result.bio.user_id;
 
-    // Cargar año
-    let year = document.getElementById("formYearEditar");
-    let options = Object.entries(year.options);
+    //Cargar Name
+    let name = document.getElementById("formNameEditar");
+    name.value = result.bio.name;
 
-    options.forEach(x => x[1].value == result.bio.year ? x[1].selected = true : x[1].selected = false)
+    //Cargar URL
+    let url = document.getElementById("formUrlEditar");
+    url.value = result.bio.url;
 
-    // Cargar trabajo
-    let work = document.getElementById("inputFormBioEditar");
-    work.value = result.bio.work;
+    // Cargar username
+    let username = document.getElementById("formUsernameEditar");
+    username.value = result.bio.username;
+
+    // Cargar Icono
+    let icon = document.getElementById("formIconEditar");
+    icon.value = result.bio.icon;
 }
