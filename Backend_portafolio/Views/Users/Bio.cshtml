@@ -10,6 +10,7 @@
 }
 
 <h3>Bio</h3>
+<!-- LISTADO DE BIO -->
 <div class="w-100 p-1 row gap-3">
     <div class=" mt-2 col-6 p-2">
         <table class="table table-borderless">
@@ -35,34 +36,36 @@
                     }
                 }
             </tbody>
-        </table>
-        <!-- BIO -->
+        </table> <!-- FIN LISTADO -->
+        <!-- CREAR -->
         <button class="btn btn-action" id="btnAddBio" onclick="showForm()"><i class="fa-solid fa-plus me-2"></i>Agregar Bio</button>
-        <form class="hide" id="formAddBio" asp-action="Bio" asp-controller="Users">
+        <form class="hide mt-4" id="formAddBio" asp-action="Bio" asp-controller="Users">
             <!-- VALIDATION -->
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <div class="d-flex mt-2 gap-1">
 
-                <div>
-                    <select class="form-select" asp-for="@Model.year">
+                <div class="col-2">
+                    <select class="form-select optSelect" asp-for="@Model.year">
                         @for (int i = anios; i >= 50; i--)
                         {
-                            <option value="@(i+1900)">@(i + 1900)</option>
+                            <option value="@(i+1900) optText">@(i + 1900)</option>
                         }
                     </select>
                 </div>
-                <div>
+                <div class="col-6">
                     <input type="text" class="form-control" id="inputFormBio" asp-for="@Model.work" />
                 </div>
-
-                <button type="submit" class="btn btn-action">Guardar</button>
-                <a class="btn btn-delete" onclick="hideForm()">Cancelar</a>
+                <div class="col-4">
+                    <button type="submit" class="btn btn-action">Guardar</button>
+                    <a class="btn btn-delete" onclick="hideForm()">Cancelar</a>
+                </div>
             </div>
             <span asp-validation-for="@Model.work" class="form-error"></span>
             <span asp-validation-for="@Model.year" class="form-error"></span>
         </form>
-        <!-- FIN BIOS-->
+        <!-- FIN CREAR-->
     </div>
+
     <!-- EDITAR -->
     <div class="mt-2 col-6 p-2 hide" id="formEditar">
         <h2>Editar</h2>
@@ -97,6 +100,7 @@
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Users", action="Borrar" }' />
 
+<!-- SCRIPTS -->
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />

@@ -22,7 +22,7 @@
 <h1 class="mb-3">Listado de @ViewBag.Format</h1>
 <p class="fs-6 mb-3">Nulla varius ex ut posuere consectetur. In tincidunt, nisi vitae. </p>
 <P>Cantidad de Entradas Totales: @ViewBag.Cantidad</P>
-<div class="d-flex justify-content-between align-items-center">
+<div class="d-flex flex-column flex-lg-row justify-content-lg-between lign-items-lg-center col-6 col-lg-12">
 
 	<!-- CREAR NUEVO -->
 	<a asp-action="Crear" asp-route-format="@ViewBag.Format" class="btn btn-action">Crear nuevo @ViewBag.Format </a>
@@ -35,7 +35,7 @@
 	</select>
 
 	<!-- BUSCADOR-->
-	<form method="post" asp-action="Index" class="d-flex justify-content-center align-items-center gap-2">
+	<form method="post" asp-action="Index" class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">
 		<input type="hidden" name="format" value="@ViewBag.Format"/>
 		<input type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
 		<div class="input-group-append">

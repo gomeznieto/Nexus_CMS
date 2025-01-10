@@ -50,28 +50,33 @@
         <div class="row flex-nowrap">
             @if (MySignInManager.IsSignedIn(User))
             {
-                <div class="menu_width px-sm-2 px-0 menu-color">
+                <div class="menu_width px-sm-2 px-0 menu-color" id="lateralBar" collapse="false">
                     <!-- MENU -->
                     <div class="d-flex flex-column align-items-center align-items-sm-start pt-2 min-vh-100">
 
                         <!-- * TITULO -->
-                        <a href="/" class="d-flex align-items-center justify-content-between pb-3 mb-md-0 me-md-auto text-decoration-none w-100">
-                            <span class="fs-6 item_size text-white">PANEL</span> <i class="menu-hamb fa-solid fa-bars"></i>
-                        </a>
+                        <div class="nav-title-page nav-title-page-dimension" id="navTitle">
+                            <a href="/" >
+                                <span class="fs-6 item_size text-white" id="itemTitle">PANEL</span>
+                            </a>
+                             <i class="menu-hamb fa-solid fa-bars" id="btnBars"></i>
+                        </div>
 
                         <ul class="nav flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
 
                             <!-- * HOME -->
                             <li>
-                                <a href="/" class="nav-link align-middle px-3 nav-title">
-                                    <i class="iconos fa-solid fa-house"></i> <span class="ms-1 item_size">Home</span>
+                                <a href="/" class="nav-link align-middle px-3 nav-title" id="itemLi">
+                                    <i class="iconos fa-solid fa-house"></i>
+                                    <span class="ms-1 item_size" id="itemTitle">Home</span>
                                 </a>
                             </li>
 
                             <!-- * POSTS -->
-                            <li>
-                                <a href="#subMenuPosts" data-bs-toggle="collapse" class="nav-link align-middle nav-title">
-                                    <i class="iconos fa-solid fa-pen"></i> <span class="ms-1 item_size">Post</span>
+                            <li id="nav_items">
+                                <a href="#subMenuPosts" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
+                                    <i class="iconos fa-solid fa-pen"></i>
+                                    <span class="ms-1 item_size" id="itemTitle">Post</span>
                                 </a>
 
                                 @if (formats != null)
@@ -81,7 +86,10 @@
                                         {
                                             <li class="w-100">
                                                 <a asp-action="Index" asp-controller="Posts" asp-route-format="@format.name" class="nav-link item_subNav px-3">
-                                                    <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">@format.name</span>
+                                                    <span class="item_size">
+                                                        <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                        <span class="ms-2">@format.name</span>
+                                                    </span>
                                                 </a>
                                             </li>
                                         }
@@ -90,22 +98,25 @@
                             </li>
 
                             <!-- * CATEGORIES -->
-                            <li>
-                                <a href="#subMenuCategories" data-bs-toggle="collapse" class="nav-link align-middle nav-title">
-                                    <i class="iconos fa-solid fa-pen"></i> <span class="ms-1 item_size">Categoria</span>
+                            <li id="nav_items">
+                                <a href="#subMenuCategories" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
+                                    <i class="iconos fa-solid fa-pen"></i>
+                                    <span class="ms-1 item_size" id="itemTitle">Categoria</span>
                                 </a>
                                 <ul class="collapse nav flex-column ms-1" id="subMenuCategories" data-bs-parent="#menu">
                                     <li class="w-100">
                                         <a asp-action="Index" asp-controller="Categorias" class="nav-link px-3 item_subNav">
                                             <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Listado</span>
+                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                <span class="ms-2">Listado</span>
                                             </span>
                                         </a>
                                     </li>
                                     <li>
                                         <a asp-action="Crear" asp-controller="Categorias" class="nav-link px-3 item_subNav">
                                             <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Crear</span>
+                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                <span class="ms-2">Crear</span>
                                             </span>
                                         </a>
                                     </li>
@@ -113,15 +124,17 @@
                             </li>
 
                             <!-- * FORMATS -->
-                            <li>
-                                <a href="#subMenuFormats" data-bs-toggle="collapse" class="nav-link align-middle nav-title">
-                                    <i class="iconos fa-solid fa-pen"></i> <span class="ms-1 item_size">Formatos</span>
+                            <li id="nav_items">
+                                <a href="#subMenuFormats" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
+                                    <i class="iconos fa-solid fa-pen"></i>
+                                    <span class="ms-1 item_size" id="itemTitle">Formatos</span>
                                 </a>
                                 <ul class="collapse nav flex-column ms-1" id="subMenuFormats" data-bs-parent="#menu">
                                     <li class="w-100">
                                         <a asp-action="Index" asp-controller="Formats" class="nav-link px-3 item_subNav">
                                             <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Listado</span>
+                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                <span class="ms-2">Listado</span>
                                             </span>
                                         </a>
                                     </li>
@@ -136,22 +149,26 @@
                             </li>
 
                             <!-- * MEDIA TYPES -->
-                            <li>
-                                <a href="#subMenuMediaTypes" data-bs-toggle="collapse" class="nav-link align-middle nav-title">
-                                    <i class="iconos fa-solid fa-pen"></i> <span class="ms-1 item_size">Tipos Media</span>
+                            <li id="nav_items">
+                                <a href="#subMenuMediaTypes" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
+                                    <i class="iconos fa-solid fa-pen"></i>
+                                    <span class="ms-1 item_size" id="itemTitle">Tipos Media</span>
                                 </a>
                                 <ul class="collapse nav flex-column ms-1" id="subMenuMediaTypes" data-bs-parent="#menu">
                                     <li class="w-100">
                                         <a asp-action="Index" asp-controller="Mediatype" class="nav-link px-3 item_subNav">
                                             <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Listado</span>
+                                                <i class="subiconos fa-regular fa-circle ms-2">
+
+                                                </i><span class="ms-2">Listado</span>
                                             </span>
                                         </a>
                                     </li>
                                     <li>
                                         <a asp-action="Crear" asp-controller="Mediatype" class="nav-link px-3 item_subNav">
                                             <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Crear</span>
+                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                <span class="ms-2">Crear</span>
                                             </span>
                                         </a>
                                     </li>
@@ -159,22 +176,26 @@
                             </li>
 
                             <!-- SOURCES -->
-                            <li>
-                                <a href="#subMenuSources" data-bs-toggle="collapse" class="nav-link align-middle nav-title">
-                                    <i class="iconos fa-solid fa-pen"></i> <span class="ms-1 item_size">Fuentes</span>
+                            <li id="nav_items">
+                                <a href="#subMenuSources" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
+                                    <i class="iconos fa-solid fa-pen"></i>
+                                    <span class="ms-1 item_size" id="itemTitle">Fuentes</span>
                                 </a>
                                 <ul class="collapse nav flex-column ms-1" id="subMenuSources" data-bs-parent="#menu">
                                     <li class="w-100">
                                         <a asp-action="Index" asp-controller="Sources" class="nav-link px-3 item_subNav">
                                             <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Listado</span>
+                                                <i class="subiconos fa-regular fa-circle ms-2">
+
+                                                </i><span class="ms-2">Listado</span>
                                             </span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a asp-action="Crear" asp-controller="Sources" class="nav-link px-3 item_subNav">
+                                        <a asp-action="Crear" asp-controller="Sources" class="nav-link px-3 item_subNav" >
                                             <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Crear</span>
+                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                <span class="ms-2">Crear</span>
                                             </span>
                                         </a>
                                     </li>
@@ -184,15 +205,17 @@
                             <!-- ADMIN -->
                             @if (MySignInManager.IsSignedIn(User) && currentUser.role == 1)
                             {
-                                <li>
-                                    <a href="#subMenuMediaUsers" data-bs-toggle="collapse" class="nav-link align-middle nav-title">
-                                        <i class="iconos fa-solid fa-pen"></i> <span class="ms-1 item_size">Usuarios</span>
+                                <li id="nav_items">
+                                    <a href="#subMenuMediaUsers" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
+                                        <i class="iconos fa-solid fa-pen"></i>
+                                        <span class="ms-1 item_size" id="itemTitle">Usuarios</span>
                                     </a>
                                     <ul class="collapse nav flex-column ms-1" id="subMenuMediaUsers" data-bs-parent="#menu">
                                         <li class="w-100">
                                             <a asp-action="Register" asp-controller="Users" class="nav-link px-3 item_subNav">
                                                 <span class="item_size">
-                                                    <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Nuevo</span>
+                                                    <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                    <span class="ms-2">Nuevo</span>
                                                 </span>
                                             </a>
                                         </li>
@@ -210,11 +233,10 @@
                         </ul>
                         <hr>
                         <!-- * PROFILE -->
-
-                        <div class="dropdown pb-4">
-                            <a href="#" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="dropdown pb-4 ms-md-4 d-flex justify-content-center align-content-center col-12 col-md-6">
+                            <a href="#" class="d-flex align-items-center justify-content-center text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                                 <img src="@(currentUser.img != null ? currentUser.img : "https://picsum.photos/id/237/200/300")" alt="hugenerd" width="30" height="30" class="rounded-circle">
-                                <span class="px-4 item_subNav fs-6">@currentUser.name</span>
+                                <span class="px-4 item_subNav fs-6 profile-name-nav " id="profileName">@currentUser.name</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                                 <li><a class="dropdown-item" asp-action="perfil" asp-controller="users">Perfil</a></li>
@@ -235,11 +257,10 @@
                 </div>
 
             } <!-- FIN IF DE USUARIO-->
-
-                <!-- MAIN -->
+            <!-- MAIN -->
             <main role="main" class="@(MySignInManager.IsSignedIn(User) ? "col" : "login-form-content") py-3">
                 <div class="@(MySignInManager.IsSignedIn(User) ? "container" : "login-width")">
-                        @RenderBody()
+                    @RenderBody()
 
                     <!-- MODALS -->
                     @if (errorModal is not null)
@@ -257,11 +278,22 @@
         </div><!-- FIN DIV FLEX -->
     </div> <!-- FIN DIV CONTAINER -->
 
+
     <!-- SCRIPTS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        document.getElementById("btnBars").addEventListener("click", (e) =>
+            {
+                e.preventDefault();
+                actionBar();
+            }
+        )
+
+    </script>
 
 </body>
 </html>

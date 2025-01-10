@@ -542,3 +542,78 @@ async function cargarRedes(id) {
     let icon = document.getElementById("formIconEditar");
     icon.value = result.bio.icon;
 }
+
+/* BARRAS NAVEGACION */
+function actionBar() {
+    // Tomamos la barra y aplicamos cambios en el css
+    let lateralBar = document.getElementById("lateralBar");
+
+    lateralBar.classList.toggle("menu_width")
+    lateralBar.classList.toggle("menu_width_collapse")
+
+    //let itemsSize = document.querySelectorAll(".item_size");
+    //let itemsSizeCollapse = document.querySelectorAll(".item_size_collapse");
+
+    //itemsSize.forEach(x => {
+    //    x.classList.toggle("item_size")
+    //    x.classList.toggle("item_size_collapse")
+    //})
+
+    //itemsSizeCollapse.forEach(x => {
+    //    x.classList.toggle("item_size")
+    //    x.classList.toggle("item_size_collapse")
+    //})
+
+    //let navLink = document.querySelectorAll(".nav-link");
+
+    //navLink.forEach(x => {
+    //    x.classList.toggle("nav-title")
+    //})
+
+    let itemTitle = document.querySelectorAll("#itemTitle")
+    itemTitle.forEach(x => x.classList.toggle("hide"))
+
+    let itemLi = document.querySelectorAll("#itemLi")
+    itemLi.forEach(x => {
+        x.classList.toggle("nav-title-collapse")
+        x.classList.toggle("nav-title")
+    })
+
+    let navTitle = document.getElementById("navTitle");
+    navTitle.classList.toggle("nav-title-page-dimension");
+    navTitle.classList.toggle("nav-title-page-collapse");
+
+    let profileName = document.getElementById("profileName");
+    profileName.classList.toggle("profile-name-nav")
+    profileName.classList.toggle("profile-name-nav-collapse")
+
+    let navItem = document.querySelectorAll("#nav_items");
+    navItem.forEach(x => {
+        x.classList.toggle("d-flex");
+        x.classList.toggle("collapese-relative");
+    });
+
+    let subIcons = document.querySelectorAll(".subiconos");
+    subIcons.forEach(x => x.classList.toggle("hide"))
+
+    let itemSubNav = document.querySelectorAll(".item_subNav");
+    itemSubNav.forEach(x => x.classList.toggle("item_subNav_bg"))
+
+    //let subMenuPost = document.getElementById("subMenuPosts");
+    //subMenuPost.classList.toggle("");
+
+    //let subMenuCategories = document.getElementById("subMenuCategories");
+    //subMenuCategories.classList.toggle("hide");
+
+    //let subMenuFormats = document.getElementById("subMenuFormats");
+    //subMenuFormats.classList.toggle("hide");
+
+    //let subMenuMediaTypes = document.getElementById("subMenuMediaTypes");
+    //subMenuMediaTypes.classList.toggle("hide");
+
+    //let subMenuSources = document.getElementById("subMenuSources");
+    //subMenuSources.classList.toggle("hide");
+
+    //let subMenuMediaUsers = document.getElementById("subMenuMediaUsers");
+    //subMenuMediaUsers.classList.toggle("hide");
+}

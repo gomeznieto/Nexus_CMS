@@ -11,9 +11,9 @@
 
 <div>
     <h1 class="display-6 fw-light">Panel de Control</h1>
-    <div class="d-flex w-100">
+    <div class="d-flex w-100 flex-lg-row flex-column">
         <!-- COLUMAN 1 -->
-        <div class=" w-50 d-flex flex-column gap-2 me-4">
+        <div class=" col-lg-6 col-12 d-flex flex-column gap-2 me-4">
             <div class="border-section">
                 <!-- RESUMEN -->
                 <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Resumen</p>
@@ -51,7 +51,7 @@
             </div>
         </div>
         <!-- COLUMAN 2 -->
-        <div class=" w-50 d-flex flex-column gap-2">
+        <div class="col-lg-6 col-12 d-flex flex-column gap-2">
             <!-- ENTRADA RAPIDA -->
                 <div class="border-section">
             @if(Model.formatList.Count() > 0)
