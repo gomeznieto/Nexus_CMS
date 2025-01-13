@@ -73,7 +73,9 @@ body {
 
 .iconos_collapse,
 .iconos {
-    font-size: 16px;
+    text-align: center;
+    min-width: 25px;
+    font-size: 12px;
     color: var(--bg-color-icon);
     border: 1px solid var(--color-border-icons);
     padding: 4px;
@@ -102,9 +104,16 @@ body {
     transition: all ease-in-out 0.3s;
 }
 
-.collapese-relative
+.collapse-absolute
 {
-    position:relative;
+    position:absolute;
+    z-index: 2;
+    left: 60px;
+}
+
+.collapse-relative 
+{
+    position: relative;
     z-index: 2;
 }
 
@@ -112,13 +121,6 @@ body {
 .item_size {
     display: none;
     transition: all ease-in-out 0.3s;
-}
-
-.menu-hamb {
-    color: var(--text-color-menu) !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .nav-title-page-collapse {
@@ -162,6 +164,8 @@ body {
     }
 
     .iconos {
+        min-width: 25px;
+        text-align: center;
         font-size: 12px;
         border: 1px solid var(--color-border-icons);
         padding: 4px;
@@ -206,6 +210,14 @@ body {
         .item_subNav:hover {
             color: var(--text-colot-menu-hover) !important;
         }
+
+    .menu-hamb {
+        display: block;
+        color: var(--text-color-menu) !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
     .menu-hamb:hover {
         cursor: pointer;

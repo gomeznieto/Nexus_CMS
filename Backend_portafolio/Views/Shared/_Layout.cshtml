@@ -53,14 +53,14 @@
             {
                 <div class="menu_width px-sm-2 px-0 menu-color" id="lateralBar" collapse="false">
                     <!-- MENU -->
-                    <div class="d-flex flex-column align-items-center align-items-sm-start pt-2 min-vh-100">
+                    <div class="d-flex flex-column align-items-center align-items-sm-start justify-content-lg-between pt-2 min-vh-100">
 
                         <!-- * TITULO -->
                         <div class="nav-title-page nav-title-page-dimension" id="navTitle">
                             <a href="/" >
                                 <span class="fs-6 item_size text-white" id="itemTitle">PANEL</span>
                             </a>
-                             <i class="menu-hamb fa-solid fa-bars" id="btnBars"></i>
+                             <i class="menu-hamb fa-solid fa-bars d-none d-lg-block" id="btnBars"></i>
                         </div>
 
                         <ul class="nav flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
@@ -101,7 +101,7 @@
                             <!-- * CATEGORIES -->
                             <li id="nav_items">
                                 <a href="#subMenuCategories" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                    <i class="iconos fa-solid fa-pen"></i>
+                                    <i class="iconos fa-solid fa-list"></i>
                                     <span class="ms-1 item_size" id="itemTitle">Categoria</span>
                                 </a>
                                 <ul class="collapse nav flex-column ms-1" id="subMenuCategories" data-bs-parent="#menu">
@@ -127,7 +127,7 @@
                             <!-- * FORMATS -->
                             <li id="nav_items">
                                 <a href="#subMenuFormats" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                    <i class="iconos fa-solid fa-pen"></i>
+                                    <i class="iconos fa-solid fa-border-all"></i>
                                     <span class="ms-1 item_size" id="itemTitle">Formatos</span>
                                 </a>
                                 <ul class="collapse nav flex-column ms-1" id="subMenuFormats" data-bs-parent="#menu">
@@ -152,7 +152,7 @@
                             <!-- * MEDIA TYPES -->
                             <li id="nav_items">
                                 <a href="#subMenuMediaTypes" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                    <i class="iconos fa-solid fa-pen"></i>
+                                    <i class="iconos fa-solid fa-play"></i>
                                     <span class="ms-1 item_size" id="itemTitle">Tipos Media</span>
                                 </a>
                                 <ul class="collapse nav flex-column ms-1" id="subMenuMediaTypes" data-bs-parent="#menu">
@@ -179,7 +179,7 @@
                             <!-- SOURCES -->
                             <li id="nav_items">
                                 <a href="#subMenuSources" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                    <i class="iconos fa-solid fa-pen"></i>
+                                    <i class="iconos fa-solid fa-link"></i>
                                     <span class="ms-1 item_size" id="itemTitle">Fuentes</span>
                                 </a>
                                 <ul class="collapse nav flex-column ms-1" id="subMenuSources" data-bs-parent="#menu">
@@ -208,7 +208,7 @@
                             {
                                 <li id="nav_items">
                                     <a href="#subMenuMediaUsers" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                        <i class="iconos fa-solid fa-pen"></i>
+                                        <i class="iconos fa-solid fa-user"></i>
                                         <span class="ms-1 item_size" id="itemTitle">Usuarios</span>
                                     </a>
                                     <ul class="collapse nav flex-column ms-1" id="subMenuMediaUsers" data-bs-parent="#menu">
@@ -234,8 +234,8 @@
                         </ul>
                         <hr>
                         <!-- * PROFILE -->
-                        <div class="dropdown pb-4 ms-md-4 d-flex justify-content-center align-content-center col-12 col-md-6">
-                            <a href="#" class="d-flex align-items-center justify-content-center text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="dropdown pb-4 ms-md-4 col d-flex align-items-end justify-content-end">
+                            <a href="#" class="d-flex justify-content-center text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                                 <img src="@(currentUser.img != null ? currentUser.img : "https://picsum.photos/id/237/200/300")" alt="hugenerd" width="30" height="30" class="rounded-circle">
                                 <span class="px-4 item_subNav fs-6 profile-name-nav " id="profileName">@currentUser.name</span>
                             </a>

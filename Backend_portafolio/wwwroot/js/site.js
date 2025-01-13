@@ -590,7 +590,7 @@ function actionBar() {
     let navItem = document.querySelectorAll("#nav_items");
     navItem.forEach(x => {
         x.classList.toggle("d-flex");
-        x.classList.toggle("collapese-relative");
+        x.classList.toggle("collapse-relative");
     });
 
     let subIcons = document.querySelectorAll(".subiconos");
@@ -599,21 +599,21 @@ function actionBar() {
     let itemSubNav = document.querySelectorAll(".item_subNav");
     itemSubNav.forEach(x => x.classList.toggle("item_subNav_bg"))
 
-    //let subMenuPost = document.getElementById("subMenuPosts");
-    //subMenuPost.classList.toggle("");
+    let subMenuPost = document.getElementById("subMenuPosts");
+    subMenuPost.classList.toggle("collapse-absolute");
 
-    //let subMenuCategories = document.getElementById("subMenuCategories");
-    //subMenuCategories.classList.toggle("hide");
+    let subMenuCategories = document.getElementById("subMenuCategories");
+    subMenuCategories.classList.toggle("collapse-absolute");
 
-    //let subMenuFormats = document.getElementById("subMenuFormats");
-    //subMenuFormats.classList.toggle("hide");
+    let subMenuFormats = document.getElementById("subMenuFormats");
+    subMenuFormats.classList.toggle("collapse-absolute");
 
-    //let subMenuMediaTypes = document.getElementById("subMenuMediaTypes");
-    //subMenuMediaTypes.classList.toggle("hide");
+    let subMenuMediaTypes = document.getElementById("subMenuMediaTypes");
+    subMenuMediaTypes.classList.toggle("collapse-absolute");
 
-    //let subMenuSources = document.getElementById("subMenuSources");
-    //subMenuSources.classList.toggle("hide");
+    let subMenuSources = document.getElementById("subMenuSources");
+    subMenuSources.classList.toggle("collapse-absolute");
 
-    //let subMenuMediaUsers = document.getElementById("subMenuMediaUsers");
-    //subMenuMediaUsers.classList.toggle("hide");
+    let subMenuMediaUsers = document.getElementById("subMenuMediaUsers");
+    subMenuMediaUsers.classList.toggle("collapse-absolute");
 }

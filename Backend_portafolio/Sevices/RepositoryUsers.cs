@@ -1,8 +1,8 @@
-﻿using Backend_portafolio.Entities;
-using Dapper;
+﻿using Dapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
-using System.ComponentModel;
+using Backend_portafolio.Entities;
+
 
 namespace Backend_portafolio.Sevices
 {
@@ -14,6 +14,8 @@ namespace Backend_portafolio.Sevices
         Task<bool> EditarPass(User user, string nuevaPass);
         Task EditarUsuario(User user);
         Task<bool> Existe(string emailNormalizado);
+        Task<User> ObtenerUsuarioPorApiKey(string apiKey);
+        Task<bool> ValidarApiKey( string apiKey);
     }
 
     public class RepositoryUsers : IRepositoryUsers
@@ -31,8 +33,8 @@ namespace Backend_portafolio.Sevices
             using var connection = new SqlConnection(_connectionString);
 
             var id = await connection.QuerySingleAsync<int>(@"
-            INSERT INTO users (name, email, emailNormalizado, passwordHash, role) 
-            VALUES (@name, @email, @emailNormalizado, @passwordHash, @role);
+            INSERT INTO users (name, email, emailNormalizado, passwordHash, role, apiKey) 
+            VALUES (@name, @email, @emailNormalizado, @passwordHash, @role, @apiKey);
             SELECT SCOPE_IDENTITY();
             ", user);
 
@@ -99,6 +101,28 @@ namespace Backend_portafolio.Sevices
 
             return user != null;
 
+        }
+
+        public async Task<bool> ValidarApiKey(string apiKey)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            var user = connection.QuerySingleOrDefault<User>(
+                "SELECT * FROM users WHERE apiKey = @apiKey",
+                new { apiKey });
+
+            return user != null;
+        }
+
+        public async Task<User> ObtenerUsuarioPorApiKey(string apiKey)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            var user = connection.QuerySingleOrDefault<User>(
+                "SELECT * FROM users WHERE apiKey = @apiKey",
+                new { apiKey });
+
+            return user;
         }
     }
 }

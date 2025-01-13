@@ -1,5 +1,7 @@
-﻿using Backend_portafolio.Models;
+﻿using Azure.Core;
+using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.Intrinsics.X86;
 
@@ -13,12 +15,10 @@ namespace Backend_portafolio.Controllers
 		private readonly IRepositoryLink _repositoryLink;
 		private readonly IRepositoryMedia _repositoryMedia;
 		private readonly IRepositoryFormat _repositoryFormat;
+		private readonly IRepositoryUsers _repositoryUser;
+        private readonly HttpContext _httpContextAccessor;
         private readonly IUsersService _usersService;
-        private IRepositoryCategorias repositoryCateogorias;
-        private IRepositoryPosts repositoryPosts;
-        private IRepositoryLink repositoryLink;
-        private IRepositoryMedia repositoryMedia;
-        private IRepositoryFormat repositoryFormat;
+
 
         public ApiController(
 			IRepositoryCategorias repositoryCateogorias,
@@ -26,6 +26,8 @@ namespace Backend_portafolio.Controllers
 			IRepositoryLink repositoryLink,
 			IRepositoryMedia repositoryMedia,
 			IRepositoryFormat repositoryFormat,
+            IRepositoryUsers repositoryUser,
+            IHttpContextAccessor httpContextAccessor,
             IUsersService usersService
 			)
         {
@@ -34,58 +36,95 @@ namespace Backend_portafolio.Controllers
 			_repositoryLink = repositoryLink;
 			_repositoryMedia = repositoryMedia;
 			_repositoryFormat = repositoryFormat;
-           _usersService = usersService;
+			_repositoryUser = repositoryUser;
+            _httpContextAccessor = httpContextAccessor.HttpContext;
+            _usersService = usersService;
         }
 
-        public ApiController(IRepositoryCategorias repositoryCateogorias, IRepositoryPosts repositoryPosts, IRepositoryLink repositoryLink, IRepositoryMedia repositoryMedia, IRepositoryFormat repositoryFormat)
-        {
-            this.repositoryCateogorias = repositoryCateogorias;
-            this.repositoryPosts = repositoryPosts;
-            this.repositoryLink = repositoryLink;
-            this.repositoryMedia = repositoryMedia;
-            this.repositoryFormat = repositoryFormat;
-        }
 
-        [HttpGet]
-        public async Task<IActionResult> Categoria()
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Categoria([FromHeader(Name = "X-Api-Key")] string apiKey)
         {
-			//TODO: Validar Token
+            // Validar el securityStamp
+            var tokenValido = await _repositoryUser.ValidarApiKey(apiKey);
 
-			var userID = _usersService.ObtenerUsuario();
-            var categorias = await _repositoryCateogorias.Obtener(userID);
+            if (!tokenValido)
+                return BadRequest("Token inválido.");
+
+            // Obtener el usuario
+            var usuario = await _repositoryUser.ObtenerUsuarioPorApiKey(apiKey);
+
+            if (usuario == null)
+                return NotFound("Usuario no encontrado.");
+
+            var categorias = await _repositoryCateogorias.Obtener(usuario.id);
 
             return Ok(categorias);
         }
 
-		public async Task<IActionResult> Formato()
-		{
-			//TODO: Validar Token
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult>Formato([FromHeader(Name = "X-Api-Key")] string apiKey)
+        {
 
-			var userID = _usersService.ObtenerUsuario();
-			var formatos = await _repositoryFormat.Obtener(userID);
+            // Validar el securityStamp
+            var tokenValido = await _repositoryUser.ValidarApiKey(apiKey);
+
+            if (!tokenValido)
+                return BadRequest("Token inválido.");
+
+            // Obtener el usuario
+            var usuario = await _repositoryUser.ObtenerUsuarioPorApiKey(apiKey);
+
+            if (usuario == null)
+                return NotFound("Usuario no encontrado.");
+
+            var formatos = await _repositoryFormat.Obtener(usuario.id);
 
 			return Ok(formatos);
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> Usuario()
-		{
-			//TODO: Validar Token
-			var userID = _usersService.ObtenerUsuario();
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Usuario([FromHeader(Name = "X-Api-Key")] string apiKey)
+        {
+            // Validar el securityStamp
+            var tokenValido = await _repositoryUser.ValidarApiKey(apiKey);
 
-			var categorias = await _repositoryCateogorias.Obtener(userID);
+            if (!tokenValido)
+                return BadRequest("Token inválido.");
 
-			return Ok(categorias);
-		}
+            // Obtener el usuario
+            var usuario = await _repositoryUser.ObtenerUsuarioPorApiKey(apiKey);
 
-		[HttpGet]
-		public async Task<IActionResult> Entrada()
-		{
-            //TODO: Validar Token
+            if (usuario == null)
+                return NotFound("Usuario no encontrado.");
 
-            var usuarioID = _usersService.ObtenerUsuario();
+            // Limpiar información sensible
+            usuario.passwordHash = null;
 
-            var posts = await _repositoryPosts.Obtener(usuarioID);
+            return Ok(usuario);
+        }
+
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Entrada([FromHeader(Name = "X-Api-Key")] string apiKey)
+        {
+            // Validar el securityStamp
+            var tokenValido = await _repositoryUser.ValidarApiKey(apiKey);
+
+            if (!tokenValido)
+                return BadRequest("Token inválido.");
+
+            // Obtener el usuario
+            var usuario = await _repositoryUser.ObtenerUsuarioPorApiKey(apiKey);
+
+            if (usuario == null)
+                return NotFound("Usuario no encontrado.");
+
+            var posts = await _repositoryPosts.Obtener(usuario.id);
 
 			if(posts is null)
 				return NotFound();
@@ -119,7 +158,6 @@ namespace Backend_portafolio.Controllers
 		public async Task<IActionResult> Entrada(int id)
 		{
 			//TODO: Validar Token
-
 			var post = await _repositoryPosts.ObtenerPorId(id);
 
 			if (post is null)

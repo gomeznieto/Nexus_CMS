@@ -15,11 +15,11 @@ namespace ASPUnitTesting
 		private readonly IRepositoryLink _repositoryLink;
 		private readonly IRepositoryMedia _repositoryMedia;
 		private readonly IRepositoryFormat _repositoryFormat;
+        private readonly IUsersService _usersService;
 
-		public PostTesting()
+        public PostTesting()
         {
 			_configuration = ConfigurationHelper.GetConfiguration();
-
 			_repositoryCateogorias = new RepositoryCategorias(_configuration);
 			_repositoryPosts = new RepositoryPosts(_configuration);
 			_repositoryLink = new RepositoryLink(_configuration);
