@@ -1,10 +1,10 @@
-﻿using Backend_portafolio.Models;
+﻿using Backend_portafolio.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace Backend_portafolio.Sevices
 {
-	struct FORMAT
+    struct FORMAT
 	{
 		public const string TABLA = "format";
 		public const string ID = "id";

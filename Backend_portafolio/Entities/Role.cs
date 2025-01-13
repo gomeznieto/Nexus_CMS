@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
-namespace Backend_portafolio.Models
+namespace Backend_portafolio.Entities
 {
     public class Role
     {

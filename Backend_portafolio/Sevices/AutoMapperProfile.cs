@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
-using SixLabors.ImageSharp.ColorSpaces.Companding;
 
 namespace Backend_portafolio.Sevices
 {

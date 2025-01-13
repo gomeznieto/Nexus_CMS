@@ -14,6 +14,11 @@ namespace Backend_portafolio.Controllers
 		private readonly IRepositoryMedia _repositoryMedia;
 		private readonly IRepositoryFormat _repositoryFormat;
         private readonly IUsersService _usersService;
+        private IRepositoryCategorias repositoryCateogorias;
+        private IRepositoryPosts repositoryPosts;
+        private IRepositoryLink repositoryLink;
+        private IRepositoryMedia repositoryMedia;
+        private IRepositoryFormat repositoryFormat;
 
         public ApiController(
 			IRepositoryCategorias repositoryCateogorias,
@@ -30,6 +35,15 @@ namespace Backend_portafolio.Controllers
 			_repositoryMedia = repositoryMedia;
 			_repositoryFormat = repositoryFormat;
            _usersService = usersService;
+        }
+
+        public ApiController(IRepositoryCategorias repositoryCateogorias, IRepositoryPosts repositoryPosts, IRepositoryLink repositoryLink, IRepositoryMedia repositoryMedia, IRepositoryFormat repositoryFormat)
+        {
+            this.repositoryCateogorias = repositoryCateogorias;
+            this.repositoryPosts = repositoryPosts;
+            this.repositoryLink = repositoryLink;
+            this.repositoryMedia = repositoryMedia;
+            this.repositoryFormat = repositoryFormat;
         }
 
         [HttpGet]

@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Backend_portafolio.Models
+namespace Backend_portafolio.Entities
 {
-	public class SocialNetwork
-	{
+    public class SocialNetwork
+    {
         public int id { get; set; }
         [Display(Name = "Nombre de la Red Social")]
         public string name { get; set; }

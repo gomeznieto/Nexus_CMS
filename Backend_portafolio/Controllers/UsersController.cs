@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Backend_portafolio.Entities;
 using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
@@ -527,7 +528,7 @@ namespace Backend_portafolio.Controllers
         [HttpPost]
         public async Task<IActionResult> EditarRedes(SocialNetworkViewModel viewModel)
         {
-            Models.SocialNetwork socialNetwork = _mapper.Map(viewModel, new Models.SocialNetwork());
+            Entities.SocialNetwork socialNetwork = _mapper.Map(viewModel, new Entities.SocialNetwork());
 
            var editado =  await _repositorySocialNetwork.Editar(socialNetwork);
 

@@ -1,4 +1,5 @@
-﻿using Backend_portafolio.Helper;
+﻿using Backend_portafolio.Entities;
+using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Backend_portafolio.Controllers
 {
-	public class CategoriasController : Controller
+    public class CategoriasController : Controller
 	{
 		private readonly IRepositoryCategorias _repositoryCategorias;
 		private readonly IUsersService _usersService;

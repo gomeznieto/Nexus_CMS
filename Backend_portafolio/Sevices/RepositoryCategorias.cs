@@ -1,4 +1,5 @@
-﻿using Backend_portafolio.Models;
+﻿using Backend_portafolio.Entities;
+using Backend_portafolio.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
 

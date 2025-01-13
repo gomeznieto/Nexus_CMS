@@ -1,10 +1,10 @@
-﻿using Backend_portafolio.Models;
+﻿using Backend_portafolio.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace Backend_portafolio.Sevices
 {
-	struct SOURCE
+    struct SOURCE
 	{
 
 		public const string TABLA = "source";

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
-using Backend_portafolio.Models;
 using Dapper;
+using Backend_portafolio.Entities;
 
 namespace Backend_portafolio.Sevices
 {
@@ -33,29 +33,29 @@ namespace Backend_portafolio.Sevices
         }
 
         // OBTENER REDES SOCIALES POR USUARIO
-        public async Task<IEnumerable<Models.SocialNetwork>> ObtenerPorUsuario(int user_id)
+        public async Task<IEnumerable<Entities.SocialNetwork>> ObtenerPorUsuario(int user_id)
         {
             using var connection = new SqlConnection(_connectionString);
 
-            return await connection.QueryAsync<Models.SocialNetwork>($@"SELECT * FROM {SocialNetwork.TABLE} WHERE {SocialNetwork.USERID} = @{SocialNetwork.USERID}", new { user_id });
+            return await connection.QueryAsync<Entities.SocialNetwork>($@"SELECT * FROM {SocialNetwork.TABLE} WHERE {SocialNetwork.USERID} = @{SocialNetwork.USERID}", new { user_id });
         }
 
         // OBTENER POR ID
-        public async Task<Models.SocialNetwork> ObtenerPorId(int id, int user_id)
+        public async Task<Entities.SocialNetwork> ObtenerPorId(int id, int user_id)
         {
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QueryFirstOrDefaultAsync<Models.SocialNetwork>($@"SELECT * FROM {SocialNetwork.TABLE} WHERE {SocialNetwork.ID} = @{SocialNetwork.ID} AND {SocialNetwork.USERID} = @{SocialNetwork.USERID}", new { id, user_id });
+            return await connection.QueryFirstOrDefaultAsync<Entities.SocialNetwork>($@"SELECT * FROM {SocialNetwork.TABLE} WHERE {SocialNetwork.ID} = @{SocialNetwork.ID} AND {SocialNetwork.USERID} = @{SocialNetwork.USERID}", new { id, user_id });
         }
 
         // CREAR
-        public async Task<int> Agregar(Models.SocialNetwork socialNetwork)
+        public async Task<int> Agregar(Entities.SocialNetwork socialNetwork)
         {
             using var connection = new SqlConnection(_connectionString);
             return await connection.ExecuteAsync($@"INSERT INTO {SocialNetwork.TABLE} ({SocialNetwork.NAME}, {SocialNetwork.URL}, {SocialNetwork.USERNAME}, {SocialNetwork.ICON}, {SocialNetwork.USERID}) VALUES (@{SocialNetwork.NAME}, @{SocialNetwork.URL}, @{SocialNetwork.USERNAME}, @{SocialNetwork.ICON}, @{SocialNetwork.USERID}) SELECT SCOPE_IDENTITY()", socialNetwork);
         }
 
         // EDITAR
-        public async Task<bool> Editar(Models.SocialNetwork socialNetwork)
+        public async Task<bool> Editar(Entities.SocialNetwork socialNetwork)
         {
             using var connection = new SqlConnection(_connectionString);
             return await connection.ExecuteAsync($@"UPDATE {SocialNetwork.TABLE} SET {SocialNetwork.NAME} = @{SocialNetwork.NAME}, {SocialNetwork.URL} = @{SocialNetwork.URL}, {SocialNetwork.USERNAME} = @{SocialNetwork.USERNAME}, {SocialNetwork.ICON} = @{SocialNetwork.ICON} WHERE {SocialNetwork.ID} = @{SocialNetwork.ID} AND {SocialNetwork.USERID} = @{SocialNetwork.USERID}", socialNetwork) > 0;

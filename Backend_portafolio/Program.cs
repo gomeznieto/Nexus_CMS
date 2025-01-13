@@ -1,4 +1,4 @@
-using Backend_portafolio.Models;
+using Backend_portafolio.Entities;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
