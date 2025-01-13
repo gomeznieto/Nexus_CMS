@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Backend_portafolio.Sevices
+namespace Backend_portafolio.Services
 {
 	public interface IUsersService
 	{

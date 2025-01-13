@@ -1,6 +1,6 @@
 ﻿using Backend_portafolio.Entities;
 
-namespace Backend_portafolio.Sevices
+namespace Backend_portafolio.Services
 {
     public interface IImageService
     {

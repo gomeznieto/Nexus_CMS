@@ -1,6 +1,5 @@
 ﻿using Backend_portafolio.Models;
-using Backend_portafolio.Sevices;
-using Microsoft.SqlServer.Server;
+using Backend_portafolio.Datos;
 using System.Text.Json;
 
 namespace Backend_portafolio.Helper

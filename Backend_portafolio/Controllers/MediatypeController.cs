@@ -1,5 +1,6 @@
 ﻿using Backend_portafolio.Entities;
-using Backend_portafolio.Sevices;
+using Backend_portafolio.Datos;
+using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend_portafolio.Controllers

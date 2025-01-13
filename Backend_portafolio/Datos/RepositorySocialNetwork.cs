@@ -2,7 +2,7 @@
 using Dapper;
 using Backend_portafolio.Entities;
 
-namespace Backend_portafolio.Sevices
+namespace Backend_portafolio.Datos
 {
     public interface IRepositorySocialNetwork
     {

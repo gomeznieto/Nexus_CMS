@@ -1,10 +1,9 @@
 ﻿using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
-using Backend_portafolio.Sevices;
-using Microsoft.AspNetCore.Authorization;
+using Backend_portafolio.Datos;
+using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Text.Json;
 
 
 namespace Backend_portafolio.Controllers

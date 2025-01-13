@@ -1,9 +1,8 @@
-﻿using Azure.Core;
-using Backend_portafolio.Models;
-using Backend_portafolio.Sevices;
+﻿using Backend_portafolio.Models;
+using Backend_portafolio.Services;
+using Backend_portafolio.Datos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.Intrinsics.X86;
 
 namespace Backend_portafolio.Controllers
 {
@@ -16,9 +15,6 @@ namespace Backend_portafolio.Controllers
 		private readonly IRepositoryMedia _repositoryMedia;
 		private readonly IRepositoryFormat _repositoryFormat;
 		private readonly IRepositoryUsers _repositoryUser;
-        private readonly HttpContext _httpContextAccessor;
-        private readonly IUsersService _usersService;
-
 
         public ApiController(
 			IRepositoryCategorias repositoryCateogorias,
@@ -37,8 +33,6 @@ namespace Backend_portafolio.Controllers
 			_repositoryMedia = repositoryMedia;
 			_repositoryFormat = repositoryFormat;
 			_repositoryUser = repositoryUser;
-            _httpContextAccessor = httpContextAccessor.HttpContext;
-            _usersService = usersService;
         }
 
 

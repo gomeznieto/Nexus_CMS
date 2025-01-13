@@ -1,7 +1,8 @@
 ﻿using Backend_portafolio.Entities;
+using Backend_portafolio.Datos;
 using Microsoft.AspNetCore.Identity;
 
-namespace Backend_portafolio.Sevices
+namespace Backend_portafolio.Services
 {
     public class UsersStore : IUserStore<User>, IUserEmailStore<User>, IUserPasswordStore<User>
     {

@@ -4,7 +4,7 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 
 
-namespace Backend_portafolio.Sevices
+namespace Backend_portafolio.Datos
 {
     struct CATEGORIA
     {

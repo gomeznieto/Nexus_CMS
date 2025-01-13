@@ -2,12 +2,12 @@
 using Backend_portafolio.Entities;
 using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
-using Backend_portafolio.Sevices;
+using Backend_portafolio.Datos;
+using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using static Backend_portafolio.Sevices.RepositorySocialNetwork;
 
 namespace Backend_portafolio.Controllers
 {
