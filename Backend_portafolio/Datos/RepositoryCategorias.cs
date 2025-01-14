@@ -57,14 +57,22 @@ namespace Backend_portafolio.Datos
 
         public async Task CrearCategoriaPorPost(IEnumerable<CategoryForm> categorias)
         {
-            using var connection = new SqlConnection(_connectionString);
-
-            foreach (var category in categorias)
+            try
             {
-                await connection.ExecuteAsync(
-                    $@"INSERT INTO {CATEGORIA_POST.TABLA} ({CATEGORIA_POST.POST_ID}, {CATEGORIA_POST.CATEGORY_ID}) VALUES (@{CATEGORIA_POST.POST_ID}, @{CATEGORIA_POST.CATEGORY_ID});",
-                    category
-                );
+                using var connection = new SqlConnection(_connectionString);
+
+                foreach (var category in categorias)
+                {
+                    await connection.ExecuteAsync(
+                        $@"INSERT INTO {CATEGORIA_POST.TABLA} ({CATEGORIA_POST.POST_ID}, {CATEGORIA_POST.CATEGORY_ID}) VALUES (@{CATEGORIA_POST.POST_ID}, @{CATEGORIA_POST.CATEGORY_ID});",
+                        category
+                    );
+                }
+
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 

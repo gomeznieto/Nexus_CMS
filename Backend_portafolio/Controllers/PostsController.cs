@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
+using Backend_portafolio.Sevices;
 
 namespace Backend_portafolio.Controllers
 {
@@ -21,6 +22,12 @@ namespace Backend_portafolio.Controllers
         private readonly IRepositoryMediatype _repositoryMediatype;
         private readonly IRepositorySource _repositorySource;
         private readonly IRepositoryLink _repositoryLink;
+        private readonly IPostService _postService;
+        private readonly ICategociaService _categoriaService;
+        private readonly IFormatService _formatService;
+        private readonly IMediaTypeService _mediaTypeService;
+        private readonly ISourceService _sourceService;
+        private readonly ILinkService _linkService;
         private readonly IMapper _mapper;
 
         public PostsController(
@@ -32,6 +39,12 @@ namespace Backend_portafolio.Controllers
             IRepositoryMediatype repositoryMediatype,
             IRepositorySource repositorySource,
             IRepositoryLink repositoryLink,
+            IPostService postService,
+            ICategociaService categoriaService,
+            IFormatService formatService,
+            ISourceService sourceService,
+            ILinkService linkService,
+            IMediaTypeService mediaTypeService,
             IMapper mapper)
         {
             _repositoryCategorias = repositoryCategorias;
@@ -41,6 +54,12 @@ namespace Backend_portafolio.Controllers
             _repositoryMediatype = repositoryMediatype;
             _repositorySource = repositorySource;
             _repositoryLink = repositoryLink;
+            _postService = postService;
+            _categoriaService = categoriaService;
+            _formatService = formatService;
+            _mediaTypeService = mediaTypeService;
+            _sourceService = sourceService;
+            _linkService = linkService;
             _usersService = usersService;
             _mapper = mapper;
         }
@@ -51,31 +70,14 @@ namespace Backend_portafolio.Controllers
         //--------------------------------------
 
         [HttpGet]
-
         public async Task<IActionResult> Index(string format, int page = 1)
         {
             try
             {
-                // Usuario registrado
-                var usuarioID = _usersService.ObtenerUsuario();
+                // Obtener todos los posts
+                IEnumerable<Post> posts = await _postService.GetAllPosts(format, page, HttpContext);
 
-                //crear session de cantidad de post en caso de no haber sido ya creada
-                if (Session.GetCantidadPostsSession(HttpContext) == -1)
-                {
-                    Session.CantidadPostsSession(HttpContext, 10);
-                }
-
-                //Obtener cantidades para generar paginación
-                var cantidadPorPagina = Session.GetCantidadPostsSession(HttpContext);
-                IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page, usuarioID);
-
-                //Obtenemos categorias para mostrar en lista
-                foreach (var post in posts)
-                {
-                    post.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(post.id);
-                }
-
-                //Formato para retornar al listado correspondiente
+                //Salida de la vista
                 ViewBag.Format = format;
                 ViewBag.Cantidad = await _repositoryPosts.ObtenerCantidadPorFormato(format);
                 ViewBag.Message = "No hay entradas para mostrar";
@@ -85,32 +87,20 @@ namespace Backend_portafolio.Controllers
             catch (Exception)
             {
                 //Crear mensaje de error para modal
-                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
-                Session.ErrorSession(HttpContext, errorModal);
-
+                Session.CrearModalError("Ha surgido un error. ¡Intente más tarde!", "Home", HttpContext);
                 return RedirectToAction("Index", "Home");
             }
         }
 
 
-        // Lógica para el buscador
+        // Buscado de posts
         [HttpPost]
         public async Task<IActionResult> Index(string format, string buscar, int page = 1)
         {
             try
             {
-
                 // Usuario registrado
-                var usuarioID = _usersService.ObtenerUsuario();
-
-                var cantidadPorPagina = Session.GetCantidadPostsSession(HttpContext);
-
-                IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page, usuarioID);
-
-                if (!buscar.IsNullOrEmpty())
-                {
-                    posts = posts.Where(p => p.title.ToUpper().Contains(buscar.ToUpper()));
-                }
+                var posts = await _postService.SearchAllPost(format, buscar, page, HttpContext);
 
                 //Formato para retornar al listado correspondiente
                 ViewBag.Format = format;
@@ -128,44 +118,22 @@ namespace Backend_portafolio.Controllers
         }
 
 
-        //--------------------------------------
-        /// CREATE
-        //--------------------------------------
+        //****************************************************
+        //******************** CREAR POST ********************
+        //****************************************************
 
         [HttpGet]
         public async Task<IActionResult> Crear(string format)
         {
             try
             {
-                var usuarioID = _usersService.ObtenerUsuario();
-
-                var model = new PostViewModel();
-
-                model.user_id = usuarioID;
-                model.format = format;
-
-                //Obtenemos el formato de la entrada creada
-                var formats = await _repositoryFormat.Obtener(usuarioID);
-                model.format_id = formats.Where(f => f.name == format).Select(f => f.id).FirstOrDefault();
-                model.format = formats.Where(f => f.name == format).Select(f => f.name).FirstOrDefault();
-
-                //Obtenemos Categorias Select List
-                model.categories = await ObtenerCategorias(usuarioID);
-
-                //Obtenemos Media Types Select List
-                model.mediaTypes = await ObtenerMediaTypes(usuarioID);
-
-                //Obtener fuente de los links
-                model.sources = await ObtenerSource(usuarioID);
-
+                var model = await _postService.GetPostViewModel(format);
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 //Crear mensaje de error para modal
-                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
-                Session.ErrorSession(HttpContext, errorModal);
-
+                Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Se ha producido un error. Intente más tarde!", type = true, path = "Posts" });
                 return RedirectToAction("Index", "Home");
             }
         }
@@ -180,9 +148,11 @@ namespace Backend_portafolio.Controllers
                 //verificamos que el model state sea valido antes de continuar
                 if (!ModelState.IsValid)
                 {
-                    viewModel.categories = await ObtenerCategorias(userID);
-                    viewModel.mediaTypes = await ObtenerMediaTypes(userID);
-                    viewModel.sources = await ObtenerSource(userID);
+                    viewModel = await _postService.GetPostViewModel(viewModel.format, viewModel);
+
+                    //viewModel.categories = await ObtenerCategorias(userID);
+                    //viewModel.mediaTypes = await ObtenerMediaTypes(userID);
+                    //viewModel.sources = await ObtenerSource(userID);
 
                     // Agregar categorias, link y multimedia
                     if (!viewModel.sourceListString.IsNullOrEmpty())
@@ -195,7 +165,7 @@ namespace Backend_portafolio.Controllers
                         foreach (var category in categoriesForms)
                         {
                             // Validar que cada categoría exista
-                            var categorySearched = await _repositoryCategorias.ObtenerPorId(category.category_id);
+                            var categorySearched = await _categoriaService.GetCategoriaById(category.category_id);
                             categorySearched.id = category.category_id;
 
                             if (categorySearched == null)
@@ -221,7 +191,7 @@ namespace Backend_portafolio.Controllers
                 }
 
                 //Verificamos que el formato que nos mandan exista
-                var Formato = await _repositoryFormat.ObtenerPorId(viewModel.format_id);
+                var Formato = await _formatService.GetAllFormat(viewModel.format_id);
 
                 if (Formato is null)
                 {
@@ -270,33 +240,16 @@ namespace Backend_portafolio.Controllers
                     }
 
                     //Subimos MeiaLinks
-                    await _repositoryLink.Crear(links);
+                    await _linkService.CreateLink(links);
                 }
 
                 //SUBIR CATEGORIAS
-                if (!viewModel.sourceListString.IsNullOrEmpty())
+                if (!viewModel.categoryListString.IsNullOrEmpty())
                 {
                     //Deserializamos string de media
                     List<CategoryForm> categoriesForms = JsonSerializer.Deserialize<List<CategoryForm>>(viewModel.categoryListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                    foreach (var category in categoriesForms)
-                    {
-                        // Validar que cada categoría exista
-                        var categorySearched = _repositoryCategorias.ObtenerPorId(category.category_id);
-
-                        if (categorySearched == null)
-                        {
-                            //Crear mensaje de error para modal
-                            Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
-                            return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-                        }
-
-                        // Agregarle el número del post a CategoriaForm
-                        category.post_id = viewModel.id;
-                    }
-
-                    //Subimos Las categorias del Post
-                    await _repositoryCategorias.CrearCategoriaPorPost(categoriesForms);
+                    await _categoriaService.CreateCategoriesForm(viewModel.id, categoriesForms);
                 }
 
                 return RedirectToAction("Index", "Posts", new { format = viewModel.format });
@@ -304,8 +257,7 @@ namespace Backend_portafolio.Controllers
             catch (Exception)
             {
                 //Crear mensaje de error para modal
-                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Posts" };
-                Session.ErrorSession(HttpContext, errorModal);
+                Session.CrearModalError("Ha surgido un error. ¡Intente más tarde!", "Home", HttpContext);
 
                 //Redirect a la página anterior
                 return RedirectToAction("Index", "Posts", new { format = viewModel.format });
@@ -364,7 +316,7 @@ namespace Backend_portafolio.Controllers
                 if (!ModelState.IsValid || viewModel.user_id != userID)
                 {
                     viewModel.categories = await ObtenerCategorias(userID);
-                    viewModel.formats = await ObtenerFormatos();
+                    viewModel.formats = await ObtenerFormatos(userID);
                     return View(viewModel);
                 }
 
@@ -564,26 +516,25 @@ namespace Backend_portafolio.Controllers
         //--------------------------------------
         private async Task<IEnumerable<SelectListItem>> ObtenerCategorias(int user_id)
         {
-            var categories = await _repositoryCategorias.Obtener(user_id);
+            var categories = await _categoriaService.GetAllCategorias(user_id);
             return categories.Select(category => new SelectListItem(category.name, category.id.ToString()));
         }
 
-        private async Task<IEnumerable<SelectListItem>> ObtenerFormatos()
+        private async Task<IEnumerable<SelectListItem>> ObtenerFormatos(int user_id)
         {
-            var userID = _usersService.ObtenerUsuario();
-            var formats = await _repositoryFormat.Obtener(userID);
+            var formats = await _formatService.GetAllFormat(user_id);
             return formats.Select(format => new SelectListItem(format.name, format.id.ToString()));
         }
 
         private async Task<IEnumerable<SelectListItem>> ObtenerMediaTypes(int user_id)
         {
-            var mediaTypes = await _repositoryMediatype.Obtener(user_id);
+            var mediaTypes = await _mediaTypeService.GetAllMediaType(user_id);
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
         }
 
         private async Task<IEnumerable<SelectListItem>> ObtenerSource(int user_id)
         {
-            var mediaTypes = await _repositorySource.Obtener(user_id);
+            var mediaTypes = await _sourceService.GetAllSource(user_id);
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
         }
 

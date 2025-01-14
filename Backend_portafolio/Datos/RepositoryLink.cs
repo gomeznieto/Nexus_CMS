@@ -19,6 +19,7 @@ namespace Backend_portafolio.Datos
     {
         Task Borrar(int id);
         Task Crear(IEnumerable<Link> mediaList);
+        Task Crear(Link link);
         Task Editar(Link nuevoLink);
         Task<IEnumerable<Link>> Obtener();
         Task<IEnumerable<Link>> ObtenerPorPost(int post_id);
@@ -32,7 +33,17 @@ namespace Backend_portafolio.Datos
             _connectionString = configuration.GetConnectionString("DevConnection");
         }
 
-        public async Task Crear (IEnumerable<Link> mediaList)
+        public async Task Crear(Link link)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            await connection.ExecuteAsync(
+                $@"INSERT INTO {LINK.TABLA} ({LINK.URL}, {LINK.POST_ID}, {LINK.SOURCE_ID}) VALUES (@{LINK.URL}, @{LINK.POST_ID}, @{LINK.SOURCE_ID});",
+                link
+            );
+        }
+
+        public async Task Crear(IEnumerable<Link> mediaList)
         {
             using var connection = new SqlConnection(_connectionString);
 
@@ -60,8 +71,9 @@ namespace Backend_portafolio.Datos
                         FROM {LINK.TABLA} L
                         INNER JOIN {SOURCE.TABLA} S
                         ON S.{SOURCE.ID} = L.{LINK.SOURCE_ID}
-                        WHERE L.{LINK.POST_ID} = @{LINK.POST_ID};", 
-                        new {
+                        WHERE L.{LINK.POST_ID} = @{LINK.POST_ID};",
+                        new
+                        {
                             post_id
                         });
         }
@@ -69,7 +81,7 @@ namespace Backend_portafolio.Datos
         public async Task Editar(Link nuevoLink)
         {
             using var connection = new SqlConnection(_connectionString);
-            await connection.ExecuteAsync($@"UPDATE {LINK.TABLA} SET {LINK.URL} = @{LINK.URL}, {LINK.SOURCE_ID} = @{LINK.SOURCE_ID} WHERE {LINK.ID} = @{LINK.ID}", nuevoLink );
+            await connection.ExecuteAsync($@"UPDATE {LINK.TABLA} SET {LINK.URL} = @{LINK.URL}, {LINK.SOURCE_ID} = @{LINK.SOURCE_ID} WHERE {LINK.ID} = @{LINK.ID}", nuevoLink);
         }
 
         public async Task Borrar(int id)

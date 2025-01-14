@@ -4,6 +4,7 @@ using Backend_portafolio.Datos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Backend_portafolio.Sevices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,7 @@ builder.Services.AddControllersWithViews(options =>
 });
 builder.Services.AddSession();
 
-//Modelos
+//RESPOSITORIOS
 builder.Services.AddTransient<IRepositoryCategorias, RepositoryCategorias>();
 builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<IRepositoryFormat, RepositoryFormat>();
@@ -32,8 +33,16 @@ builder.Services.AddTransient<IRepositoryRole, RepositoryRole>();
 builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
 builder.Services.AddTransient<IRepositoryBio, RepositoryBio>();
 builder.Services.AddTransient<IRepositorySocialNetwork, RepositorySocialNetwork>();
+
+// SERVICIOS
 builder.Services.AddTransient<IUserStore<User>, UsersStore>();
 builder.Services.AddTransient<IImageService, ImageService>();
+builder.Services.AddTransient<IFormatService, FormatService>();
+builder.Services.AddTransient<IPostService, PostService>();
+builder.Services.AddTransient<ICategociaService, CategoriaService>();
+builder.Services.AddTransient<IMediaTypeService, MediaTypeService>();
+builder.Services.AddTransient<ISourceService, SourceService>();
+builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<SignInManager<User>>();
 
 // AUTENTICACION
