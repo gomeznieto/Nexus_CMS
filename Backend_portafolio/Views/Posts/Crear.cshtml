@@ -15,7 +15,7 @@
         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
         <!-- HIDDEN -->
-        <input type="hidden" asp-for="user_id" /> 
+        <input type="hidden" asp-for="user_id" />
         <input type="hidden" asp-for="format_id" />
         <input type="hidden" asp-for="format" />
         <input type="hidden" asp-for="draft" id="inputDraft" />
@@ -87,30 +87,28 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-
-        function agregarCategorias() {
+                function agregarCategorias() {
             let objs = []; // Eliminamos la anotación de tipo porque no es válida en JavaScript
 
-        @if (Model?.categoryList != null)
-        {
-            @foreach (var item in Model.categoryList)
+            @if (Model?.categoryList != null)
             {
-                <text>
-                        objs.push({
-                            id: @item.Categoria.id,
-                            postId: @Model.id,
-                            name: "@item.Categoria.name"
-                        });
-                </text>
+                @foreach (var item in Model.categoryList)
+                {
+                    <text>
+                                    objs.push({
+                                        id: @item.Categoria.id,
+                                        postId: @Model.id,
+                                        name: "@item.Categoria.name"
+                                    });
+                    </text>
+                }
             }
-        }
 
-                objs.forEach(x => addCategoryRefresh(x));
+            objs.forEach(x => addCategoryRefresh(x));
         }
 
         // Llama automáticamente a la función después de definirla
         agregarCategorias();
-
 
         //Agregar una multi media más
         function addInputMedia() {
@@ -124,18 +122,18 @@
             select.className = 'form-select mb-3 select-style w-25';
 
             // Agregamos opciones al select utilizando los SelectListItem del modelo
-        @foreach (var item in Model?.mediaTypes)
-        {
-            <text>
-                                                                                                                                            var option = document.createElement("option");
-                option.text = "@item.Text";
-                option.value = "@item.Value";
-                select.add(option);
-            </text>
-        }
+            @foreach (var item in Model?.mediaTypes)
+            {
+                <text>
+                        var option = document.createElement("option");
+                        option.text = "@item.Text";
+                        option.value = "@item.Value";
+                        select.add(option);
+                </text>
+            }
 
-                // Agregamos el select al div
-                div.appendChild(select);
+            // Agregamos el select al div
+            div.appendChild(select);
 
             // Creamos el input
             var input = document.createElement('input');
@@ -177,16 +175,16 @@
             select.className = 'form-select mb-3 select-style w-25';
 
             // Agregamos opciones al select utilizando los SelectListItem del modelo
-        @foreach (var item in Model?.sources)
-        {
-            <text>
-                                                                                                                                            
-                var option = document.createElement("option");
-                option.text = "@item.Text";
-                option.value = "@item.Value";
-                select.add(option);
-            </text>
-        }
+            @foreach (var item in Model?.sources)
+            {
+                <text>
+
+                        var option = document.createElement("option");
+                        option.text = "@item.Text";
+                        option.value = "@item.Value";
+                        select.add(option);
+                </text>
+            }
                 // Agregamos el select al div
                 div.appendChild(select);
 

@@ -1,6 +1,4 @@
-﻿const { type } = require("jquery");
-
-// MODAL
+﻿// MODAL
 function openModal(obj) {
     const modal = document.getElementById("modal");
     const inputModal = document.getElementsByName("id")[0];
@@ -255,6 +253,7 @@ function removeInput(element, type) {
 
 //Agregar categorias
 let categoryList = [];
+
 function addCategory(element) {
     const categoryId = element.options[element.selectedIndex].value;
     const categoryName = element.options[element.selectedIndex].text;

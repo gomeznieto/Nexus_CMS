@@ -19,6 +19,7 @@ namespace Backend_portafolio.Datos
     {
         Task Borrar(int id);
         Task Crear(IEnumerable<Media> media);
+        Task Crear(Media media);
         Task Editar(Media nuevoMedia);
         Task<IEnumerable<Media>> Obtener();
         Task<IEnumerable<Media>> ObtenerPorPost(int post_id);
@@ -32,7 +33,7 @@ namespace Backend_portafolio.Datos
             _connectionString = configuration.GetConnectionString("DevConnection");
         }
 
-        public async Task Crear (IEnumerable<Media> mediaList)
+        public async Task Crear(IEnumerable<Media> mediaList)
         {
             using var connection = new SqlConnection(_connectionString);
 
@@ -43,6 +44,15 @@ namespace Backend_portafolio.Datos
                     media
                 );
             }
+        }
+
+        public async Task Crear(Media mediaList)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.ExecuteAsync(
+                $@"INSERT INTO {MEDIA.TABLA} ({MEDIA.URL}, {MEDIA.POST_ID}, {MEDIA.MEDIA_ID}) VALUES (@{MEDIA.URL}, @{MEDIA.POST_ID}, @{MEDIA.MEDIA_ID});",
+                mediaList
+            );
         }
 
         public async Task<IEnumerable<Media>> Obtener()
@@ -60,8 +70,9 @@ namespace Backend_portafolio.Datos
                             FROM {MEDIA.TABLA} M
                             INNER JOIN {MEDIATYPE.TABLA} MT
                             ON MT.{MEDIATYPE.ID} = M.{MEDIA.MEDIA_ID}
-                            WHERE {MEDIA.POST_ID} = @{MEDIA.POST_ID};", 
-                            new {
+                            WHERE {MEDIA.POST_ID} = @{MEDIA.POST_ID};",
+                            new
+                            {
                                 post_id
                             });
         }
@@ -69,7 +80,7 @@ namespace Backend_portafolio.Datos
         public async Task Editar(Media nuevoMedia)
         {
             using var connection = new SqlConnection(_connectionString);
-            await connection.ExecuteAsync($@"UPDATE {MEDIA.TABLA} SET {MEDIA.URL} = @{MEDIA.URL}, {MEDIA.MEDIA_ID} = @{MEDIA.MEDIA_ID} WHERE {MEDIA.ID} = @{MEDIA.ID}", nuevoMedia );
+            await connection.ExecuteAsync($@"UPDATE {MEDIA.TABLA} SET {MEDIA.URL} = @{MEDIA.URL}, {MEDIA.MEDIA_ID} = @{MEDIA.MEDIA_ID} WHERE {MEDIA.ID} = @{MEDIA.ID}", nuevoMedia);
         }
 
         public async Task Borrar(int id)

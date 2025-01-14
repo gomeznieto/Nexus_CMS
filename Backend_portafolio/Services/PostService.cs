@@ -2,21 +2,19 @@
 using Backend_portafolio.Datos;
 using Backend_portafolio.Services;
 using Backend_portafolio.Entities;
-using Microsoft.SqlServer.Server;
 using Backend_portafolio.Helper;
 using Microsoft.IdentityModel.Tokens;
 using Backend_portafolio.Models;
-using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Text.Json;
 
 namespace Backend_portafolio.Sevices
 {
     public interface IPostService
     {
-        Task<List<Post>> GetAllPosts(string format, int pagina, HttpContext httpContext);
+        Task Create(PostViewModel viewModel);
+        Task<List<Post>> GetAllPosts(string format, int pagina);
         Task<PostViewModel> GetPostViewModel(string format, PostViewModel v = null);
-        Task<List<Post>> SearchAllPost(string format, string buscar, int page, HttpContext httpContext);
+        Task<List<Post>> SearchAllPost(string format, string buscar, int page);
     }
 
     public class PostService : IPostService
@@ -29,10 +27,11 @@ namespace Backend_portafolio.Sevices
         private readonly IRepositoryMediatype _repositoryMediatype;
         private readonly IRepositorySource _repositorySource;
         private readonly IRepositoryLink _repositoryLink;
-        private readonly ICategociaService _categoriaService;
+        private readonly ICategoriaService _categoriaService;
         private readonly IFormatService _formatService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly ISourceService _sourceService;
+        private readonly HttpContext _httpContext;
         private readonly IMapper _mapper;
 
         public PostService(
@@ -44,10 +43,11 @@ namespace Backend_portafolio.Sevices
             IRepositoryMediatype repositoryMediatype,
             IRepositorySource repositorySource,
             IRepositoryLink repositoryLink,
-            ICategociaService categoriaService,
+            ICategoriaService categoriaService,
             IFormatService formatService,
             ISourceService sourceService,
             IMediaTypeService mediaTypeService,
+            IHttpContextAccessor httpContextAccessor,
             IMapper mapper)
         {
             _repositoryCategorias = repositoryCategorias;
@@ -57,29 +57,30 @@ namespace Backend_portafolio.Sevices
             _repositoryMediatype = repositoryMediatype;
             _repositorySource = repositorySource;
             _repositoryLink = repositoryLink;
-            _usersService = usersService;
             _categoriaService = categoriaService;
             _formatService = formatService;
             _mediaTypeService = mediaTypeService;
             _sourceService = sourceService;
+            _usersService = usersService;
+            _httpContext = httpContextAccessor.HttpContext;
             _mapper = mapper;
         }
 
         // Obtener
-        public async Task<List<Post>> GetAllPosts(string format, int pagina, HttpContext httpContext)
+        public async Task<List<Post>> GetAllPosts(string format, int pagina)
         {
 
             // Usuario registrado
             var usuarioID = _usersService.ObtenerUsuario();
 
             //crear session de cantidad de post en caso de no haber sido ya creada
-            if (Session.GetCantidadPostsSession(httpContext) == -1)
+            if (Session.GetCantidadPostsSession(_httpContext) == -1)
             {
-                Session.CantidadPostsSession(httpContext, 10);
+                Session.CantidadPostsSession(_httpContext, 10);
             }
 
             //Obtener cantidades para generar paginación
-            var cantidadPorPagina = Session.GetCantidadPostsSession(httpContext);
+            var cantidadPorPagina = Session.GetCantidadPostsSession(_httpContext);
             IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, pagina, usuarioID);
 
             //Obtenemos categorias para mostrar en lista
@@ -91,12 +92,12 @@ namespace Backend_portafolio.Sevices
             return posts.ToList();
         }
 
-        public async Task<List<Post>> SearchAllPost(string format, string buscar, int page, HttpContext httpContext)
+        public async Task<List<Post>> SearchAllPost(string format, string buscar, int page)
         {
             // Usuario registrado
             var usuarioID = _usersService.ObtenerUsuario();
 
-            var cantidadPorPagina = Session.GetCantidadPostsSession(httpContext);
+            var cantidadPorPagina = Session.GetCantidadPostsSession(_httpContext);
 
             IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page, usuarioID);
 
@@ -128,13 +129,13 @@ namespace Backend_portafolio.Sevices
             if(viewModel.format_id == 0)
                 viewModel.format = format;
 
-            //Obtenemos Categorias Select List
+            //Obtenemos Categorias Select List parar mostrar en la vista
             viewModel.categories = await ObtenerCategorias(usuarioID);
 
-            //Obtenemos Media Types Select List
+            //Obtenemos Media Types Select List parar mostrar en la vista
             viewModel.mediaTypes = await ObtenerMediaTypes(usuarioID);
 
-            //Obtener fuente de los links
+            //Obtener fuente Select List para mostrar en la vista
             viewModel.sources = await ObtenerSource(usuarioID);
 
             return viewModel;
@@ -142,7 +143,7 @@ namespace Backend_portafolio.Sevices
 
         // Crear Post
         // ** Se guardan Categoria, Media, MediaType y Source que haya completado el usuario
-        public async Task CreatePost(PostViewModel viewModel)
+        public async Task Create(PostViewModel viewModel)
         {
             await _repositoryPosts.Crear(viewModel);
         }

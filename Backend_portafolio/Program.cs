@@ -20,9 +20,12 @@ builder.Services.AddControllersWithViews(options =>
 });
 builder.Services.AddSession();
 
+// SERVICIOS USUARIO
+builder.Services.AddTransient<IUserStore<User>, UsersStore>();
+builder.Services.AddTransient<SignInManager<User>>();
+
 //RESPOSITORIOS
 builder.Services.AddTransient<IRepositoryCategorias, RepositoryCategorias>();
-builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<IRepositoryFormat, RepositoryFormat>();
 builder.Services.AddTransient<IRepositoryPosts, RepositoryPosts>();
 builder.Services.AddTransient<IRepositoryMedia, RepositoryMedia>();
@@ -34,16 +37,16 @@ builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
 builder.Services.AddTransient<IRepositoryBio, RepositoryBio>();
 builder.Services.AddTransient<IRepositorySocialNetwork, RepositorySocialNetwork>();
 
-// SERVICIOS
-builder.Services.AddTransient<IUserStore<User>, UsersStore>();
-builder.Services.AddTransient<IImageService, ImageService>();
-builder.Services.AddTransient<IFormatService, FormatService>();
+//SERVICIOS
+builder.Services.AddTransient<IUsersService, UsersService>();
+builder.Services.AddTransient<ICategoriaService, CategoriaService>();
 builder.Services.AddTransient<IPostService, PostService>();
-builder.Services.AddTransient<ICategociaService, CategoriaService>();
+builder.Services.AddTransient<IFormatService, FormatService>();
+builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddTransient<IMediaTypeService, MediaTypeService>();
 builder.Services.AddTransient<ISourceService, SourceService>();
 builder.Services.AddTransient<ILinkService, LinkService>();
-builder.Services.AddTransient<SignInManager<User>>();
+builder.Services.AddTransient<IMediaService, MediaService>();
 
 // AUTENTICACION
 builder.Services.AddIdentityCore<User>(opciones =>
@@ -69,10 +72,12 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddHttpContextAccessor();
 
+
 //Auto Mapper
 builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

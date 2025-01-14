@@ -34,11 +34,5 @@ namespace Backend_portafolio.Entities
         public IEnumerable<Link> linkList { get; set; }
         public IEnumerable<Category_Post> categoryList { get; set; }
 
-
-        // A BORRAR
-        //[Display(Name = "Categoria")]
-        //public int category_id { get; set; } //BORRAR
-        //public string category { get; set; } //BORRAR
-
     }
 }

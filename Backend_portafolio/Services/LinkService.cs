@@ -1,6 +1,7 @@
 ﻿using Backend_portafolio.Models;
 using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
+using System.Text.Json;
 
 
 namespace Backend_portafolio.Sevices
@@ -10,6 +11,8 @@ namespace Backend_portafolio.Sevices
         Task CreateLink(Link link);
         Task CreateLink(IEnumerable<Link> links);
         Task<IEnumerable<Link>> GetAllLink(int postId);
+        IEnumerable<Link> SerealizarJsonLink(string jsonLinks);
+        List<LinkForm> SerealizarJsonLinkForm(string jsonLinks);
     }
 
     public class LinkService : ILinkService
@@ -39,6 +42,16 @@ namespace Backend_portafolio.Sevices
             {
                 await _repositoryLink.Crear(link);
             }
+        }
+
+        public List<LinkForm> SerealizarJsonLinkForm(string jsonLinks)
+        {
+            return JsonSerializer.Deserialize<List<LinkForm>>(jsonLinks, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+
+        public IEnumerable<Link> SerealizarJsonLink(string jsonLinks)
+        {
+            return JsonSerializer.Deserialize<List<Link>>(jsonLinks, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
     }
 }

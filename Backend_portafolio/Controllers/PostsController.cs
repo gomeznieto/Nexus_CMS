@@ -23,9 +23,10 @@ namespace Backend_portafolio.Controllers
         private readonly IRepositorySource _repositorySource;
         private readonly IRepositoryLink _repositoryLink;
         private readonly IPostService _postService;
-        private readonly ICategociaService _categoriaService;
+        private readonly ICategoriaService _categoriaService;
         private readonly IFormatService _formatService;
         private readonly IMediaTypeService _mediaTypeService;
+        private readonly IMediaService _mediaService;
         private readonly ISourceService _sourceService;
         private readonly ILinkService _linkService;
         private readonly IMapper _mapper;
@@ -40,11 +41,12 @@ namespace Backend_portafolio.Controllers
             IRepositorySource repositorySource,
             IRepositoryLink repositoryLink,
             IPostService postService,
-            ICategociaService categoriaService,
+            ICategoriaService categoriaService,
             IFormatService formatService,
             ISourceService sourceService,
             ILinkService linkService,
             IMediaTypeService mediaTypeService,
+            IMediaService mediaService,
             IMapper mapper)
         {
             _repositoryCategorias = repositoryCategorias;
@@ -58,6 +60,7 @@ namespace Backend_portafolio.Controllers
             _categoriaService = categoriaService;
             _formatService = formatService;
             _mediaTypeService = mediaTypeService;
+            _mediaService = mediaService;
             _sourceService = sourceService;
             _linkService = linkService;
             _usersService = usersService;
@@ -75,7 +78,7 @@ namespace Backend_portafolio.Controllers
             try
             {
                 // Obtener todos los posts
-                IEnumerable<Post> posts = await _postService.GetAllPosts(format, page, HttpContext);
+                IEnumerable<Post> posts = await _postService.GetAllPosts(format, page);
 
                 //Salida de la vista
                 ViewBag.Format = format;
@@ -100,7 +103,7 @@ namespace Backend_portafolio.Controllers
             try
             {
                 // Usuario registrado
-                var posts = await _postService.SearchAllPost(format, buscar, page, HttpContext);
+                var posts = await _postService.SearchAllPost(format, buscar, page);
 
                 //Formato para retornar al listado correspondiente
                 ViewBag.Format = format;
@@ -148,68 +151,48 @@ namespace Backend_portafolio.Controllers
                 //verificamos que el model state sea valido antes de continuar
                 if (!ModelState.IsValid)
                 {
+                    // Obtener el viewModel con las listas de categorias, media types y sources
                     viewModel = await _postService.GetPostViewModel(viewModel.format, viewModel);
 
-                    //viewModel.categories = await ObtenerCategorias(userID);
-                    //viewModel.mediaTypes = await ObtenerMediaTypes(userID);
-                    //viewModel.sources = await ObtenerSource(userID);
+                    // Recueperar las categorias que se han seleccionado
+                    if (!viewModel.categoryListString.IsNullOrEmpty())
+                    {
+                        viewModel.categoryList = await _categoriaService.SerealizarJsonCategoryPost(viewModel.categoryListString);
+                    }
 
-                    // Agregar categorias, link y multimedia
                     if (!viewModel.sourceListString.IsNullOrEmpty())
                     {
-                        //Deserializamos string de media
-                        List<CategoryForm> categoriesForms = JsonSerializer.Deserialize<List<CategoryForm>>(viewModel.categoryListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        viewModel.linkList = _linkService.SerealizarJsonLink(viewModel.sourceListString);
+                    }
 
-                        List<Category_Post> categoryPostList = new List<Category_Post>();
-
-                        foreach (var category in categoriesForms)
-                        {
-                            // Validar que cada categoría exista
-                            var categorySearched = await _categoriaService.GetCategoriaById(category.category_id);
-                            categorySearched.id = category.category_id;
-
-                            if (categorySearched == null)
-                            {
-                                //Crear mensaje de error para modal
-                                Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
-                                return RedirectToAction("Index", "Posts", new { format = viewModel.format });
-                            }
-                            else
-                            {
-                                Category_Post aux = new Category_Post();
-                                aux.Categoria = categorySearched;
-                                categoryPostList.Add(aux);
-
-                            }
-
-                        }
-
-                        viewModel.categoryList = categoryPostList;
+                    if (!viewModel.mediaListString.IsNullOrEmpty())
+                    {
+                        viewModel.mediaList = _mediaService.SerealizarJsonMedia(viewModel.mediaListString);
                     }
 
                     return View(viewModel);
                 }
 
                 //Verificamos que el formato que nos mandan exista
-                var Formato = await _formatService.GetAllFormat(viewModel.format_id);
+                var Formato = await _formatService.GetFormatById(viewModel.format_id);
 
                 if (Formato is null)
                 {
                     //Crear mensaje de error para modal
-                    Session.ErrorSession(HttpContext, new ModalViewModel { message = "¡Error en uno de los datos ingresados!", type = true, path = "Posts" });
+                    Session.CrearModalError("¡Error en uno de los datos ingresados!", "Posts", HttpContext);
                     return RedirectToAction("Index", "Posts", new { format = viewModel.format });
                 }
 
                 //Colocamos fecha actual
                 viewModel.created_at = DateTime.Now;
 
-                await _repositoryPosts.Crear(viewModel);
+                await _postService.Create(viewModel);
 
                 // SUBIR MEDIA
                 if (!viewModel.mediaListString.IsNullOrEmpty())
                 {
                     //Deserializamos string de media
-                    List<MediaForm> mediaForms = JsonSerializer.Deserialize<List<MediaForm>>(viewModel.mediaListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    List<MediaForm> mediaForms = _mediaService.SerealizarJsonMediaForm(viewModel.mediaListString);
 
                     //Mappeamos de MediaForm a Media
                     List<Media> medias = _mapper.Map<List<Media>>(mediaForms);
@@ -221,14 +204,14 @@ namespace Backend_portafolio.Controllers
                     }
 
                     //Subimos MeiaLinks
-                    await _repositoryMedia.Crear(medias);
+                    await _mediaService.Create(medias);
                 }
 
                 //SUBIR LINKS
                 if (!viewModel.sourceListString.IsNullOrEmpty())
                 {
                     //Deserializamos string de media
-                    List<LinkForm> linksForms = JsonSerializer.Deserialize<List<LinkForm>>(viewModel.sourceListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    List<LinkForm> linksForms = _linkService.SerealizarJsonLinkForm(viewModel.sourceListString);
 
                     //Mappeamos de MediaForm a Media
                     List<Link> links = _mapper.Map<List<Link>>(linksForms);
@@ -247,8 +230,7 @@ namespace Backend_portafolio.Controllers
                 if (!viewModel.categoryListString.IsNullOrEmpty())
                 {
                     //Deserializamos string de media
-                    List<CategoryForm> categoriesForms = JsonSerializer.Deserialize<List<CategoryForm>>(viewModel.categoryListString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
+                    List<CategoryForm> categoriesForms = _categoriaService.SerealizarJsonCategoryForm(viewModel.categoryListString);
                     await _categoriaService.CreateCategoriesForm(viewModel.id, categoriesForms);
                 }
 
