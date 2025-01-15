@@ -143,12 +143,6 @@ namespace Backend_portafolio.Datos
         }
 
 
-        //public async Task Borrar(int id)
-        //{
-        //    using var connection = new SqlConnection(_connectionString);
-        //    await connection.ExecuteAsync($@"DELETE {POST.TABLA} WHERE {POST.ID} = @{POST.ID}", new { id });
-        //}
-
         public async Task Borrar(int id)
         {
             using var connection = new SqlConnection(_connectionString);

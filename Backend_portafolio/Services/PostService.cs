@@ -6,13 +6,13 @@ using Backend_portafolio.Helper;
 using Microsoft.IdentityModel.Tokens;
 using Backend_portafolio.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.SqlServer.Server;
 
 namespace Backend_portafolio.Sevices
 {
     public interface IPostService
     {
         Task CreatePost(PostViewModel viewModel);
+        Task EditPost(PostViewModel viewModel);
         Task DeletePost(int id);
         Task<List<Post>> GetAllPosts(string format, int pagina);
         Task<Post> GetPostById(int id);
@@ -20,17 +20,16 @@ namespace Backend_portafolio.Sevices
         Task<PostViewModel> PrepareEditPostViewModel(int id);
         Task<PostViewModel> PrepareViewModel(PostViewModel viewModel);
         Task<List<Post>> SearchAllPost(string format, string buscar, int page);
+        Task<int> GetCountPostByFormat(string format);
+        Task EditarBorrador(int id, bool draft);
     }
 
     public class PostService : IPostService
     {
         private readonly IUsersService _usersService;
         private readonly IRepositoryCategorias _repositoryCategorias;
-        private readonly IRepositoryFormat _repositoryFormat;
         private readonly IRepositoryPosts _repositoryPosts;
         private readonly IRepositoryMedia _repositoryMedia;
-        private readonly IRepositoryMediatype _repositoryMediatype;
-        private readonly IRepositorySource _repositorySource;
         private readonly IRepositoryLink _repositoryLink;
         private readonly ICategoriaService _categoriaService;
         private readonly IFormatService _formatService;
@@ -44,11 +43,8 @@ namespace Backend_portafolio.Sevices
         public PostService(
             IUsersService usersService,
             IRepositoryCategorias repositoryCategorias,
-            IRepositoryFormat repositoryFormat,
             IRepositoryPosts repositoryPosts,
             IRepositoryMedia repositoryMedia,
-            IRepositoryMediatype repositoryMediatype,
-            IRepositorySource repositorySource,
             IRepositoryLink repositoryLink,
             ICategoriaService categoriaService,
             IFormatService formatService,
@@ -60,11 +56,8 @@ namespace Backend_portafolio.Sevices
             IMapper mapper)
         {
             _repositoryCategorias = repositoryCategorias;
-            _repositoryFormat = repositoryFormat;
             _repositoryPosts = repositoryPosts;
             _repositoryMedia = repositoryMedia;
-            _repositoryMediatype = repositoryMediatype;
-            _repositorySource = repositorySource;
             _repositoryLink = repositoryLink;
             _categoriaService = categoriaService;
             _formatService = formatService;
@@ -77,7 +70,11 @@ namespace Backend_portafolio.Sevices
             _mapper = mapper;
         }
 
-        // Obtener
+
+        //****************************************************
+        //******************* OBTENER POSTS ******************
+        //****************************************************
+
         public async Task<List<Post>> GetAllPosts(string format, int pagina)
         {
 
@@ -102,6 +99,14 @@ namespace Backend_portafolio.Sevices
 
             return posts.ToList();
         }
+        public async Task<Post> GetPostById(int id)
+        {
+            return await _repositoryPosts.ObtenerPorId(id);
+        }
+
+        //****************************************************
+        //******************* BUSCAR POSTS *******************
+        //****************************************************
 
         public async Task<List<Post>> SearchAllPost(string format, string buscar, int page)
         {
@@ -120,13 +125,11 @@ namespace Backend_portafolio.Sevices
             return posts.ToList();
         }
 
-        public async Task<Post>GetPostById(int id)
-        {
-            return await _repositoryPosts.ObtenerPorId(id);
-        }
+        //****************************************************
+        //******************** VIEW MODELS *******************
+        //****************************************************
 
-        // Preparar el view model para editar un post
-        public async Task<PostViewModel>PrepareEditPostViewModel(int id)
+        public async Task<PostViewModel> PrepareEditPostViewModel(int id)
         {
             // Obtenemos el post por id
             var model = await GetPostById(id);
@@ -184,7 +187,7 @@ namespace Backend_portafolio.Sevices
         }
 
         // Prepara el view model para editar un post
-        public async Task<PostViewModel>PrepareViewModel(PostViewModel viewModel)
+        public async Task<PostViewModel> PrepareViewModel(PostViewModel viewModel)
         {
             // Obtener el viewModel con las listas de categorias, media types y sources
             viewModel = await GetPostViewModel(viewModel.format, viewModel);
@@ -221,16 +224,30 @@ namespace Backend_portafolio.Sevices
             //Obtener fuente Select List para mostrar en la vista
             viewModel.sources = await ObtenerSource(viewModel.user_id);
 
+            //Obtener formatos para mostrar en la vista
+            viewModel.formats = await ObtenerFormatos(viewModel.user_id);
+
             return viewModel;
         }
 
-        // Crear Post 
+        //****************************************************
+        //********************* CREAR POST *******************
+        //****************************************************
+
         // ** Validar que el formato exista
         // ** Se guardan Categoria, Media, MediaType y Source que haya completado el usuario
         public async Task CreatePost(PostViewModel viewModel)
         {
             try
             {
+                // Usuario registrado
+                var userID = _usersService.ObtenerUsuario();
+
+                if(userID != viewModel.user_id)
+                {
+                    throw new Exception("¡No tienes permisos para realizar esta acción!");
+                }
+
                 // Validar que el formato exista
                 var Formato = await _formatService.GetFormatById(viewModel.format_id);
 
@@ -291,12 +308,162 @@ namespace Backend_portafolio.Sevices
                     await _categoriaService.CreateCategoriesForm(viewModel.id, categoriesForms);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception("¡Se ha producido un error. Intente más tarde!", ex);
             }
 
         }
+
+
+        //****************************************************
+        //******************** EDITAR POST *******************
+        //****************************************************
+
+        public async Task EditPost(PostViewModel viewModel)
+        {
+            try
+            {
+                // Usuario registrado
+                var userID = _usersService.ObtenerUsuario();
+
+                if (userID != viewModel.user_id)
+                {
+                    throw new Exception("¡No tienes permisos para realizar esta acción!");
+                }
+
+                // Validar que el formato exista
+                var format = await _formatService.GetFormatById(viewModel.format_id);
+
+                if (format is null)
+                {
+                    throw new Exception("¡El formato no existe!");
+                }
+
+                // Cargamos la fecha de creación
+                viewModel.modify_at = DateTime.Now;
+
+                // Creamos el post
+                await _repositoryPosts.Editar(viewModel);
+
+                // Verificamos si se modificaron los datos de media
+                if (!viewModel.mediaListString.IsNullOrEmpty() && viewModel.mediaListString != "[]")
+                {
+                    //Deserializamos string de media
+                    List<MediaForm> mediaForms = _mediaService.SerealizarJsonMediaForm(viewModel.mediaListString);
+                    List<Media> medias = new List<Media>();
+
+                    //Verificamos si entre los datos tenemos que actualizar algunos
+                    foreach (var mediaForm in mediaForms)
+                    {
+                        Media aux = _mapper.Map<Media>(mediaForm);
+                        aux.post_id = viewModel.id;
+
+                        if (aux?.id is 0)
+                        {
+                            //NUEVO
+                            medias.Add(aux);
+                        }
+                        else if (aux?.id is not 0 && aux?.url is not null)
+                        {
+                            //ACTUALIZAMOS
+                            await _repositoryMedia.Editar(aux);
+                        }
+                        else
+                        {
+                            //ELIMINAMOS AL ESTAR URL NULL
+                            await _repositoryMedia.Borrar(aux.id);
+                        }
+                    }
+
+                    //Subimos MeiaLinks
+                    await _repositoryMedia.Crear(medias);
+                }
+
+                /***** LINKS *****/
+                if (!viewModel.sourceListString.IsNullOrEmpty() && viewModel.sourceListString != "[]")
+                {
+                    //Deserializamos string de media
+                    List<LinkForm> linkForms = _linkService.SerealizarJsonLinkForm(viewModel.sourceListString);
+                    List<Link> links = new List<Link>();
+
+                    //Verificamos si entre los datos tenemos que actualizar algunos
+                    foreach (var linkForm in linkForms)
+                    {
+                        Link aux = _mapper.Map<Link>(linkForm);
+
+                        aux.post_id = viewModel.id;
+
+                        if (aux?.id is 0)
+                        {
+                            //NUEVO
+                            links.Add(aux);
+                        }
+                        else if (aux?.id is not 0 && aux?.url is not null)
+                        {
+                            //ACTUALIZAMOS
+                            await _repositoryLink.Editar(aux);
+                        }
+                        else
+                        {
+                            //ELIMINAMOS AL ESTAR URL NULL
+                            await _repositoryLink.Borrar(aux.id);
+                        }
+                    }
+
+                    //Subimos Links
+                    await _repositoryLink.Crear(links);
+                }
+
+                // CATEGOIRIAS
+                //SUBIR CATEGORIAS
+                if (!viewModel.sourceListString.IsNullOrEmpty())
+                {
+                    //Deserializamos string de media
+                    List<CategoryForm> categoriesForms = _categoriaService.SerealizarJsonCategoryForm(viewModel.categoryListString);
+                    List<Category_Post> categoriesPosts = (await _repositoryCategorias.ObtenerCategoriaPostPorId(viewModel.id)).ToList();
+
+                    foreach (var categoryForm in categoriesForms)
+                    {
+                        // Validar que cada categoría exista
+                        var categorySearched = _repositoryCategorias.ObtenerPorId(categoryForm.category_id);
+
+                        if (categorySearched == null)
+                        {
+                            //Crear mensaje de error para modal
+                            throw new Exception("La categoría no existe");
+                        }
+
+
+                        //Si la categoria no se encuentra en el listado ya subido, se agrega
+                        if (categoriesPosts.All(x => x.Categoria.id != categoryForm.category_id))
+                        {
+                            await _repositoryCategorias.CrearCategoriaPorPost(categoryForm);
+                        }
+                    }
+
+                    //Buscamos entre las categorias que ya están subidas por aquellas que no están en las que nos llegan
+                    foreach (var categoryPost in categoriesPosts)
+                    {
+                        if (categoriesForms.All(x => x.category_id != categoryPost.Categoria.id))
+                        {
+                            await _repositoryCategorias.BorrarCatergoriaPorPost(categoryPost.post_id, categoryPost.Categoria.id);
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("¡Se ha producido un error. Intente más tarde!", ex);
+            }
+
+        }
+
+
+        //****************************************************
+        //******************** BORRAR POST *******************
+        //****************************************************
 
         public async Task DeletePost(int id)
         {
@@ -309,11 +476,41 @@ namespace Backend_portafolio.Sevices
 
                 await _repositoryPosts.Borrar(id);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception("La entrada no se pudo borrar.\n¡Se ha producido un error!", ex);
             }
         }
+
+
+        //****************************************************
+        //******************* BORRADOR POST ******************
+        //****************************************************
+
+        public async Task EditarBorrador(int id, bool draft)
+        {
+            try
+            {
+                await _repositoryPosts.EditarBorrador(id, draft);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("¡Se ha producido un error. Intente más tarde!", ex);
+            }
+        }
+
+
+
+        //****************************************************
+        //************ CANTIDAD POST POR FORMATO *************
+        //****************************************************
+
+        public async Task<int>GetCountPostByFormat(string format)
+        {
+            return await _repositoryPosts.ObtenerCantidadPorFormato(format);
+        }
+
+
 
         //****************************************************
         //***************** METODOS PRIVADOS *****************

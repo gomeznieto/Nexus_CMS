@@ -5,201 +5,178 @@ using Backend_portafolio.Services;
 using Backend_portafolio.Datos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Backend_portafolio.Sevices;
 
 namespace Backend_portafolio.Controllers
 {
     public class CategoriasController : Controller
-	{
-		private readonly IRepositoryCategorias _repositoryCategorias;
-		private readonly IUsersService _usersService;
+    {
+        private readonly IRepositoryCategorias _repositoryCategorias;
+        private readonly IUsersService _usersService;
+        private readonly ICategoriaService _categoriaService;
 
-		public CategoriasController(IRepositoryCategorias repositoryCategorias, IUsersService usersService)
+        public CategoriasController(
+            IRepositoryCategorias repositoryCategorias,
+            IUsersService usersService,
+            ICategoriaService categoriaService
+            )
         {
-			_repositoryCategorias = repositoryCategorias;
-			_usersService = usersService;
-		}
+            _repositoryCategorias = repositoryCategorias;
+            _usersService = usersService;
+            _categoriaService = categoriaService;
+        }
 
-		/************/
-		/*  INDEX  */
-		/************/
-		[HttpGet]
-		public async Task<IActionResult> Index(int page = 1)
-		{
-			try
-			{
-				var userID = _usersService.ObtenerUsuario();
+        //****************************************************
+        //********************** INDEX **********************
+        //****************************************************
+        [HttpGet]
+        public async Task<IActionResult> Index(int page = 1) //TODO: PAGINACION
+        {
+            try
+            {
+                var userID = _usersService.ObtenerUsuario();
+                var categorias = await _categoriaService.GetAllCategorias(userID);
 
-				var categorias = await _repositoryCategorias.Obtener(userID);
+                ViewBag.Cantidad = categorias.Count();
+                ViewBag.Message = $"No hay categorias para mostrar.";
 
-				ViewBag.Cantidad = categorias.Count();
-				ViewBag.Message = $"No hay categorias para mostrar.";
+                return View(categorias.OrderBy(x => x.name).ToList());
+            }
+            catch (Exception)
+            {
+                Session.CrearModalError("Ha surgido un error. ¡Intente más tarde!", "home", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+        }
 
-				return View(categorias.OrderBy(x => x.name).ToList());
-			} 
-			catch (Exception)
-			{
-				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
-				Session.ErrorSession(HttpContext, errorModal);
+        [HttpPost]
+        public async Task<IActionResult> Index(string buscar)
+        {
+            try
+            {
+                var categorias = await _categoriaService.GetCategoryByName(buscar);
 
-				return RedirectToAction("Index", "Home");
-			}
-		}
+                ViewBag.Cantidad = categorias.Count();
+                ViewBag.Message = $"Sin resultados para \"{buscar}\".";
 
-		[HttpPost]
-		public async Task<IActionResult> Index(string buscar)
-		{
-			try
-			{
-				var userID = _usersService.ObtenerUsuario();
-				var categorias = await _repositoryCategorias.Obtener(userID);
-
-				if (!buscar.IsNullOrEmpty())
-				{
-					categorias = categorias.Where(p => p.name.ToUpper().Contains(buscar.ToUpper()));
-				}
-
-				ViewBag.Cantidad = categorias.Count();
-				ViewBag.Message = $"Sin resultados para \"{buscar}\".";
-
-				return View(categorias.OrderBy(x => x.name).ToList());
-			}
-			catch (Exception)
-			{
-
-				//Crear mensaje de error para modal
-				var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Home" };
-				Session.ErrorSession(HttpContext, errorModal);
-
-				return RedirectToAction("Index", "Home");
-			}
-		}
+                return View(categorias);
+            }
+            catch (Exception)
+            {
+                Session.CrearModalError("Ha surgido un error. ¡Intente más tarde!", "home", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+        }
 
 
-		/************/
-		/*  CREAR   */
-		/************/
+        //****************************************************
+        //********************** CREATE **********************
+        //****************************************************
 
-		[HttpGet]
-		public IActionResult Crear()
-		{
-			var userID = _usersService.ObtenerUsuario();
+        [HttpGet]
+        public IActionResult Crear()
+        {
+            var viewModel = _categoriaService.GetViewModel();
+            return View(viewModel);
+        }
 
-			var viewModel = new Categoria();
-			viewModel.user_id = userID;
+        [HttpPost]
+        public async Task<IActionResult> Crear(Categoria categoria)
+        {
 
-			return View(viewModel);
-		}
+            if (!ModelState.IsValid)
+            {
+                return View(categoria);
+            }
 
-		[HttpPost]
-		public async Task <IActionResult> Crear(Categoria categoria)
-		{
-			//Validamos los datos que nos llegan del formulario
-			var userID = _usersService.ObtenerUsuario();
-
-			if(!ModelState.IsValid || categoria.user_id != userID)
-			{
-				return View(categoria);
-			}
-
-			//Validar que la categoria no exista en la base de datos
-			var existe = await _repositoryCategorias.Existe(categoria.name, userID);
-
-			if(existe)
-			{
-				ModelState.AddModelError(nameof(categoria.name), $"El nombre {categoria.name} ya existe!");
-				return View(categoria);
-			}
-
-			categoria.name = categoria.name.Trim();
-
-			//Crea la categoria
-			await _repositoryCategorias.Crear(categoria);
-
-			return RedirectToAction("Index");
-		}
+            try
+            {
+                await _categoriaService.CreateCategories(categoria);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "home", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+        }
 
 
-		/************/
-		/*  EDITAR  */
-		/************/
+        //****************************************************
+        //*********************** EDIT ***********************
+        //****************************************************
 
-		[HttpGet]
-		public async Task<IActionResult> Editar(int id)
-		{
-			var categoriaCambiar = await _repositoryCategorias.ObtenerPorId(id);
+        [HttpGet]
+        public async Task<IActionResult> Editar(int id)
+        {
+            try
+            {
+                var categoriaCambiar = await _categoriaService.GetCategoriaById(id);
+                return View(categoriaCambiar);
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "home", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+        }
 
-			if (categoriaCambiar == null)
-				return RedirectToAction("NoEncontrado", "Home");
+        [HttpPost]
+        public async Task<IActionResult> Editar(Categoria categoria)
+        {
+            var userID = _usersService.ObtenerUsuario();
 
-			return View(categoriaCambiar);
-		}
+            //Validar errores del Model
+            if (!ModelState.IsValid)
+                return View(categoria);
 
-		[HttpPost]
-		public async Task<IActionResult> Editar(Categoria categoria)
-		{
-			var userID = _usersService.ObtenerUsuario();
-
-			//Validar errores del Model
-			if(!ModelState.IsValid || userID != categoria.user_id)
-				return View(categoria);
-
-			//Validar que la categoria no exista en la base de datos
-			var existe = await _repositoryCategorias.Existe(categoria.name, userID);
-
-			if (existe)
-			{
-				ModelState.AddModelError(nameof(categoria.name), $"El nombre {categoria.name} ya existe!");
-				return View(categoria);
-			}
-
-			categoria.name = categoria.name.Trim();
-
-			await _repositoryCategorias.Editar(categoria);
-
-			return RedirectToAction("Index");
-		}
-
-
-		/************/
-		/*  BORRAR  */
-		/************/
-
-		[HttpPost]
-		public async Task<IActionResult> Borrar(int id)
-		{
-			//Verificar si existe
-			var categoria = await _repositoryCategorias.ObtenerPorId(id);
-
-			if (categoria == null)
-				return View("NoEncontrado", "Home");
+            try
+            {
+                await _categoriaService.EditCategory(categoria);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "home", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+        }
 
 
-			//Verificar si no está en uso
-			var borrar = await _repositoryCategorias.sePuedeBorrar(id);
+        //****************************************************
+        //********************** DELETE **********************
+        //****************************************************
 
-			if(!borrar)
-				return Json(new { error = true, mensaje = "No se puede borrar porque se encuentra en uso" });
+        [HttpPost]
+        public async Task<IActionResult> Borrar(int id)
+        {
+            try
+            {
+                await _categoriaService.DeleteCategory(id);
+                return Json(new { error = false, mensaje = "Borrado con Éxito" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = true, mensaje = ex.Message });
+            }
+        }
 
-			//Borrar
-			await _repositoryCategorias.Borrar(id);
+        //****************************************************
+        //********************* FUNCIONES ********************
+        //****************************************************
+        [HttpGet]
+        public async Task<IActionResult> VerificarExisteCategoria(string name)
+        {
+            try
+            {
+               await _categoriaService.Existe(name);
+                return Json(true);
+            }
+            catch(Exception ex)
+            {
+                return Json(new { error = true, mensaje = ex.Message });
+            }
 
-			return Json(new { error = false, mensaje = "Borrado con Éxito" });
-		}
-
-		/***************/
-		/*  FUNCIONES  */
-		/***************/
-		[HttpGet]
-		public async Task<IActionResult> VerificarExisteCategoria(string name, int userID)
-		{
-			var existeCategoria = await _repositoryCategorias.Existe(name, userID);
-
-			if (existeCategoria)
-				return Json($"El nombre {name} ya existe!");
-
-			return Json(true);
-
-		}
-	}
+        }
+    }
 }

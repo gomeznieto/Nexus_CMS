@@ -4,6 +4,7 @@ using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Services;
 using System.Text.Json;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backend_portafolio.Sevices
 {
@@ -14,6 +15,13 @@ namespace Backend_portafolio.Sevices
         Task<List<Category_Post>> SerealizarJsonCategoryPost(string jsonCategoria);
         public List<CategoryForm> SerealizarJsonCategoryForm(string jsonCategoria);
         Task<IEnumerable<Category_Post>> GetCategoriasByPost(int post_id);
+        Task<List<Categoria>> GetCategoryByName(string buscar);
+        Task CreateCategories(Categoria category);
+        Task<Categoria> GetCategoriaById(int id);
+        Categoria GetViewModel();
+        Task EditCategory(Categoria category);
+        Task DeleteCategory(int id);
+        Task<bool> Existe(string name);
     }
 
     public class CategoriaService : ICategoriaService
@@ -30,6 +38,10 @@ namespace Backend_portafolio.Sevices
             _repositoryCategorias = repositoryCategorias;
         }
 
+        //****************************************************
+        //*********************** GETS ***********************
+        //****************************************************
+
         public async Task<IEnumerable<Categoria>> GetAllCategorias(int userId)
         {
             var userID = _usersService.ObtenerUsuario();
@@ -41,14 +53,80 @@ namespace Backend_portafolio.Sevices
 
         public async Task<Categoria> GetCategoriaById(int id)
         {
-            var categoria = await _repositoryCategorias.ObtenerPorId(id);
-            return categoria;
+            try
+            {
+                var categoria = await _repositoryCategorias.ObtenerPorId(id);
+
+                if (categoria == null)
+                    throw new Exception("Ha surgido un error. ¡Intente más tarde!");
+
+                return categoria;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Ha surgido un error. ¡Intente más tarde!");
+            }
         }
 
         public async Task<IEnumerable<Category_Post>> GetCategoriasByPost(int post_id)
         {
             var categorias = await _repositoryCategorias.ObtenerCategoriaPostPorId(post_id);
             return categorias;
+        }
+
+        public async Task<List<Categoria>> GetCategoryByName(string buscar)
+        {
+            var userID = _usersService.ObtenerUsuario();
+            var categorias = await GetAllCategorias(userID);
+
+            if (!buscar.IsNullOrEmpty())
+            {
+                categorias = categorias.Where(p => p.name.ToUpper().Contains(buscar.ToUpper()));
+            }
+
+            return categorias.OrderBy(x => x.name).ToList();
+        }
+
+        public Categoria GetViewModel()
+        {
+            var userID = _usersService.ObtenerUsuario();
+            var viewModel = new Categoria();
+            viewModel.user_id = userID;
+
+            return viewModel;
+        }
+
+        //****************************************************
+        //********************** CREATE **********************
+        //****************************************************
+
+        public async Task CreateCategories(Categoria category)
+        {
+            try
+            {
+                var userID = _usersService.ObtenerUsuario();
+
+                if (userID != category.user_id)
+                {
+                    throw new SecurityTokenException("No puedes crear una categoría para otro usuario");
+                }
+
+                var existe = await _repositoryCategorias.Existe(category.name, userID);
+
+                if (existe)
+                {
+                    throw new Exception("La categoría ya existe");
+                }
+
+                category.name = category.name.Trim();
+
+                await _repositoryCategorias.Crear(category);
+
+            }
+            catch (Exception)
+            {
+                throw new Exception("Ha surgido un error. ¡Intente más tarde!");
+            }
         }
 
         public async Task CreateCategoriesForm(int id, List<CategoryForm> categoriesForms)
@@ -72,11 +150,71 @@ namespace Backend_portafolio.Sevices
                 //Subimos Las categorias del Post
                 await _repositoryCategorias.CrearCategoriaPorPost(categoriesForms);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw new Exception(e.Message);
+                throw new Exception("Ha surgido un error. ¡Intente más tarde!");
             }
         }
+
+        //****************************************************
+        //*********************** EDIT ***********************
+        //****************************************************
+
+        public async Task EditCategory(Categoria category)
+        {
+            try
+            {
+                var userID = _usersService.ObtenerUsuario();
+                if (userID != category.user_id)
+                {
+                    throw new SecurityTokenException("No puedes editar una categoría de otro usuario");
+                }
+                var existe = await _repositoryCategorias.Existe(category.name, userID);
+                if (existe)
+                {
+                    throw new Exception("La categoría ya existe");
+                }
+                category.name = category.name.Trim();
+                await _repositoryCategorias.Editar(category);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Ha surgido un error. ¡Intente más tarde!");
+            }
+        }
+
+        //****************************************************
+        //********************** DELETE **********************
+        //****************************************************
+
+        public async Task DeleteCategory(int id)
+        {
+            try
+            {
+                var category = await GetCategoriaById(id);
+
+                if (category == null)
+                    throw new Exception("La categoría no existe");
+
+                //Verificar si no está en uso
+                var borrar = await _repositoryCategorias.sePuedeBorrar(id);
+
+                if (!borrar)
+                    throw new Exception("La categoría está en uso");
+
+                //Borrar
+                await _repositoryCategorias.Borrar(id);
+
+            }
+            catch (Exception)
+            {
+                throw new Exception("Ha surgido un error. ¡Intente más tarde!");
+            }
+        }
+
+        //****************************************************
+        //********************* FUNCIONES ********************
+        //****************************************************
 
         public async Task<List<Category_Post>> SerealizarJsonCategoryPost(string jsonCategoria)
         {
@@ -115,6 +253,24 @@ namespace Backend_portafolio.Sevices
         public List<CategoryForm> SerealizarJsonCategoryForm(string jsonCategoria)
         {
             return JsonSerializer.Deserialize<List<CategoryForm>>(jsonCategoria, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+
+        public async Task<bool> Existe(string name)
+        {
+            try
+            {
+                var userID = _usersService.ObtenerUsuario();
+                var existeCategoria = await _repositoryCategorias.Existe(name, userID);
+
+                if (existeCategoria)
+                    throw new Exception($"El nombre {name} ya existe!");
+
+                return existeCategoria;
+            }
+            catch (Exception)
+            {
+                throw new Exception($"El nombre {name} ya existe!");
+            }
         }
     }
 }
