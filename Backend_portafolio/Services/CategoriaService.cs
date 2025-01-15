@@ -11,10 +11,9 @@ namespace Backend_portafolio.Sevices
     {
         Task CreateCategoriesForm(int id, List<CategoryForm> categoriesForms);
         Task<IEnumerable<Categoria>> GetAllCategorias(int userId);
-        Task<Categoria> GetCategoriaById(int id);
-        Task<IEnumerable<Categoria>> GetCategoriasByPost(int post_id);
         Task<List<Category_Post>> SerealizarJsonCategoryPost(string jsonCategoria);
         public List<CategoryForm> SerealizarJsonCategoryForm(string jsonCategoria);
+        Task<IEnumerable<Category_Post>> GetCategoriasByPost(int post_id);
     }
 
     public class CategoriaService : ICategoriaService
@@ -46,9 +45,9 @@ namespace Backend_portafolio.Sevices
             return categoria;
         }
 
-        public async Task<IEnumerable<Categoria>> GetCategoriasByPost(int post_id)
+        public async Task<IEnumerable<Category_Post>> GetCategoriasByPost(int post_id)
         {
-            var categorias = await _repositoryCategorias.ObtenerPorPost(post_id);
+            var categorias = await _repositoryCategorias.ObtenerCategoriaPostPorId(post_id);
             return categorias;
         }
 

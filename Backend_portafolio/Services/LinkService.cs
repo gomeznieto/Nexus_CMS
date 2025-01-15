@@ -11,6 +11,7 @@ namespace Backend_portafolio.Sevices
         Task CreateLink(Link link);
         Task CreateLink(IEnumerable<Link> links);
         Task<IEnumerable<Link>> GetAllLink(int postId);
+        Task<List<Link>> GetLinkByPost(int postId);
         IEnumerable<Link> SerealizarJsonLink(string jsonLinks);
         List<LinkForm> SerealizarJsonLinkForm(string jsonLinks);
     }
@@ -29,6 +30,11 @@ namespace Backend_portafolio.Sevices
         public async Task<IEnumerable<Link>> GetAllLink(int postId)
         {
             return await _repositoryLink.ObtenerPorPost(postId);
+        }
+
+        public async Task<List<Link>> GetLinkByPost(int postId)
+        {
+            return (List<Link>)await _repositoryLink.ObtenerPorPost(postId);
         }
 
         public async Task CreateLink(Link link)

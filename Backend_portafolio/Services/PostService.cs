@@ -6,14 +6,19 @@ using Backend_portafolio.Helper;
 using Microsoft.IdentityModel.Tokens;
 using Backend_portafolio.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.SqlServer.Server;
 
 namespace Backend_portafolio.Sevices
 {
     public interface IPostService
     {
-        Task Create(PostViewModel viewModel);
+        Task CreatePost(PostViewModel viewModel);
+        Task DeletePost(int id);
         Task<List<Post>> GetAllPosts(string format, int pagina);
+        Task<Post> GetPostById(int id);
         Task<PostViewModel> GetPostViewModel(string format, PostViewModel v = null);
+        Task<PostViewModel> PrepareEditPostViewModel(int id);
+        Task<PostViewModel> PrepareViewModel(PostViewModel viewModel);
         Task<List<Post>> SearchAllPost(string format, string buscar, int page);
     }
 
@@ -30,6 +35,8 @@ namespace Backend_portafolio.Sevices
         private readonly ICategoriaService _categoriaService;
         private readonly IFormatService _formatService;
         private readonly IMediaTypeService _mediaTypeService;
+        private readonly IMediaService _mediaService;
+        private readonly ILinkService _linkService;
         private readonly ISourceService _sourceService;
         private readonly HttpContext _httpContext;
         private readonly IMapper _mapper;
@@ -47,6 +54,8 @@ namespace Backend_portafolio.Sevices
             IFormatService formatService,
             ISourceService sourceService,
             IMediaTypeService mediaTypeService,
+            IMediaService mediaService,
+            ILinkService linkService,
             IHttpContextAccessor httpContextAccessor,
             IMapper mapper)
         {
@@ -60,6 +69,8 @@ namespace Backend_portafolio.Sevices
             _categoriaService = categoriaService;
             _formatService = formatService;
             _mediaTypeService = mediaTypeService;
+            _mediaService = mediaService;
+            _linkService = linkService;
             _sourceService = sourceService;
             _usersService = usersService;
             _httpContext = httpContextAccessor.HttpContext;
@@ -109,43 +120,199 @@ namespace Backend_portafolio.Sevices
             return posts.ToList();
         }
 
+        public async Task<Post>GetPostById(int id)
+        {
+            return await _repositoryPosts.ObtenerPorId(id);
+        }
+
+        // Preparar el view model para editar un post
+        public async Task<PostViewModel>PrepareEditPostViewModel(int id)
+        {
+            // Obtenemos el post por id
+            var model = await GetPostById(id);
+
+            //Mapeamos de Post a PostViewModel
+            var modelView = _mapper.Map<PostViewModel>(model);
+
+            // Armamos el view model para editar el post
+            modelView = await GetPostViewModel(modelView.format, modelView);
+
+            return modelView;
+        }
+
         // Obtener PostViewModel para crear post
         //** Completamos el view model con las listas de categorias, formatos, media types y sources
         public async Task<PostViewModel> GetPostViewModel(string format, PostViewModel viewModel = null)
         {
 
-            // Si no se manda un view model, se crea uno nuevo
-            if (viewModel == null)
-                viewModel = new PostViewModel();
-
-            var usuarioID = viewModel.user_id;
-
-            if(usuarioID == 0)
+            try
             {
-                usuarioID = _usersService.ObtenerUsuario();
-                viewModel.user_id = usuarioID;
+                // Si no se manda un view model, se crea uno nuevo
+                if (viewModel == null)
+                    viewModel = new PostViewModel();
+
+                var usuarioID = viewModel.user_id;
+
+                if (usuarioID == 0)
+                {
+                    usuarioID = _usersService.ObtenerUsuario();
+                    viewModel.user_id = usuarioID;
+                }
+
+                viewModel.formats = await ObtenerFormatos(usuarioID);
+                viewModel.format_id = int.Parse(viewModel.formats.Where(f => f.Text == format).Select(f => f.Value).FirstOrDefault());
+
+                if (viewModel.format_id == 0)
+                    throw new Exception("¡El formato no existe!");
+
+                //Obtenemos Categorias Select List parar mostrar en la vista
+                if (viewModel.id != 0)
+                {
+                    viewModel.mediaList = await _mediaService.GetMediaByPost(viewModel.id);
+                    viewModel.linkList = await _linkService.GetLinkByPost(viewModel.id);
+                    viewModel.categoryList = await _categoriaService.GetCategoriasByPost(viewModel.id);
+                }
+
+                viewModel = await PrepareSelectViewModel(viewModel);
+
+                return viewModel;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("¡Se ha producido un error. Intente más tarde!", ex);
+            }
+        }
+
+        // Prepara el view model para editar un post
+        public async Task<PostViewModel>PrepareViewModel(PostViewModel viewModel)
+        {
+            // Obtener el viewModel con las listas de categorias, media types y sources
+            viewModel = await GetPostViewModel(viewModel.format, viewModel);
+
+            // Recueperar las categorias que se han seleccionado
+            if (!viewModel.categoryListString.IsNullOrEmpty())
+            {
+                viewModel.categoryList = await _categoriaService.SerealizarJsonCategoryPost(viewModel.categoryListString);
             }
 
-            if(viewModel.format_id == 0)
-                viewModel.format = format;
+            // Recueperar las fuentes que se han seleccionado
+            if (!viewModel.sourceListString.IsNullOrEmpty())
+            {
+                viewModel.linkList = _linkService.SerealizarJsonLink(viewModel.sourceListString);
+            }
 
-            //Obtenemos Categorias Select List parar mostrar en la vista
-            viewModel.categories = await ObtenerCategorias(usuarioID);
-
-            //Obtenemos Media Types Select List parar mostrar en la vista
-            viewModel.mediaTypes = await ObtenerMediaTypes(usuarioID);
-
-            //Obtener fuente Select List para mostrar en la vista
-            viewModel.sources = await ObtenerSource(usuarioID);
+            // Recueperar los medios que se han seleccionado
+            if (!viewModel.mediaListString.IsNullOrEmpty())
+            {
+                viewModel.mediaList = _mediaService.SerealizarJsonMedia(viewModel.mediaListString);
+            }
 
             return viewModel;
         }
 
-        // Crear Post
-        // ** Se guardan Categoria, Media, MediaType y Source que haya completado el usuario
-        public async Task Create(PostViewModel viewModel)
+        public async Task<PostViewModel> PrepareSelectViewModel(PostViewModel viewModel)
         {
-            await _repositoryPosts.Crear(viewModel);
+            //Obtenemos Categorias Select List parar mostrar en la vista
+            viewModel.categories = await ObtenerCategorias(viewModel.user_id);
+
+            //Obtenemos Media Types Select List parar mostrar en la vista
+            viewModel.mediaTypes = await ObtenerMediaTypes(viewModel.user_id);
+
+            //Obtener fuente Select List para mostrar en la vista
+            viewModel.sources = await ObtenerSource(viewModel.user_id);
+
+            return viewModel;
+        }
+
+        // Crear Post 
+        // ** Validar que el formato exista
+        // ** Se guardan Categoria, Media, MediaType y Source que haya completado el usuario
+        public async Task CreatePost(PostViewModel viewModel)
+        {
+            try
+            {
+                // Validar que el formato exista
+                var Formato = await _formatService.GetFormatById(viewModel.format_id);
+
+                if (Formato is null)
+                {
+                    throw new Exception("¡El formato no existe!");
+                }
+
+                // Cargamos la fecha de creación
+                viewModel.created_at = DateTime.Now;
+
+                // Creamos el post
+                await _repositoryPosts.Crear(viewModel);
+
+                // SUBIR MEDIA
+                if (!viewModel.mediaListString.IsNullOrEmpty())
+                {
+                    //Deserializamos string de media
+                    List<MediaForm> mediaForms = _mediaService.SerealizarJsonMediaForm(viewModel.mediaListString);
+
+                    //Mappeamos de MediaForm a Media
+                    List<Media> medias = _mapper.Map<List<Media>>(mediaForms);
+
+                    //Agregamos el numero de post creado a cada Media
+                    foreach (var media in medias)
+                    {
+                        media.post_id = viewModel.id;
+                    }
+
+                    //Subimos MeiaLinks
+                    await _mediaService.Create(medias);
+                }
+
+                //SUBIR LINKS
+                if (!viewModel.sourceListString.IsNullOrEmpty())
+                {
+                    //Deserializamos string de media
+                    List<LinkForm> linksForms = _linkService.SerealizarJsonLinkForm(viewModel.sourceListString);
+
+                    //Mappeamos de MediaForm a Media
+                    List<Link> links = _mapper.Map<List<Link>>(linksForms);
+
+                    //Agregamos el numero de post creado a cada Media
+                    foreach (var link in links)
+                    {
+                        link.post_id = viewModel.id;
+                    }
+
+                    //Subimos MeiaLinks
+                    await _linkService.CreateLink(links);
+                }
+
+                //SUBIR CATEGORIAS
+                if (!viewModel.categoryListString.IsNullOrEmpty())
+                {
+                    //Deserializamos string de media
+                    List<CategoryForm> categoriesForms = _categoriaService.SerealizarJsonCategoryForm(viewModel.categoryListString);
+                    await _categoriaService.CreateCategoriesForm(viewModel.id, categoriesForms);
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("¡Se ha producido un error. Intente más tarde!", ex);
+            }
+
+        }
+
+        public async Task DeletePost(int id)
+        {
+            try
+            {
+                var post = await GetPostById(id);
+
+                if (post is null)
+                    throw new Exception("¡El post no existe!");
+
+                await _repositoryPosts.Borrar(id);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("La entrada no se pudo borrar.\n¡Se ha producido un error!", ex);
+            }
         }
 
         //****************************************************

@@ -9,6 +9,7 @@ namespace Backend_portafolio.Sevices
     {
         Task Create(Media media);
         Task Create(List<Media> medias);
+        Task<IEnumerable<Media>> GetMediaByPost(int post_id);
         IEnumerable<Media> SerealizarJsonMedia(string jsonMedia);
         List<MediaForm> SerealizarJsonMediaForm(string jsonMedia);
     }
@@ -25,6 +26,11 @@ namespace Backend_portafolio.Sevices
         {
             return await _repositoryMedia.Obtener();
         }
+        
+        public async Task<IEnumerable<Media>> GetMediaByPost(int post_id)
+        {
+            return await _repositoryMedia.ObtenerPorPost(post_id);
+        }
 
         public async Task Create (Media media)
         {
@@ -38,7 +44,6 @@ namespace Backend_portafolio.Sevices
                 await _repositoryMedia.Crear(media);
             }
         }
-
         public List<MediaForm> SerealizarJsonMediaForm(string jsonMedia)
         {
             return JsonSerializer.Deserialize<List<MediaForm>>(jsonMedia, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });

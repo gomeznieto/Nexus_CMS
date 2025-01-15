@@ -143,10 +143,63 @@ namespace Backend_portafolio.Datos
         }
 
 
+        //public async Task Borrar(int id)
+        //{
+        //    using var connection = new SqlConnection(_connectionString);
+        //    await connection.ExecuteAsync($@"DELETE {POST.TABLA} WHERE {POST.ID} = @{POST.ID}", new { id });
+        //}
+
         public async Task Borrar(int id)
         {
             using var connection = new SqlConnection(_connectionString);
-            await connection.ExecuteAsync($@"DELETE {POST.TABLA} WHERE {POST.ID} = @{POST.ID}", new { id });
+
+            // Abre la conexión explícitamente
+            await connection.OpenAsync();
+
+            // Inicia la transacción
+            using var transaction = await connection.BeginTransactionAsync();
+
+            try
+            {
+                // Eliminar registros relacionados en la tabla category_post
+                await connection.ExecuteAsync(
+                    "DELETE FROM category_post WHERE post_id = @id",
+                    new { id },
+                    transaction: transaction
+                );
+
+                // Eliminar registros relacionados en la tabla media
+                await connection.ExecuteAsync(
+                    "DELETE FROM media WHERE post_id = @id",
+                    new { id },
+                    transaction: transaction
+                );
+
+                // Eliminar registros relacionados en la tabla link
+                await connection.ExecuteAsync(
+                    "DELETE FROM link WHERE post_id = @id",
+                    new { id },
+                    transaction: transaction
+                );
+
+                // Finalmente, eliminar el post
+                await connection.ExecuteAsync(
+                    "DELETE FROM post WHERE id = @id",
+                    new { id },
+                    transaction: transaction
+                );
+
+                // Commit de la transacción
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                // Si algo falla, revertir todas las operaciones
+                await transaction.RollbackAsync();
+                throw new Exception("Error al eliminar el post y sus dependencias", ex);
+            }
         }
+
+
     }
 }
