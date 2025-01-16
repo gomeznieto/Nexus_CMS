@@ -55,9 +55,16 @@ namespace Backend_portafolio.Datos
 
 		public async Task Editar(Format format)
 		{
-			using var connection = new SqlConnection(_connectionString);
-			await connection.ExecuteAsync($@"UPDATE {FORMAT.TABLA} SET {FORMAT.NOMBRE} = @{FORMAT.NOMBRE} WHERE {FORMAT.ID} = @{FORMAT.ID} AND {FORMAT.USER_ID} = @{FORMAT.USER_ID}", format);
-		}
+			try
+			{
+				using var connection = new SqlConnection(_connectionString);
+				await connection.ExecuteAsync($@"UPDATE {FORMAT.TABLA} SET {FORMAT.NOMBRE} = @{FORMAT.NOMBRE} WHERE {FORMAT.ID} = @{FORMAT.ID} AND {FORMAT.USER_ID} = @{FORMAT.USER_ID}", format);
+			}
+            catch (SqlException ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
 
 		public async Task Borrar(int id)
 		{

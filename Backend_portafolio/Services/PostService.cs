@@ -162,7 +162,7 @@ namespace Backend_portafolio.Sevices
                     viewModel.user_id = usuarioID;
                 }
 
-                viewModel.formats = await ObtenerFormatos(usuarioID);
+                viewModel.formats = await ObtenerFormatos();
                 viewModel.format_id = int.Parse(viewModel.formats.Where(f => f.Text == format).Select(f => f.Value).FirstOrDefault());
 
                 if (viewModel.format_id == 0)
@@ -225,7 +225,7 @@ namespace Backend_portafolio.Sevices
             viewModel.sources = await ObtenerSource(viewModel.user_id);
 
             //Obtener formatos para mostrar en la vista
-            viewModel.formats = await ObtenerFormatos(viewModel.user_id);
+            viewModel.formats = await ObtenerFormatos();
 
             return viewModel;
         }
@@ -522,9 +522,9 @@ namespace Backend_portafolio.Sevices
             return categories.Select(category => new SelectListItem(category.name, category.id.ToString()));
         }
 
-        private async Task<IEnumerable<SelectListItem>> ObtenerFormatos(int user_id)
+        private async Task<IEnumerable<SelectListItem>> ObtenerFormatos()
         {
-            var formats = await _formatService.GetAllFormat(user_id);
+            var formats = await _formatService.GetAllFormat();
             return formats.Select(format => new SelectListItem(format.name, format.id.ToString()));
         }
 

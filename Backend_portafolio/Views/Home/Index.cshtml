@@ -33,19 +33,33 @@
                 <ul class="list-group list-unstyled">
                     @foreach (var format in Model.formatList)
                     {
-                        var ultimoPost = Model.ultimosPosts
-                        .Where(x => x.format_id == format.id)
-                        .OrderByDescending(x => x.id)
-                        .FirstOrDefault();
-                        <li class="d-flex flex-column ">
-                            <p class="fw-bold fst-italic"><i class="fa-solid fa-layer-group iconos_home me-1"></i>@format.name</p>
-                            <p>
-                                <i class="fas fa-edit iconos_home me-1">
-                                </i>
-                                <a href="/posts/Editar/@ultimoPost.id?format=@format.name" class="link_home">@(ultimoPost != null ? ultimoPost.title : "--")</a>
-                                <span class="date_home "> (@ultimoPost.created_at.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES")) - @ultimoPost.created_at.ToShortTimeString())</span>
-                            </p>
-                        </li>
+                        @if (Model.ultimosPosts.Count(x => x.format_id == format.id) == 0)
+                        {
+                            <li class="d-flex flex-column ">
+                                <p class="fw-bold fst-italic"><i class="fa-solid fa-layer-group iconos_home me-1"></i>@format.name</p>
+                                <p>
+                                    <i class="fas fa-edit iconos_home me-1">
+                                    </i>
+                                    <span class="date_home ">Sin entradas creadas</span>
+                                </p>
+                            </li>
+                        }
+                        else
+                        {
+                            var ultimoPost = Model.ultimosPosts
+                            .Where(x => x.format_id == format.id)
+                            .OrderByDescending(x => x.id)
+                            .FirstOrDefault();
+                            <li class="d-flex flex-column ">
+                                <p class="fw-bold fst-italic"><i class="fa-solid fa-layer-group iconos_home me-1"></i>@format.name</p>
+                                <p>
+                                    <i class="fas fa-edit iconos_home me-1">
+                                    </i>
+                                    <a href="/posts/Editar/@ultimoPost.id?format=@format.name" class="link_home">@(ultimoPost != null ? ultimoPost.title : "--")</a>
+                                    <span class="date_home "> (@ultimoPost.created_at.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES")) - @ultimoPost.created_at.ToShortTimeString())</span>
+                                </p>
+                            </li>
+                        }
                     }
                 </ul>
             </div>

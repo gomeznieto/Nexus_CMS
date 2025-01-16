@@ -1,6 +1,8 @@
 ﻿using Backend_portafolio.Models;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Datos;
+using Backend_portafolio.Services;
+using System.Reflection.Metadata;
 
 namespace Backend_portafolio.Sevices
 {
@@ -9,17 +11,27 @@ namespace Backend_portafolio.Sevices
         Task CreateFormat(Format format);
         Task DeleteFormat(int id);
         Task EditFormat(Format format);
-        Task<IEnumerable<Format>> GetAllFormat(int userId);
+        Task<bool> Existe(string name);
+        Task<IEnumerable<Format>> GetAllFormat();
         Task<Format> GetFormatById(int id);
+        Format GetFormatViewModel();
     }
 
     public class FormatService : IFormatService
     {
         private readonly IRepositoryFormat _repositoryFormat;
-
-        public FormatService(IRepositoryFormat repositoryFormat)
+        private readonly IUsersService _usersService;
+        private readonly HttpContext _httpContext;
+        public FormatService(
+            IRepositoryFormat repositoryFormat,
+            IHttpContextAccessor httpContextAccessor,
+           IUsersService usersService
+        )
         {
             _repositoryFormat = repositoryFormat;
+            _usersService = usersService;
+            _httpContext = httpContextAccessor.HttpContext;
+
         }
 
         //****************************************************
@@ -27,15 +39,38 @@ namespace Backend_portafolio.Sevices
         //****************************************************
 
         // Obtener todos los formatos
-        public async Task<IEnumerable<Format>> GetAllFormat(int userId)
+        public async Task<IEnumerable<Format>> GetAllFormat()
         {
-            return await _repositoryFormat.Obtener(userId);
+            var userID = _usersService.ObtenerUsuario();
+            return await _repositoryFormat.Obtener(userID);
         }
 
         // Obtener un formato por id
         public async Task<Format> GetFormatById(int id)
         {
-            return await _repositoryFormat.ObtenerPorId(id);
+            try
+            {
+                var format = await _repositoryFormat.ObtenerPorId(id);
+
+                if (format == null)
+                    throw new Exception("Formato no encontrado");
+
+                return format;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        // Obtener un formato para la vista con el usuario actual
+        public Format GetFormatViewModel()
+        {
+            var viewModel = new Format();
+            var userId = _usersService.ObtenerUsuario();
+            viewModel.user_id = userId;
+
+            return viewModel;
         }
 
         //****************************************************
@@ -45,7 +80,22 @@ namespace Backend_portafolio.Sevices
         // Crear un formato
         public async Task CreateFormat(Format format)
         {
-            await _repositoryFormat.Crear(format);
+            try
+            {
+                var userId = _usersService.ObtenerUsuario();
+
+                if (userId != format.user_id)
+                    throw new Exception("No puedes crear un formato para otro usuario");
+
+                await _repositoryFormat.Crear(format);
+
+                //Actualizar Session de Formatos para barra de navegacion
+                await Helper.Session.UpdateSession(_httpContext, _repositoryFormat, userId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         //****************************************************
@@ -56,7 +106,22 @@ namespace Backend_portafolio.Sevices
         // Editar un formato
         public async Task EditFormat(Format format)
         {
-            await _repositoryFormat.Editar(format);
+            try
+            {
+                var userID = _usersService.ObtenerUsuario();
+                if (userID != format.user_id)
+                    throw new Exception("No puedes editar un formato de otro usuario");
+
+                var existeFormato = GetFormatById(format.id);
+                if (existeFormato == null)
+                    throw new Exception("Formato no encontrado");
+
+                await _repositoryFormat.Editar(format);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         //****************************************************
@@ -66,7 +131,56 @@ namespace Backend_portafolio.Sevices
         // Borrar un formato
         public async Task DeleteFormat(int id)
         {
-            await _repositoryFormat.Borrar(id);
+            try
+            {
+                var userID = _usersService.ObtenerUsuario();
+                var format = await GetFormatById(id);
+
+                // Verificar si existe el formato
+                if (format == null)
+                    throw new Exception("Formato no encontrado");
+
+                // Verificar si el formato pertenece al usuario
+                if (userID != format.user_id)
+                    throw new Exception("No puedes borrar un formato de otro usuario");
+
+                // Verificar si se puede borrar
+                var borrar = await _repositoryFormat.sePuedeBorrar(id);
+                if (!borrar)
+                    throw new Exception("No se puede borrar porque el formato se encuentra en uso");
+
+                await _repositoryFormat.Borrar(id);
+
+                // Actualizar Session de Formatos para barra de navegacion
+                await Helper.Session.UpdateSession(_httpContext, _repositoryFormat, userID);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        //****************************************************
+        //********************* FUNCIONES ********************
+        //****************************************************
+
+        public async Task<bool> Existe(string name)
+        {
+            try
+            {
+                var userID = _usersService.ObtenerUsuario();
+                var existeCategoria = await _repositoryFormat.Existe(name, userID);
+
+                if (existeCategoria)
+                    throw new Exception($"El nombre {name} ya existe!");
+
+                return existeCategoria;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
     }
