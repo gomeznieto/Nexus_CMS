@@ -219,7 +219,7 @@ namespace Backend_portafolio.Sevices
             viewModel.categories = await ObtenerCategorias(viewModel.user_id);
 
             //Obtenemos Media Types Select List parar mostrar en la vista
-            viewModel.mediaTypes = await ObtenerMediaTypes(viewModel.user_id);
+            viewModel.mediaTypes = await ObtenerMediaTypes();
 
             //Obtener fuente Select List para mostrar en la vista
             viewModel.sources = await ObtenerSource(viewModel.user_id);
@@ -528,9 +528,9 @@ namespace Backend_portafolio.Sevices
             return formats.Select(format => new SelectListItem(format.name, format.id.ToString()));
         }
 
-        private async Task<IEnumerable<SelectListItem>> ObtenerMediaTypes(int user_id)
+        private async Task<IEnumerable<SelectListItem>> ObtenerMediaTypes()
         {
-            var mediaTypes = await _mediaTypeService.GetAllMediaType(user_id);
+            var mediaTypes = await _mediaTypeService.GetAllMediaType();
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
         }
 

@@ -52,10 +52,17 @@ namespace Backend_portafolio.Datos
 		//TODO CREAR
 		public async Task Crear(MediaType mediatype)
 		{
-			using var connection = new SqlConnection(_connectionString);
-			var id = await connection.QuerySingleAsync<int>($@"INSERT INTO {MEDIATYPE.TABLA} ({MEDIATYPE.NAME}, {MEDIATYPE.USER_ID}) VALUES (@{MEDIATYPE.NAME}, @{MEDIATYPE.USER_ID}) 
+			try
+			{
+                using var connection = new SqlConnection(_connectionString);
+                var id = await connection.QuerySingleAsync<int>($@"INSERT INTO {MEDIATYPE.TABLA} ({MEDIATYPE.NAME}, {MEDIATYPE.USER_ID}) VALUES (@{MEDIATYPE.NAME}, @{MEDIATYPE.USER_ID}) 
 															SELECT SCOPE_IDENTITY()", mediatype);
-			mediatype.id = id;
+                mediatype.id = id;
+            }
+			catch(SqlException ex)
+			{
+                throw new ApplicationException(ex.Message);
+            }
 		}
 
 		//TODO EDITAR
