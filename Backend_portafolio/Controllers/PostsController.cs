@@ -10,7 +10,6 @@ namespace Backend_portafolio.Controllers
 {
     public class PostsController : Controller
     {
-        private readonly IUsersService _usersService;
         private readonly IPostService _postService;
         private readonly ICategoriaService _categoriaService;
         private readonly IFormatService _formatService;
@@ -21,7 +20,6 @@ namespace Backend_portafolio.Controllers
         private readonly IMapper _mapper;
 
         public PostsController(
-            IUsersService usersService,
             IPostService postService,
             ICategoriaService categoriaService,
             IFormatService formatService,
@@ -38,7 +36,6 @@ namespace Backend_portafolio.Controllers
             _mediaService = mediaService;
             _sourceService = sourceService;
             _linkService = linkService;
-            _usersService = usersService;
             _mapper = mapper;
         }
 

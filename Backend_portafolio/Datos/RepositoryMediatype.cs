@@ -82,19 +82,26 @@ namespace Backend_portafolio.Datos
 		//TODO EXISTE
 		public async Task<bool> Existe(string name, int user_id)
 		{
-			using var connection = new SqlConnection(_connectionString);
-			var existe = await connection.QueryFirstOrDefaultAsync<bool>(
-					$@"IF EXISTS (
+			try
+			{
+                using var connection = new SqlConnection(_connectionString);
+                var existe = await connection.QueryFirstOrDefaultAsync<bool>(
+                        $@"IF EXISTS (
                     SELECT 1 FROM {MEDIATYPE.TABLA}
                     WHERE UPPER({MEDIATYPE.NAME}) = UPPER(@{MEDIATYPE.NAME}) AND {MEDIATYPE.USER_ID} = @{MEDIATYPE.USER_ID}
 						)
 						SELECT 1
 					ELSE
 						SELECT 0"
-							, new { name, user_id }
-						);
+                                , new { name, user_id }
+                            );
 
-			return existe;
+                return existe;
+            }
+			catch(SqlException ex)
+            {
+				throw new ApplicationException(ex.Message);
+            }
 		}
 
 		public async Task<bool>sePuedeBorrar(int mediatype_id)

@@ -1,7 +1,6 @@
 ﻿using Backend_portafolio.Entities;
 using Backend_portafolio.Helper;
 using Backend_portafolio.Services;
-using Backend_portafolio.Datos;
 using Microsoft.AspNetCore.Mvc;
 using Backend_portafolio.Sevices;
 
@@ -9,7 +8,6 @@ namespace Backend_portafolio.Controllers
 {
     public class CategoriasController : Controller
     {
-        private readonly IUsersService _usersService;
         private readonly ICategoriaService _categoriaService;
 
         public CategoriasController(
@@ -17,7 +15,6 @@ namespace Backend_portafolio.Controllers
             ICategoriaService categoriaService
             )
         {
-            _usersService = usersService;
             _categoriaService = categoriaService;
         }
 
@@ -30,8 +27,7 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                var userID = _usersService.ObtenerUsuario();
-                var categorias = await _categoriaService.GetAllCategorias(userID);
+                var categorias = await _categoriaService.GetAllCategorias();
 
                 ViewBag.Cantidad = categorias.Count();
                 ViewBag.Message = $"No hay categorias para mostrar.";
@@ -118,8 +114,6 @@ namespace Backend_portafolio.Controllers
         [HttpPost]
         public async Task<IActionResult> Editar(Categoria categoria)
         {
-            var userID = _usersService.ObtenerUsuario();
-
             //Validar errores del Model
             if (!ModelState.IsValid)
                 return View(categoria);

@@ -9,6 +9,7 @@ namespace Backend_portafolio.Sevices
         Task CreateMediaType(MediaType viewModel);
         Task DeleteMediaType(int id);
         Task EditMediaType(MediaType viewModel);
+        Task<bool> ExisteMediaType(string mediaType);
         Task<IEnumerable<MediaType>> GetAllMediaType();
         Task<MediaType> GetMediaTypeById(int id);
         MediaType GetMediaTypeViewModel();
@@ -177,6 +178,25 @@ namespace Backend_portafolio.Sevices
             //****************************************************
             //********************* FUNCIONES ********************
             //****************************************************
+
+        public async Task<bool> ExisteMediaType(string mediaType)
+        {
+            try
+            {
+                var userID = _usersService.ObtenerUsuario();
+                
+                var existeMediaType = await _repositoryMediatype.Existe(mediaType, userID);
+
+                if(existeMediaType)
+                    throw new ApplicationException($"El tipo de media {mediaType} ya se encuentra creado");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
+        }
 
     }
 }

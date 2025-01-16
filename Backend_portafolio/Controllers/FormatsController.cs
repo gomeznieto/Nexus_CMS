@@ -10,19 +10,14 @@ namespace Backend_portafolio.Controllers
 {
     public class FormatsController : Controller
     {
-        private readonly IRepositoryFormat _repositoryFormat;
         private readonly IFormatService _formatService;
-        private readonly IUsersService _usersService;
 
 
         public FormatsController(
-            IRepositoryFormat repositoryFormat,
-            IFormatService formatService,
-            IUsersService usersService)
+            IFormatService formatService
+        )
         {
-            _repositoryFormat = repositoryFormat;
             _formatService = formatService;
-            _usersService = usersService;
         }
 
 
@@ -149,22 +144,5 @@ namespace Backend_portafolio.Controllers
             }
 
         }
-
-        //     [HttpGet]
-        //     [Route("api/[controller]/get")]
-        //     public async Task<IActionResult> apiJSON()
-        //     {
-        //try
-        //{
-        //             var userID = _usersService.ObtenerUsuario();
-
-        //             var formatos = await _repositoryFormat.Obtener(userID);
-        //	return Json(formatos);
-        //}
-        //catch (Exception)
-        //{
-        //	return Json(new { error = true, mensaje = "Se ha producido un error."});
-        //}
-        //     }
     }
 }

@@ -53,10 +53,17 @@ namespace Backend_portafolio.Datos
 		//TODO CREAR
 		public async Task Crear(Source source)
 		{
-			using var connection = new SqlConnection(_connectionString);
-			var id = await connection.QuerySingleAsync<int>($@"INSERT INTO {SOURCE.TABLA} ({SOURCE.NAME}, {SOURCE.ICON}, {SOURCE.USER_ID}) VALUES (@{SOURCE.NAME}, @{SOURCE.ICON}, @{SOURCE.USER_ID}) 
+			try
+			{
+                using var connection = new SqlConnection(_connectionString);
+                var id = await connection.QuerySingleAsync<int>($@"INSERT INTO {SOURCE.TABLA} ({SOURCE.NAME}, {SOURCE.ICON}, {SOURCE.USER_ID}) VALUES (@{SOURCE.NAME}, @{SOURCE.ICON}, @{SOURCE.USER_ID}) 
 															SELECT SCOPE_IDENTITY()", source);
-			source.id = id;
+                source.id = id;
+            }
+			catch(SqlException ex)
+			{
+                throw new ApplicationException(ex.Message);
+            }
 		}
 
 		//TODO EDITAR
@@ -69,8 +76,15 @@ namespace Backend_portafolio.Datos
 		//TODO BORRA
 		public async Task Borrar(int id, int user_id)
 		{
-			using var connection = new SqlConnection(_connectionString);
-			await connection.ExecuteAsync($@"DELETE {SOURCE.TABLA} WHERE {SOURCE.ID} = @{SOURCE.ID} AND {SOURCE.USER_ID} = @{SOURCE.USER_ID}", new { id, user_id });
+			try
+			{
+                using var connection = new SqlConnection(_connectionString);
+                await connection.ExecuteAsync($@"DELETE {SOURCE.TABLA} WHERE {SOURCE.ID} = @{SOURCE.ID} AND {SOURCE.USER_ID} = @{SOURCE.USER_ID}", new { id, user_id });
+            }
+			catch (Exception ex)
+			{
+				throw new ApplicationException(ex.Message);
+            }
 		}
 
 		//TODO EXISTE

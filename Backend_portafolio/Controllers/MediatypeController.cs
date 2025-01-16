@@ -1,6 +1,4 @@
 ﻿using Backend_portafolio.Entities;
-using Backend_portafolio.Datos;
-using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Mvc;
 using Backend_portafolio.Sevices;
 using Backend_portafolio.Helper;
@@ -9,19 +7,13 @@ namespace Backend_portafolio.Controllers
 {
     public class MediatypeController : Controller
     {
-        private readonly IRepositoryMediatype _repositoryMediatype;
         private readonly IMediaTypeService _mediaTypeService;
-        private readonly IUsersService _usersService;
 
 		public MediatypeController(
-			IRepositoryMediatype repositoryMediatype, 
-			IMediaTypeService mediaTypeService,
-			IUsersService usersService
-			)
+			IMediaTypeService mediaTypeService
+		)
         {
-            _repositoryMediatype = repositoryMediatype;
             _mediaTypeService = mediaTypeService;
-            _usersService = usersService;
 		}
 
 
@@ -138,24 +130,17 @@ namespace Backend_portafolio.Controllers
         //****************************************************
 
         [HttpGet]
-		public async Task<IActionResult> VerificarExisteCategoria(string name)
+		public async Task<IActionResult> VerificarExisteMediaType(string name)
 		{
 			try
 			{
-				var userID = _usersService.ObtenerUsuario();
-
-				var existeCategoria = await _repositoryMediatype.Existe(name, userID);
-
-				if (existeCategoria)
-					return Json($"El nombre {name} ya existe!");
-
-				return Json(true);
+				await _mediaTypeService.ExisteMediaType(name);
+                return Json(true);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				return Json($"Se ha producido un error. Intente nuevamente más tarde!");
+				return Json(ex.Message);
 			}
-
 		}
 	}
 }

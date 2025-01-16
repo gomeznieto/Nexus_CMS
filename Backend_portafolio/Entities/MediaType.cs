@@ -8,7 +8,7 @@ namespace Backend_portafolio.Entities
         public int id { get; set; }
         [Display(Name = "Tipo de Medio")]
         [Required(ErrorMessage = "El campo {0} es requerido")]
-        [Remote(action: "VerificarExisteCategoria", controller: "Mediatype")]
+        [Remote(action: "VerificarExisteMediaType", controller: "Mediatype")]
         public string name { get; set; }
         public int user_id { get; set; }
     }

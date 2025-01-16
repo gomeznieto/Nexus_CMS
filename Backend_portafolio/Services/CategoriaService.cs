@@ -11,7 +11,7 @@ namespace Backend_portafolio.Sevices
     public interface ICategoriaService
     {
         Task CreateCategoriesForm(int id, List<CategoryForm> categoriesForms);
-        Task<IEnumerable<Categoria>> GetAllCategorias(int userId);
+        Task<IEnumerable<Categoria>> GetAllCategorias();
         Task<List<Category_Post>> SerealizarJsonCategoryPost(string jsonCategoria);
         public List<CategoryForm> SerealizarJsonCategoryForm(string jsonCategoria);
         Task<IEnumerable<Category_Post>> GetCategoriasByPost(int post_id);
@@ -43,7 +43,7 @@ namespace Backend_portafolio.Sevices
         //****************************************************
 
         // Obtener todas las categorías
-        public async Task<IEnumerable<Categoria>> GetAllCategorias(int userId)
+        public async Task<IEnumerable<Categoria>> GetAllCategorias()
         {
             var userID = _usersService.ObtenerUsuario();
 
@@ -82,7 +82,7 @@ namespace Backend_portafolio.Sevices
         public async Task<List<Categoria>> GetCategoryByName(string buscar)
         {
             var userID = _usersService.ObtenerUsuario();
-            var categorias = await GetAllCategorias(userID);
+            var categorias = await GetAllCategorias();
 
             if (!buscar.IsNullOrEmpty())
             {
