@@ -12,7 +12,7 @@ namespace Backend_portafolio.Sevices
         Task DeleteFormat(int id);
         Task EditFormat(Format format);
         Task<bool> Existe(string name);
-        Task<IEnumerable<Format>> GetAllFormat();
+        Task<List<Format>> GetAllFormat();
         Task<Format> GetFormatById(int id);
         Format GetFormatViewModel();
     }
@@ -39,10 +39,10 @@ namespace Backend_portafolio.Sevices
         //****************************************************
 
         // Obtener todos los formatos
-        public async Task<IEnumerable<Format>> GetAllFormat()
+        public async Task<List<Format>> GetAllFormat()
         {
             var userID = _usersService.ObtenerUsuario();
-            return await _repositoryFormat.Obtener(userID);
+            return (await _repositoryFormat.Obtener(userID)).ToList();
         }
 
         // Obtener un formato por id
@@ -90,7 +90,7 @@ namespace Backend_portafolio.Sevices
                 await _repositoryFormat.Crear(format);
 
                 //Actualizar Session de Formatos para barra de navegacion
-                await Helper.Session.UpdateSession(_httpContext, _repositoryFormat, userId);
+                await Helper.Session.UpdateSession(_httpContext, this, userId);
             }
             catch (Exception ex)
             {
@@ -152,7 +152,7 @@ namespace Backend_portafolio.Sevices
                 await _repositoryFormat.Borrar(id);
 
                 // Actualizar Session de Formatos para barra de navegacion
-                await Helper.Session.UpdateSession(_httpContext, _repositoryFormat, userID);
+                await Helper.Session.UpdateSession(_httpContext, this, userID);
 
             }
             catch (Exception ex)

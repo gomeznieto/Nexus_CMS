@@ -12,8 +12,10 @@ namespace Backend_portafolio.Sevices
     public interface IPostService
     {
         Task CreatePost(PostViewModel viewModel);
+        Task CreatePost(Post viewModel);
         Task EditPost(PostViewModel viewModel);
         Task DeletePost(int id);
+        Task<List<Post>> GetAllPosts();
         Task<List<Post>> GetAllPosts(string format, int pagina);
         Task<Post> GetPostById(int id);
         Task<PostViewModel> GetPostViewModel(string format, PostViewModel v = null);
@@ -74,6 +76,19 @@ namespace Backend_portafolio.Sevices
         //****************************************************
         //******************* OBTENER POSTS ******************
         //****************************************************
+
+        public async Task<List<Post>> GetAllPosts()
+        {
+            try
+            {
+                var usuarioID = _usersService.ObtenerUsuario();
+                return (await _repositoryPosts.Obtener(usuarioID)).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         public async Task<List<Post>> GetAllPosts(string format, int pagina)
         {
@@ -216,13 +231,13 @@ namespace Backend_portafolio.Sevices
         public async Task<PostViewModel> PrepareSelectViewModel(PostViewModel viewModel)
         {
             //Obtenemos Categorias Select List parar mostrar en la vista
-            viewModel.categories = await ObtenerCategorias(viewModel.user_id);
+            viewModel.categories = await ObtenerCategorias();
 
             //Obtenemos Media Types Select List parar mostrar en la vista
             viewModel.mediaTypes = await ObtenerMediaTypes();
 
             //Obtener fuente Select List para mostrar en la vista
-            viewModel.sources = await ObtenerSource(viewModel.user_id);
+            viewModel.sources = await ObtenerSource();
 
             //Obtener formatos para mostrar en la vista
             viewModel.formats = await ObtenerFormatos();
@@ -236,6 +251,23 @@ namespace Backend_portafolio.Sevices
 
         // ** Validar que el formato exista
         // ** Se guardan Categoria, Media, MediaType y Source que haya completado el usuario
+        public async Task CreatePost(Post post)
+        {
+            try
+            {
+                var userId = _usersService.ObtenerUsuario();
+
+                post.user_id = userId;
+                post.created_at = DateTime.Now;
+                await _repositoryPosts.Crear(post);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("¡Se ha producido un error. Intente más tarde!", ex);
+            }
+        }
+
         public async Task CreatePost(PostViewModel viewModel)
         {
             try
@@ -243,7 +275,7 @@ namespace Backend_portafolio.Sevices
                 // Usuario registrado
                 var userID = _usersService.ObtenerUsuario();
 
-                if(userID != viewModel.user_id)
+                if (userID != viewModel.user_id)
                 {
                     throw new Exception("¡No tienes permisos para realizar esta acción!");
                 }
@@ -505,7 +537,7 @@ namespace Backend_portafolio.Sevices
         //************ CANTIDAD POST POR FORMATO *************
         //****************************************************
 
-        public async Task<int>GetCountPostByFormat(string format)
+        public async Task<int> GetCountPostByFormat(string format)
         {
             return await _repositoryPosts.ObtenerCantidadPorFormato(format);
         }
@@ -516,9 +548,9 @@ namespace Backend_portafolio.Sevices
         //***************** METODOS PRIVADOS *****************
         //****************************************************
 
-        private async Task<IEnumerable<SelectListItem>> ObtenerCategorias(int user_id)
+        private async Task<IEnumerable<SelectListItem>> ObtenerCategorias()
         {
-            var categories = await _categoriaService.GetAllCategorias(user_id);
+            var categories = await _categoriaService.GetAllCategorias();
             return categories.Select(category => new SelectListItem(category.name, category.id.ToString()));
         }
 
@@ -534,9 +566,9 @@ namespace Backend_portafolio.Sevices
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
         }
 
-        private async Task<IEnumerable<SelectListItem>> ObtenerSource(int user_id)
+        private async Task<IEnumerable<SelectListItem>> ObtenerSource()
         {
-            var mediaTypes = await _sourceService.GetAllSource(user_id);
+            var mediaTypes = await _sourceService.GetAllSource();
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
         }
     }

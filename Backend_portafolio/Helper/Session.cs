@@ -1,16 +1,17 @@
 ﻿using Backend_portafolio.Models;
-using Backend_portafolio.Datos;
 using System.Text.Json;
+using Backend_portafolio.Sevices;
 
 namespace Backend_portafolio.Helper
 {
     public static class Session
     {
-        public static async Task UpdateSession(HttpContext httpContext, IRepositoryFormat repositoryFormat, int user_id)
+
+        public static async Task UpdateSession(HttpContext httpContext, IFormatService formatService, int user_id)
         {
 			try
 			{
-				var formats = await repositoryFormat.Obtener(user_id);
+				var formats = await formatService.GetAllFormat();
 				var formatsJson = JsonSerializer.Serialize(formats.ToList());
 				httpContext.Session.SetString("Formats", formatsJson);
 			}

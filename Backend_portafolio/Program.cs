@@ -47,6 +47,7 @@ builder.Services.AddTransient<IMediaTypeService, MediaTypeService>();
 builder.Services.AddTransient<ISourceService, SourceService>();
 builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<IMediaService, MediaService>();
+builder.Services.AddTransient<IHomeService, HomeService>();
 
 // AUTENTICACION
 builder.Services.AddIdentityCore<User>(opciones =>
