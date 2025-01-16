@@ -27,8 +27,9 @@ namespace Backend_portafolio.Controllers
         }
 
         //****************************************************
-        //********************** INDEX **********************
+        //*********************** INDEX **********************
         //****************************************************
+
         [HttpGet]
         public async Task<IActionResult> Index(int page = 1) //TODO: PAGINACION
         {
@@ -85,9 +86,7 @@ namespace Backend_portafolio.Controllers
         {
 
             if (!ModelState.IsValid)
-            {
                 return View(categoria);
-            }
 
             try
             {
@@ -165,7 +164,7 @@ namespace Backend_portafolio.Controllers
         //********************* FUNCIONES ********************
         //****************************************************
         [HttpGet]
-        public async Task<IActionResult> VerificarExisteCategoria(string name)
+        public async Task<IActionResult> VerificarExisteCategoria(string name, int user_id)
         {
             try
             {
@@ -174,7 +173,7 @@ namespace Backend_portafolio.Controllers
             }
             catch(Exception ex)
             {
-                return Json(new { error = true, mensaje = ex.Message });
+                return Json(ex.Message);
             }
 
         }

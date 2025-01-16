@@ -10,17 +10,19 @@ namespace Backend_portafolio.Controllers
         private readonly IRepositoryFormat _repositoryFormat;
         private readonly IUsersService _usersService;
 
+
         public FormatsController(IRepositoryFormat repositoryFormat, IUsersService usersService)
         {
             _repositoryFormat = repositoryFormat;
             _usersService = usersService;
         }
 
-		/***********/
-		/*  INDEX  */
-		/***********/
 
-		public async Task<IActionResult> Index()
+        //****************************************************
+        //*********************** INDEX **********************
+        //****************************************************
+
+        public async Task<IActionResult> Index()
         {
 			try
 			{
@@ -37,11 +39,11 @@ namespace Backend_portafolio.Controllers
         }
 
 
-		/***********/
-		/*  CREAR  */
-		/***********/
+        //****************************************************
+        //********************** CREATE **********************
+        //****************************************************
 
-		[HttpGet]
+        [HttpGet]
         public IActionResult Crear()
         {
 			var viewModel = new Format();
@@ -100,11 +102,11 @@ namespace Backend_portafolio.Controllers
 		}
 
 
-		/***********/
-		/*  EDITAR */
-		/***********/
+        //****************************************************
+        //*********************** EDIT ***********************
+        //****************************************************
 
-		[HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Editar(Format model)
         {
 			try
@@ -132,10 +134,11 @@ namespace Backend_portafolio.Controllers
 			}
 		}
 
-		/***************/
-		/*   BORRAR    */
-		/***************/
-		[HttpPost]
+        //****************************************************
+        //********************** DELETE **********************
+        //****************************************************
+
+        [HttpPost]
         public async Task<IActionResult>Borrar(int id)
 		{
 			try
@@ -166,11 +169,11 @@ namespace Backend_portafolio.Controllers
 		}
 
 
-		/***************/
-		/*  FUNCIONES  */
-		/***************/
+        //****************************************************
+        //********************* FUNCIONES ********************
+        //****************************************************
 
-		[HttpGet]
+        [HttpGet]
 		public async Task<IActionResult> VerificarExisteFormato(string name)
 		{
 			try
@@ -186,27 +189,26 @@ namespace Backend_portafolio.Controllers
 			}
 			catch (Exception)
 			{
-
 				return Json($"Se produjo un error al intentear validar {name}. Intente con otro nombre o en otro momento!");
 			}
 
 		}
 
-        [HttpGet]
-        [Route("api/[controller]/get")]
-        public async Task<IActionResult> apiJSON()
-        {
-			try
-			{
-                var userID = _usersService.ObtenerUsuario();
+   //     [HttpGet]
+   //     [Route("api/[controller]/get")]
+   //     public async Task<IActionResult> apiJSON()
+   //     {
+			//try
+			//{
+   //             var userID = _usersService.ObtenerUsuario();
 
-                var formatos = await _repositoryFormat.Obtener(userID);
-				return Json(formatos);
-			}
-			catch (Exception)
-			{
-				return Json(new { error = true, mensaje = "Se ha producido un error."});
-			}
-        }
+   //             var formatos = await _repositoryFormat.Obtener(userID);
+			//	return Json(formatos);
+			//}
+			//catch (Exception)
+			//{
+			//	return Json(new { error = true, mensaje = "Se ha producido un error."});
+			//}
+   //     }
     }
 }

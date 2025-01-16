@@ -22,29 +22,52 @@ namespace Backend_portafolio.Sevices
             _repositoryFormat = repositoryFormat;
         }
 
+        //****************************************************
+        //*********************** GETS ***********************
+        //****************************************************
+
+        // Obtener todos los formatos
         public async Task<IEnumerable<Format>> GetAllFormat(int userId)
         {
             return await _repositoryFormat.Obtener(userId);
         }
 
+        // Obtener un formato por id
+        public async Task<Format> GetFormatById(int id)
+        {
+            return await _repositoryFormat.ObtenerPorId(id);
+        }
+
+        //****************************************************
+        //********************** CREATE **********************
+        //****************************************************
+
+        // Crear un formato
         public async Task CreateFormat(Format format)
         {
             await _repositoryFormat.Crear(format);
         }
 
+        //****************************************************
+        //*********************** EDIT ***********************
+        //****************************************************
+
+
+        // Editar un formato
         public async Task EditFormat(Format format)
         {
             await _repositoryFormat.Editar(format);
         }
 
+        //****************************************************
+        //********************** DELETE **********************
+        //****************************************************
+
+        // Borrar un formato
         public async Task DeleteFormat(int id)
         {
             await _repositoryFormat.Borrar(id);
         }
 
-        public async Task<Format> GetFormatById(int id)
-        {
-            return await _repositoryFormat.ObtenerPorId(id);
-        }
     }
 }

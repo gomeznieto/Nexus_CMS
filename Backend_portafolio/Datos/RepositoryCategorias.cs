@@ -148,19 +148,26 @@ namespace Backend_portafolio.Datos
         // VERIFICAR SI EXISTE EL NOMBRE DE LA CATEGORIA
         public async Task<bool> Existe(string name, int user_id)
         {
-            using var connection = new SqlConnection(_connectionString);
-            var existe = await connection.QueryFirstOrDefaultAsync<bool>(
-                    $@"IF EXISTS (
+            try
+            {
+                using var connection = new SqlConnection(_connectionString);
+                var existe = await connection.QueryFirstOrDefaultAsync<bool>(
+                        $@"IF EXISTS (
                     SELECT 1 FROM {CATEGORIA.TABLA}
                     WHERE UPPER({CATEGORIA.NOMBRE}) = UPPER(@{CATEGORIA.NOMBRE}) AND {CATEGORIA.USER_ID} = @{CATEGORIA.USER_ID}
 						)
 						SELECT 1
 					ELSE
 						SELECT 0"
-                            , new { name, user_id }
-                        );
+                                , new { name, user_id }
+                            );
 
-            return existe;
+                return existe;
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         // EDITAR CATEGORIA

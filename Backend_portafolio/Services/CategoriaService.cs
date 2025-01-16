@@ -42,6 +42,7 @@ namespace Backend_portafolio.Sevices
         //*********************** GETS ***********************
         //****************************************************
 
+        // Obtener todas las categorías
         public async Task<IEnumerable<Categoria>> GetAllCategorias(int userId)
         {
             var userID = _usersService.ObtenerUsuario();
@@ -51,6 +52,7 @@ namespace Backend_portafolio.Sevices
             return categorias;
         }
 
+        // Obtener una categoría por id
         public async Task<Categoria> GetCategoriaById(int id)
         {
             try
@@ -68,12 +70,15 @@ namespace Backend_portafolio.Sevices
             }
         }
 
+        // Obtener las categorías de un post
         public async Task<IEnumerable<Category_Post>> GetCategoriasByPost(int post_id)
         {
             var categorias = await _repositoryCategorias.ObtenerCategoriaPostPorId(post_id);
             return categorias;
         }
 
+
+        // Obtener categorías por nombre
         public async Task<List<Categoria>> GetCategoryByName(string buscar)
         {
             var userID = _usersService.ObtenerUsuario();
@@ -87,6 +92,7 @@ namespace Backend_portafolio.Sevices
             return categorias.OrderBy(x => x.name).ToList();
         }
 
+        // Obtener el modelo de vista
         public Categoria GetViewModel()
         {
             var userID = _usersService.ObtenerUsuario();
@@ -216,6 +222,7 @@ namespace Backend_portafolio.Sevices
         //********************* FUNCIONES ********************
         //****************************************************
 
+        // Serializar las categorías de un post
         public async Task<List<Category_Post>> SerealizarJsonCategoryPost(string jsonCategoria)
         {
             try
@@ -250,11 +257,13 @@ namespace Backend_portafolio.Sevices
             }
         }
 
+        // Serializar las categorías de un post
         public List<CategoryForm> SerealizarJsonCategoryForm(string jsonCategoria)
         {
             return JsonSerializer.Deserialize<List<CategoryForm>>(jsonCategoria, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
+        // Verificar si existe una categoría
         public async Task<bool> Existe(string name)
         {
             try
@@ -263,13 +272,13 @@ namespace Backend_portafolio.Sevices
                 var existeCategoria = await _repositoryCategorias.Existe(name, userID);
 
                 if (existeCategoria)
-                    throw new Exception($"El nombre {name} ya existe!");
+                    throw new Exception($"La categoría {name} ya existe! Intente con otro.");
 
                 return existeCategoria;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception($"El nombre {name} ya existe!");
+                throw new Exception(ex.Message);
             }
         }
     }
