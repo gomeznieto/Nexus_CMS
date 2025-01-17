@@ -3,7 +3,6 @@ using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Identity.Client;
 
 namespace Backend_portafolio.Services
 {
@@ -16,37 +15,18 @@ namespace Backend_portafolio.Services
     }
     public class BioService : IBioService
     {
-        private readonly UserManager<User> _userManager;
-        private readonly IRepositoryRole _repositoryRole;
-        private readonly IRepositoryUsers _repositoryUsers;
-        private readonly SignInManager<User> _signInManager;
-        private readonly IMapper _mapper;
+
         private readonly IUsersService _usersService;
         private readonly IRepositoryBio _repositoryBio;
-        private readonly IImageService _imageService;
-        private readonly HttpContext _httpContext;
+
 
         public BioService(
-            UserManager<User> userManager,
-            IRepositoryRole repositoryRole,
-            IRepositoryUsers repositoryUsers,
-            IHttpContextAccessor httpContextAccessor,
-            SignInManager<User> MySignInManager,
-            IMapper mapper,
             IUsersService usersService,
-            IRepositoryBio repositoryBio,
-            IImageService imageService
+            IRepositoryBio repositoryBio
         )
         {
-            _httpContext = httpContextAccessor.HttpContext;
-            _userManager = userManager;
-            _repositoryRole = repositoryRole;
-            _repositoryUsers = repositoryUsers;
-            _signInManager = MySignInManager;
-            _mapper = mapper;
             _usersService = usersService;
             _repositoryBio = repositoryBio;
-            _imageService = imageService;
         }
 
         //****************************************************

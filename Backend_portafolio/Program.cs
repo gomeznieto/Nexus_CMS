@@ -20,11 +20,15 @@ builder.Services.AddControllersWithViews(options =>
 });
 builder.Services.AddSession();
 
-// SERVICIOS USUARIO
+//****************************************************
+//***************** USER SERVICES ********************
+//****************************************************
 builder.Services.AddTransient<IUserStore<User>, UsersStore>();
 builder.Services.AddTransient<SignInManager<User>>();
 
-//RESPOSITORIOS
+//****************************************************
+//*********************** DATA ***********************
+//****************************************************
 builder.Services.AddTransient<IRepositoryCategorias, RepositoryCategorias>();
 builder.Services.AddTransient<IRepositoryFormat, RepositoryFormat>();
 builder.Services.AddTransient<IRepositoryPosts, RepositoryPosts>();
@@ -37,7 +41,9 @@ builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
 builder.Services.AddTransient<IRepositoryBio, RepositoryBio>();
 builder.Services.AddTransient<IRepositorySocialNetwork, RepositorySocialNetwork>();
 
-//SERVICIOS
+//****************************************************
+//********************* SERVICES *********************
+//****************************************************
 builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<ICategoriaService, CategoriaService>();
 builder.Services.AddTransient<IPostService, PostService>();
@@ -49,8 +55,11 @@ builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<IMediaService, MediaService>();
 builder.Services.AddTransient<IHomeService, HomeService>();
 builder.Services.AddTransient<IBioService, BioService>();
+builder.Services.AddTransient<INetworkService, NetworkService>();
 
-// AUTENTICACION
+//****************************************************
+//********************** AUTH ************************
+//****************************************************
 builder.Services.AddIdentityCore<User>(opciones =>
 {
 	opciones.Password.RequireUppercase = false;
@@ -61,7 +70,9 @@ builder.Services.AddIdentityCore<User>(opciones =>
 });
 
 
-// COOKIES
+//****************************************************
+//********************* COOKIES **********************
+//****************************************************
 builder.Services.AddAuthentication(options =>
 {
 	options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
@@ -74,8 +85,9 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-
-//Auto Mapper
+//****************************************************
+//********************** MAPPER **********************
+//****************************************************
 builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
