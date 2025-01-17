@@ -8,7 +8,6 @@
 <div class="login-form">
     <p class="fs-5">Ingrese su cuenta</p>
     <form asp-action="Login" class="w-100">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="mb-3">
             <input asp-for="Email" class="form-control" placeholder="Correo electronico"/>
             <span asp-validation-for="Email" class="text-danger"></span>
@@ -17,6 +16,7 @@
             <input asp-for="Password" class="form-control" placeholder="Contraseña"/>
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-check d-flex align-content-center align-items-center gap-1">
             <input type="checkbox" class="form-check-input" asp-for="RememberMe" />
             <label class="form-check-label fs-5">Recordar en esta computadora</label>

@@ -1,4 +1,5 @@
 ﻿using Backend_portafolio.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend_portafolio.Controllers
@@ -6,11 +7,13 @@ namespace Backend_portafolio.Controllers
 	public class ModalsController:Controller
 	{
 
+		[AllowAnonymous]
 		public IActionResult DeleteErrorModal()
 		{
 			try
 			{
 				Session.DeleteErrorSession(HttpContext);
+				return Json(true);
 
 			}
 			catch (Exception)
@@ -18,7 +21,6 @@ namespace Backend_portafolio.Controllers
 				return Json(false);
 			}
 
-			return Json(true);
 		}
 
         public IActionResult DeleteSuccessModal()
@@ -26,6 +28,7 @@ namespace Backend_portafolio.Controllers
             try
             {
                 Session.DeleteSuccessSession(HttpContext);
+				return Json(true);
 
             }
             catch (Exception)
@@ -33,7 +36,6 @@ namespace Backend_portafolio.Controllers
                 return Json(false);
             }
 
-            return Json(true);
         }
 
         public IActionResult ChangeNumberPosts(int cantidad)
@@ -41,6 +43,7 @@ namespace Backend_portafolio.Controllers
 			try
 			{
 				Session.CantidadPostsSession(HttpContext, cantidad);
+				return Json(true);
 
 			}
 			catch (Exception)
@@ -48,7 +51,6 @@ namespace Backend_portafolio.Controllers
 				return Json(false);
 			}
 
-			return Json(true);
 		}
 
 	}

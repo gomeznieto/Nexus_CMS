@@ -10,6 +10,7 @@
 }
 
 <h3>Bio</h3>
+
 <!-- LISTADO DE BIO -->
 <div class="w-100 p-1 row gap-3">
     <div class=" mt-2 col-6 p-2">
@@ -37,18 +38,19 @@
                 }
             </tbody>
         </table> <!-- FIN LISTADO -->
+
         <!-- CREAR -->
         <button class="btn btn-action" id="btnAddBio" onclick="showForm()"><i class="fa-solid fa-plus me-2"></i>Agregar Bio</button>
         <form class="hide mt-4" id="formAddBio" asp-action="Bio" asp-controller="Users">
             <!-- VALIDATION -->
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <div class="d-flex mt-2 gap-1">
-
+            <input type="hidden" asp-for="@Model.user_id" />
                 <div class="col-2">
                     <select class="form-select optSelect" asp-for="@Model.year">
                         @for (int i = anios; i >= 50; i--)
                         {
-                            <option value="@(i+1900) optText">@(i + 1900)</option>
+                            <option value="@(i+1900)">@(i + 1900)</option>
                         }
                     </select>
                 </div>

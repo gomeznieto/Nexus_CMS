@@ -4,7 +4,6 @@ using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
 using Backend_portafolio.Datos;
 using Backend_portafolio.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +13,10 @@ namespace Backend_portafolio.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<User> _userManager;
-        private readonly IRepositoryRole _repositoryRole;
-        private readonly IRepositoryBio _repositoryBio;
-        private readonly SignInManager<User> _signInManager;
         private readonly IUsersService _usersService;
         private readonly IRepositoryUsers _repositoryUsers;
         private readonly IRepositorySocialNetwork _repositorySocialNetwork;
-        private readonly IImageService _imageService;
+        private readonly IBioService _bioService;
         private readonly IMapper _mapper;
 
         public UsersController(
@@ -32,39 +28,27 @@ namespace Backend_portafolio.Controllers
             IRepositoryUsers repositoryUsers,
             IRepositorySocialNetwork repositorySocialNetwork,
             IImageService imageService,
+            IBioService bioService,
             IMapper mapper
             )
         {
             _userManager = userManager;
-            _repositoryRole = repositoryRole;
-            _repositoryBio = repositoryBio;
-            _signInManager = signInManager;
             _usersService = usersService;
             _repositoryUsers = repositoryUsers;
             _repositorySocialNetwork = repositorySocialNetwork;
-            _imageService = imageService;
+            _bioService = bioService;
             _mapper = mapper;
         }
 
-        /*
-         ========================================
 
-        = REGISTRO DE USUARIO
-
-        Unicamente el admin tiene la autorización para poder crear nuevos usuarios
-
-         ========================================
-         */
+        //****************************************************
+        //********************* REGISTER *********************
+        //****************************************************
 
         [HttpGet]
         public async Task<IActionResult> Register()
         {
-
-            RegisterViewModel viewModel = new RegisterViewModel();
-
-            // Obtener roles
-            viewModel.roles = (await _repositoryRole.Obtener()).ToList();
-
+            var viewModel = await _usersService.GetRegisterViewModel();
             return View(viewModel);
         }
 
@@ -73,50 +57,25 @@ namespace Backend_portafolio.Controllers
         {
             if (!ModelState.IsValid)
             {
-                viewModel.roles = (await _repositoryRole.Obtener()).ToList();
-
+                viewModel = await _usersService.GetRegisterViewModel(viewModel);
                 return View(viewModel);
             }
 
-            User user = await _signInManager.UserManager.GetUserAsync(User);
-            Role adminRole = (await _repositoryRole.Obtener()).FirstOrDefault(x => x.name == "admin");
-
-            // Verificamos que el Rol sea de Admin para que pueda registrar un nuevo cliente
-            if (adminRole != null && user.role != adminRole.id)
+            try
             {
-                viewModel.roles = (await _repositoryRole.Obtener()).ToList();
-
-                return View(viewModel);
+                await _usersService.CreateUser(viewModel);
+                return RedirectToAction("Index", "Home");
             }
-
-            var usuario = new User() { email = viewModel.Email, name = viewModel.Name, role = viewModel.role };
-
-            var result = await _userManager.CreateAsync(usuario, password: viewModel.Password);
-
-            if (result.Succeeded)
+            catch (Exception ex)
             {
-                //await _signInManager.SignInAsync(usuario, isPersistent: true); //Línea de código para loggearse con el user recién creado. Al ser creado solo por el admin esto no serí necesario
-                return RedirectToAction("index", "home");
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
             }
-            else
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-
-                return View(viewModel);
-            }
-
         }
 
-        /*
-         ========================================
-
-        = LOGIN
-
-         ========================================
-         */
+        //****************************************************
+        //********************** LOGIN ***********************
+        //****************************************************
 
         [AllowAnonymous]
         [HttpGet]
@@ -130,135 +89,120 @@ namespace Backend_portafolio.Controllers
         public async Task<IActionResult> Login(LoginViewModel viewModel)
         {
             if (!ModelState.IsValid)
-            {
                 return View(viewModel);
-            }
 
-            var result = await _signInManager.PasswordSignInAsync(viewModel.Email, viewModel.Password, viewModel.RememberMe, lockoutOnFailure: false);
-
-            if (result.Succeeded)
+            try
             {
-                return RedirectToAction("index", "home");
+                await _usersService.LoginUser(viewModel);
+                return RedirectToAction("Index", "Home");
             }
-            else
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Nombre del usuario o password incorrectos");
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
                 return View(viewModel);
             }
         }
 
 
-        /*
-         ========================================
-
-        = LOGOUT
-
-        Método para salir del usuario
-
-         ========================================
-         */
+        //****************************************************
+        //********************** LOGOUT **********************
+        //****************************************************
 
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
-            return RedirectToAction("Index", "Home");
+            try
+            {
+                await _usersService.LogoutUser();
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
 
-        /*
-         ========================================
-
-        = CONFIGURACION
-
-         ========================================
-         */
+        //****************************************************
+        //********************* CONFIGURE ********************
+        //****************************************************
 
         [HttpGet]
         public async Task<IActionResult> Configuracion()
         {
-            User user = await _signInManager.UserManager.GetUserAsync(User);
+            try
+            {
+                var viewModel = await _usersService.GetUserViewModel();
+                return View(viewModel);
 
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
 
-            UserViewModel viewModel = _mapper.Map<UserViewModel>(user);
-
-            viewModel.RoleName = (await _repositoryRole.Obtener()).Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
-
-            return View(viewModel);
         }
 
 
-        /*
-         ========================================
+        //****************************************************
+        //********************* PROFILE **********************
+        //****************************************************
 
-        = PERFIL
-
-         ========================================
-         */
         [HttpGet]
         public async Task<IActionResult> Perfil()
         {
-            User user = await _signInManager.UserManager.GetUserAsync(User);
-            UserViewModel viewModel = _mapper.Map<User, UserViewModel>(user);
-            viewModel.RoleName = (await _repositoryRole.Obtener()).Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
+            try
+            {
+                var viewModel = await _usersService.GetUserViewModel();
+                return View(viewModel);
 
-            return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
 
-        /*
-         ========================================
-
-        = BIO
-
-         ========================================
-         */
+        //****************************************************
+        //*********************** BIO ************************
+        //****************************************************
         [HttpGet]
         public async Task<IActionResult> Bio()
         {
             try
             {
-                var usuarioID = _usersService.ObtenerUsuario();
-                BioViewModel viewModel = new BioViewModel();
-                viewModel.Bios = (await _repositoryBio.Obtener(usuarioID)).OrderByDescending(x => x.year).ToList();
-
+                var viewModel = await _bioService.GetBioViewModel();
                 return View(viewModel);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Crear mensaje de error para modal
-                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Users" };
-                Session.ErrorSession(HttpContext, errorModal);
-
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
                 return RedirectToAction("Index", "Home");
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Bio(Bio bio)
+        public async Task<IActionResult> Bio(BioViewModel viewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                viewModel = await _bioService.GetBioViewModel(viewModel);
+                return View(viewModel);
+            }
+
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return View(bio);
-                }
-
-                var usuarioID = _usersService.ObtenerUsuario();
-
-                bio.user_id = usuarioID;
-                await _repositoryBio.Agregar(bio);
-
+                await _bioService.CreateBio(viewModel);
                 Session.CrearModalSuccess("Se ha creado la bio con éxito", "Users", HttpContext);
-
                 return RedirectToAction("Bio");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Crear mensaje de error para modal
-                var errorModal = new ModalViewModel { message = "Ha surgido un error. ¡Intente más tarde!", type = true, path = "Users" };
-                Session.ErrorSession(HttpContext, errorModal);
-
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
                 return RedirectToAction("Index", "Home");
             }
         }
@@ -268,208 +212,82 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                var usuarioID = _usersService.ObtenerUsuario();
-
-                var bio = await _repositoryBio.ObtenerPorId(id, usuarioID);
-
-                if (bio == null || usuarioID != bio.user_id)
-                {
-                    return Json(new { error = true, mensaje = "La bio no se pudo borrar.\n¡Se ha producido un error!" });
-                }
-
-                await _repositoryBio.Borrar(id, usuarioID);
-
+                await _bioService.DeleteBio(id);
                 return Json(new { error = false, mensaje = "¡La bio ha sido borrada correctamente!" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Json(new { error = true, mensaje = "La bio no se pudo borrar.\n¡Se ha producido un error!" });
-
+                return Json(new { error = true, mensaje = ex.Message });
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Editar(Bio bio)
+        public async Task<IActionResult> Editar(BioViewModel viewmodel)
         {
+            if (!ModelState.IsValid)
+                return View(viewmodel);
+
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return View(bio);
-                }
-
-                var usuarioID = _usersService.ObtenerUsuario();
-
-                if (usuarioID != bio.user_id)
-                {
-                    return RedirectToAction("Bio");
-                }
-
-                await _repositoryBio.Editar(bio);
-
+                await _bioService.EditBio(viewmodel);
                 Session.CrearModalSuccess("Se ha modificado la bio con éxito", "Users", HttpContext);
-
                 return RedirectToAction("Bio");
             }
             catch (Exception)
             {
-                //Crear mensaje de error para modal
                 Session.CrearModalError("Ha surgido un error. ¡Intente más tarde!", "Users", HttpContext);
-
                 return RedirectToAction("Bio");
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ObtenerBio(int id)
-        {
-            var usuarioID = _usersService.ObtenerUsuario();
-            var bio = await _repositoryBio.ObtenerPorId(id, usuarioID);
 
-            if (bio == null)
-            {
-                return Json(new { error = true, mensaje = "La bio no se pudo obtener.\n¡Se ha producido un error!" });
-            }
-
-            return Json(new { error = false, bio });
-        }
-
-        /*
-        ========================================
-
-        = USER
-
-        Edición del perfil del usuario
-
-        ========================================
-        */
-
+        //****************************************************
+        //*********************** USER ***********************
+        //****************************************************
 
         [HttpPost]
         public async Task<IActionResult> EditarUser(UserViewModel ViewModel)
         {
             try
             {
-                var usuarioID = _usersService.ObtenerUsuario();
-                var usuario = await _repositoryUsers.BuscarPorId(usuarioID);
-
-                User usuarioEdit = _mapper.Map<User>(ViewModel);
-
-                if (ViewModel.ImageFile != null)
-                {
-                    usuarioEdit.img = await _imageService.UploadImageAsync(ViewModel.ImageFile, usuario, "profile-images");
-                }
-                else
-                {
-                    usuarioEdit.img = usuario.img;
-                }
-
-                var result = await _userManager.UpdateAsync(usuarioEdit);
-
-                if (result.Succeeded)
-                {
-                    //Crear mensaje de error para modal
-                    var successModal = new ModalViewModel { message = "El perfil ha sido guardado exitosamente", type = true, path = "Users" };
-                    Session.SuccessSession(HttpContext, successModal);
-
-                    return RedirectToAction("Perfil");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-
-                }
-                return View(ViewModel);
+                await _usersService.EditUser(ViewModel);
+                Session.CrearModalSuccess("El perfil ha sido guardado exitosamente", "Users", HttpContext);
+                return RedirectToAction("Perfil");
             }
-            catch (ArgumentException argument)
+            catch (Exception argument)
             {
-                //Crear mensaje de error para modal
-                var errorModal = new ModalViewModel { message = argument.Message, type = true, path = "Users" };
-                Session.ErrorSession(HttpContext, errorModal);
-
+                Session.CrearModalError(argument.Message, "Users", HttpContext);
                 return RedirectToAction("Perfil");
             }
         }
 
-        /*
-         ========================================
-
-        = MODIFICAR PASS
-
-         ========================================
-         */
-
+        //****************************************************
+        //*********************** PASS ***********************
+        //****************************************************
         [HttpPost]
         public async Task<IActionResult> EditarPass(UserViewModel viewModel)
         {
 
+            if (!ModelState.IsValid)
+                return View(viewModel);
+
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return View(viewModel);
-                }
-
-                // Obtenemos el usuario
-                var usuarioID = _usersService.ObtenerUsuario();
-                var usuario = await _userManager.FindByIdAsync(usuarioID.ToString());
-
-                // Si el usuario es nulo, redirigimos a la configuración
-                if (usuario == null)
-                {
-                    return RedirectToAction("Configuracion");
-                }
-
-                // Verificamos que la contraseña actual sea correcta
-                var isValidPassword = await _userManager.CheckPasswordAsync(usuario, viewModel.password);
-
-                if (!isValidPassword)
-                {
-                    Session.CrearModalError("La contraseña no pudo ser modificada. Intente más tarde!", "Users", HttpContext);
-
-                    return RedirectToAction("Configuracion");
-                }
-
-                // Cambiamos la contraseña
-                bool result = await _repositoryUsers.EditarPass(usuario, viewModel.passwordNuevo);
-
-                // Verificamos si la contraseña fue cambiada
-                usuario = await _userManager.FindByIdAsync(usuarioID.ToString());
-
-                var isPasswordChanged = await _userManager.CheckPasswordAsync(usuario, viewModel.passwordNuevo);
-
-                // Si la contraseña no fue cambiada, redirigimos a la configuración
-                if (!isPasswordChanged)
-                {
-                    Session.CrearModalError("La contraseña no pudo ser modificada. Intente más tarde!", "Users", HttpContext);
-
-                    return RedirectToAction("Configuracion");
-                }
-
-                // Mensaje de éxito
+                await _usersService.ChangePassword(viewModel);
                 Session.CrearModalSuccess("La contraseña ha sido cambiada exitosamente", "Users", HttpContext);
-
                 return RedirectToAction("Configuracion");
-
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Session.CrearModalError("La contraseña no pudo ser modificada. Intente más tarde!", "Users", HttpContext);
-
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
                 return RedirectToAction("Configuracion");
             }
         }
 
-        /*
-         ========================================
+        //****************************************************
+        //********************* NETWORKS *********************
+        //****************************************************
 
-        = REDES
-
-         ========================================
-         */
         [HttpGet]
         public async Task<IActionResult> Redes()
         {
@@ -530,7 +348,7 @@ namespace Backend_portafolio.Controllers
         {
             Entities.SocialNetwork socialNetwork = _mapper.Map(viewModel, new Entities.SocialNetwork());
 
-           var editado =  await _repositorySocialNetwork.Editar(socialNetwork);
+            var editado = await _repositorySocialNetwork.Editar(socialNetwork);
 
             if (!editado)
             {
@@ -567,13 +385,9 @@ namespace Backend_portafolio.Controllers
         }
 
 
-        /*
-         ========================================
-
-        = FUNCIONES
-
-         ========================================
-         */
+        //****************************************************
+        //********************* FUNCIONES ********************
+        //****************************************************
 
 
         // Verificar si el Email existe

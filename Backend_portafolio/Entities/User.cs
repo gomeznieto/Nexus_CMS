@@ -23,6 +23,7 @@ namespace Backend_portafolio.Entities
         public string email { get; set; }
         public string emailNormalizado { get; set; }
         public string passwordHash { get; set; }
+        public string apiKey { get; set; }
 
     }
 }

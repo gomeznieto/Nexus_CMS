@@ -11,6 +11,7 @@
 <div class="w-100 p-1 row gap-3">
     <form method="post" asp-action="EditarUser" asp-controller="Users" class="mt-2 col-6 p-2" enctype="multipart/form-data">
         <input type="hidden" asp-for="@Model.id" />
+        <input type="hidden" asp-for="@Model.email" />
         <input type="hidden" asp-for="@Model.role" />
         <!-- IMAGEN -->
         <div class="d-flex align-items-center mt-2 ">
