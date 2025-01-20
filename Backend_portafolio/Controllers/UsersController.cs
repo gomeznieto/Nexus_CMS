@@ -15,29 +15,22 @@ namespace Backend_portafolio.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IUsersService _usersService;
         private readonly IRepositoryUsers _repositoryUsers;
-        private readonly IRepositorySocialNetwork _repositorySocialNetwork;
         private readonly IBioService _bioService;
-        private readonly IMapper _mapper;
+        private readonly INetworkService _networkService;
 
         public UsersController(
             UserManager<User> userManager,
-            IRepositoryRole repositoryRole,
-            IRepositoryBio repositoryBio,
-            SignInManager<User> signInManager,
             IUsersService usersService,
-            IRepositoryUsers repositoryUsers,
-            IRepositorySocialNetwork repositorySocialNetwork,
-            IImageService imageService,
             IBioService bioService,
-            IMapper mapper
+            INetworkService networkService,
+            IRepositoryUsers repositoryUsers
             )
         {
             _userManager = userManager;
             _usersService = usersService;
             _repositoryUsers = repositoryUsers;
-            _repositorySocialNetwork = repositorySocialNetwork;
             _bioService = bioService;
-            _mapper = mapper;
+            _networkService = networkService;
         }
 
 
@@ -291,39 +284,35 @@ namespace Backend_portafolio.Controllers
         [HttpGet]
         public async Task<IActionResult> Redes()
         {
-            //Usuario
-            var usuarioID = _usersService.ObtenerUsuario();
-
-            // Redes
-            var viewModel = new SocialNetworkViewModel();
-            viewModel.Networks = (await _repositorySocialNetwork.ObtenerPorUsuario(usuarioID)).ToList();
-            return View(viewModel);
+            try
+            {
+                var viewModel = await _networkService.GetSocialNetworkViewModel();
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Redes(SocialNetworkViewModel viewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return View(viewModel);
-                }
-
-                var usuarioID = _usersService.ObtenerUsuario();
-
-                viewModel.user_id = usuarioID;
-                await _repositorySocialNetwork.Agregar(viewModel);
-
+                await _networkService.CreteSocialNetwork(viewModel);
                 Session.CrearModalSuccess("Se ha creado la Red Social con éxito", "Users", HttpContext);
-
                 return RedirectToAction("Redes");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Crear mensaje de error para modal
-                Session.CrearModalError("Ha surgido un error. ¡Intente más tarde!", "Users", HttpContext);
-
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
                 return RedirectToAction("Index", "Home");
             }
         }
@@ -331,32 +320,33 @@ namespace Backend_portafolio.Controllers
         [HttpGet]
         public async Task<IActionResult> ObtenerRedes(int id)
         {
-            var usuarioID = _usersService.ObtenerUsuario();
-            var bio = await _repositorySocialNetwork.ObtenerPorId(id, usuarioID);
-
-            if (bio == null)
+            try
             {
-                return Json(new { error = true, mensaje = "La bio no se pudo obtener.\n¡Se ha producido un error!" });
+                var bio = await _networkService.GetSocialNetworkById(id);
+                return Json(new { error = false, bio });
             }
-
-            return Json(new { error = false, bio });
+            catch (Exception ex)
+            {
+                return Json(new { error = true, mensaje = ex.Message });
+            }
 
         }
 
         [HttpPost]
         public async Task<IActionResult> EditarRedes(SocialNetworkViewModel viewModel)
         {
-            Entities.SocialNetwork socialNetwork = _mapper.Map(viewModel, new Entities.SocialNetwork());
-
-            var editado = await _repositorySocialNetwork.Editar(socialNetwork);
-
-            if (!editado)
+            try
             {
-                Session.CrearModalError("La red social no pudo ser modificada. Intente más tarde!", "Users", HttpContext);
+                await _networkService.EditSocialNetwork(viewModel);
+                Session.CrearModalSuccess("La red social ha sido modificada exitosamente", "Users", HttpContext);
                 return RedirectToAction("Redes");
             }
-            Session.CrearModalSuccess("La red social ha sido modificada exitosamente", "Users", HttpContext);
-            return RedirectToAction("Redes");
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
+
+            }
         }
 
         [HttpPost]
@@ -364,23 +354,12 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                var usuarioID = _usersService.ObtenerUsuario();
-
-                var bio = await _repositorySocialNetwork.ObtenerPorId(id, usuarioID);
-
-                if (bio == null || usuarioID != bio.user_id)
-                {
-                    return Json(new { error = true, mensaje = "La bio no se pudo borrar.\n¡Se ha producido un error!" });
-                }
-
-                await _repositorySocialNetwork.Borrar(id, usuarioID);
-
+                await _networkService.DeleteSocialNetwork(id);
                 return Json(new { error = false, mensaje = "¡La bio ha sido borrada correctamente!" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Json(new { error = true, mensaje = "La bio no se pudo borrar.\n¡Se ha producido un error!" });
-
+                return Json(new { error = true, mensaje = ex.Message });
             }
         }
 

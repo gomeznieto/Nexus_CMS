@@ -45,6 +45,7 @@
         <!-- AGREGAR RED SOCIAL -->
         <button class="btn btn-action" id="btnAddRedes" onclick="showForm()"><i class="fa-solid fa-plus me-2"></i>Agregar Red Social</button>
         <form class="hide" id="formAddRedes" asp-action="Redes" asp-controller="Users">
+            <input type="hidden" asp-for="@Model.user_id" />
             <!-- VALIDATION -->
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <div class="mt-2">
