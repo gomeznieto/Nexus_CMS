@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
+using System.Runtime.CompilerServices;
 
 namespace Backend_portafolio.Services
 {
@@ -19,6 +20,9 @@ namespace Backend_portafolio.Services
         Task LoginUser(LoginViewModel viewModel);
         Task LogoutUser();
         int ObtenerUsuario();
+        Task VerifyEmail(string email);
+        Task verifyNewPassword(string newPass, string repeatNewPass);
+        Task verifyPassword(string pass);
     }
 
     public class UsersService : IUsersService
@@ -55,7 +59,10 @@ namespace Backend_portafolio.Services
         //*********************** GETS ***********************
         //****************************************************
 
-        // Obtener el usuario autenticado
+        /**
+         * Obtiene el id del usuario autenticado
+         * @return id del usuario
+         */
         public int ObtenerUsuario()
         {
             if (_httpContext.User.Identity.IsAuthenticated)
@@ -70,7 +77,10 @@ namespace Backend_portafolio.Services
             }
         }
 
-        // Obtener los datos del usuario
+        /**
+         * Obtiene los datos del usuario autenticado
+         * @return Usuario
+         */
         public async Task<User> GetDataUser()
         {
             try
@@ -87,7 +97,11 @@ namespace Backend_portafolio.Services
             }
         }
 
-        // Obtener el viewmodel para el registro
+        /**
+         * Obtiene el modelo de vista de registro
+         * @param viewModel Modelo de vista de registro
+         * @return Modelo de vista de registro
+         */
         public async Task<RegisterViewModel> GetRegisterViewModel(RegisterViewModel viewModel = null)
         {
             try
@@ -104,6 +118,10 @@ namespace Backend_portafolio.Services
 
         }
 
+        /**
+         * Obtiene el modelo de vista de usuario
+         * @return Modelo de vista de usuario
+         */
         public async Task<UserViewModel> GetUserViewModel()
         {
             try
@@ -123,6 +141,10 @@ namespace Backend_portafolio.Services
         //********************** CREATE **********************
         //****************************************************
 
+        /**
+         * Crea un nuevo usuario
+         * @param viewModel Modelo de vista de registro
+         */
         public async Task CreateUser(RegisterViewModel viewModel)
         {
             try
@@ -156,6 +178,10 @@ namespace Backend_portafolio.Services
         //*********************** EDIT ***********************
         //****************************************************
 
+        /**
+         * Edita un usuario
+         * @param viewModel Modelo de vista de usuario
+         */
         public async Task EditUser(UserViewModel viewModel)
         {
             try
@@ -185,6 +211,10 @@ namespace Backend_portafolio.Services
         //********************** LOGIN ***********************
         //****************************************************
 
+        /**
+         * Inicia sesión de un usuario
+         * @param viewModel Modelo de vista de login
+         */
         public async Task LoginUser(LoginViewModel viewModel)
         {
             try
@@ -207,6 +237,9 @@ namespace Backend_portafolio.Services
         //********************** LOGOUT **********************
         //****************************************************
 
+        /**
+         * Cierra la sesión de un usuario
+         */
         public async Task LogoutUser()
         {
             try
@@ -224,6 +257,10 @@ namespace Backend_portafolio.Services
         //*********************** PASS ***********************
         //****************************************************
 
+        /**
+         * Cambia la contraseña de un usuario
+         * @param viewModel Modelo de vista de usuario
+         */
         public async Task ChangePassword(UserViewModel viewModel)
         {
             try
@@ -261,6 +298,75 @@ namespace Backend_portafolio.Services
             }
         }
 
+
+        //****************************************************
+        //********************* FUNCIONES ********************
+        //****************************************************
+
+        /**
+         * Verifica si un email ya existe
+         * @param email Email
+         */
+        public async Task VerifyEmail(string email)
+        {
+            try
+            {
+                var existEmail = await _repositoryUsers.Existe(email);
+
+                if (!existEmail)
+                    throw new ApplicationException($"El email \"{email}\" ya existe!\nIntente con otro.");
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
+        }
+
+        /**
+         * Verifica la contraseña de un usuario
+         * @param pass Contraseña
+         */
+        public async Task verifyPassword(string pass)
+        {
+            try
+            {
+                var userData = await GetDataUser();
+                var existePass = await _userManager.CheckPasswordAsync(userData, pass);
+
+                if (!existePass)
+                    throw new Exception("La contrasela es incorrecta");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        /**
+         * Verifica la nueva contraseña de un usuario
+         * @param newPass Nueva contraseña
+         * @param repeatNewPass Repetir nueva contraseña
+         */
+        public async Task verifyNewPassword(string newPass, string repeatNewPass)
+        {
+            try
+            {
+
+                if(newPass != repeatNewPass)
+                    throw new Exception("Las contraseñas no coinciden");
+
+                var userData = await GetDataUser();
+
+                var samePass = await _userManager.CheckPasswordAsync(userData, newPass);
+
+                if (samePass)
+                    throw new Exception("La nueva contraseña no puede ser igual a la anterior");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
     }
 

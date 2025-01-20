@@ -510,6 +510,7 @@ async function cargarRedes(id) {
     const response = await fetch(urlPost);
     const result = await response.json();
 
+
     // Verificar error
     if (result.error) {
         // Mostrar mensaje de error en el modal correspondiente
@@ -532,6 +533,7 @@ async function cargarRedes(id) {
     //Cargar URL
     let url = document.getElementById("formUrlEditar");
     url.value = result.bio.url;
+    console.log(user);
 
     // Cargar username
     let username = document.getElementById("formUsernameEditar");

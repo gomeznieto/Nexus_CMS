@@ -12,23 +12,17 @@ namespace Backend_portafolio.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly UserManager<User> _userManager;
         private readonly IUsersService _usersService;
-        private readonly IRepositoryUsers _repositoryUsers;
         private readonly IBioService _bioService;
         private readonly INetworkService _networkService;
 
         public UsersController(
-            UserManager<User> userManager,
             IUsersService usersService,
             IBioService bioService,
-            INetworkService networkService,
-            IRepositoryUsers repositoryUsers
+            INetworkService networkService
             )
         {
-            _userManager = userManager;
             _usersService = usersService;
-            _repositoryUsers = repositoryUsers;
             _bioService = bioService;
             _networkService = networkService;
         }
@@ -281,6 +275,7 @@ namespace Backend_portafolio.Controllers
         //********************* NETWORKS *********************
         //****************************************************
 
+        
         [HttpGet]
         public async Task<IActionResult> Redes()
         {
@@ -375,17 +370,13 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                var existeEmail = await _repositoryUsers.Existe(email);
-
-                if (existeEmail)
-                    return Json($"El nombre {email} ya existe!");
+                await _usersService.VerifyEmail(email);
 
                 return Json(true);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                return Json($"Se produjo un error al intentear validar {email}. Intente con otro nombre o en otro momento!");
+                return Json(ex.Message);
             }
 
         }
@@ -394,23 +385,14 @@ namespace Backend_portafolio.Controllers
         [HttpGet]
         public async Task<IActionResult> VerficarExistePass(string password)
         {
-
             try
             {
-                var usuarioID = _usersService.ObtenerUsuario();
-                var usuario = await _repositoryUsers.BuscarPorId(usuarioID);
-
-                var existePass = await _userManager.CheckPasswordAsync(usuario, password);
-
-                if (!existePass)
-                    return Json($"La contraseña es incorrecta");
-
+                await _usersService.verifyPassword(password);
                 return Json(true);
-
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Json($"La contraseña no es correcta");
+                return Json(ex.Message);
             }
         }
 
@@ -418,30 +400,14 @@ namespace Backend_portafolio.Controllers
         [AcceptVerbs("Get", "Post")]
         public async Task<IActionResult> VerificarPassNuevo(string passwordNuevo, string repetirPasswordNuevo)
         {
-
             try
             {
-                if (passwordNuevo is null || repetirPasswordNuevo is null)
-                    return Json("Las constraseñas deben ser iguales");
-
-                var usuarioID = _usersService.ObtenerUsuario();
-                var usuario = await _repositoryUsers.BuscarPorId(usuarioID);
-
-                // Verificamos que las constraseñas sean iguales
-                if (passwordNuevo != repetirPasswordNuevo)
-                    return Json($"La contraseña deben ser iguales");
-
-                // Verificamos que la contraseña sea diferente a la actual
-                var existePass = await _userManager.CheckPasswordAsync(usuario, passwordNuevo);
-                if (existePass)
-                    return Json($"La contraseña debe ser diferente a la actual");
-
+                await _usersService.verifyNewPassword(passwordNuevo, repetirPasswordNuevo);
                 return Json(true);
-
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Json($"La contraseña no es correcta");
+                return Json(ex.Message);
             }
         }
     }
