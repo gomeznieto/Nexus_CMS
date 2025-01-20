@@ -10,7 +10,7 @@ namespace Backend_portafolio.Sevices
         Task DeleteFormat(int id);
         Task EditFormat(Format format);
         Task<bool> Existe(string name);
-        Task<List<Format>> GetAllFormat();
+        Task<List<Format>> GetAllFormat(int userID = 0);
         Task<Format> GetFormatById(int id);
         Format GetFormatViewModel();
     }
@@ -37,9 +37,11 @@ namespace Backend_portafolio.Sevices
         //****************************************************
 
         // Obtener todos los formatos
-        public async Task<List<Format>> GetAllFormat()
+        public async Task<List<Format>> GetAllFormat(int userID = 0)
         {
-            var userID = _usersService.ObtenerUsuario();
+            if (userID == 0)
+                userID = _usersService.ObtenerUsuario();
+
             return (await _repositoryFormat.Obtener(userID)).ToList();
         }
 

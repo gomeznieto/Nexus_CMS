@@ -10,18 +10,18 @@ namespace Backend_portafolio.Sevices
 {
     public interface ICategoriaService
     {
-        Task CreateCategoriesForm(int id, List<CategoryForm> categoriesForms);
-        Task<IEnumerable<Categoria>> GetAllCategorias();
-        Task<List<Category_Post>> SerealizarJsonCategoryPost(string jsonCategoria);
-        public List<CategoryForm> SerealizarJsonCategoryForm(string jsonCategoria);
-        Task<IEnumerable<Category_Post>> GetCategoriasByPost(int post_id);
+        Task<IEnumerable<Categoria>> GetAllCategorias(int userID = 0);
         Task<List<Categoria>> GetCategoryByName(string buscar);
-        Task CreateCategories(Categoria category);
-        Task<Categoria> GetCategoriaById(int id);
         Categoria GetViewModel();
+        Task<IEnumerable<Category_Post>> GetCategoriasByPost(int post_id);
+        Task<Categoria> GetCategoriaById(int id);
+        Task CreateCategoriesForm(int id, List<CategoryForm> categoriesForms);
+        Task CreateCategories(Categoria category);
         Task EditCategory(Categoria category);
         Task DeleteCategory(int id);
         Task<bool> Existe(string name);
+        public List<CategoryForm> SerealizarJsonCategoryForm(string jsonCategoria);
+        Task<List<Category_Post>> SerealizarJsonCategoryPost(string jsonCategoria);
     }
 
     public class CategoriaService : ICategoriaService
@@ -43,9 +43,10 @@ namespace Backend_portafolio.Sevices
         //****************************************************
 
         // Obtener todas las categorías
-        public async Task<IEnumerable<Categoria>> GetAllCategorias()
+        public async Task<IEnumerable<Categoria>> GetAllCategorias(int userID = 0)
         {
-            var userID = _usersService.ObtenerUsuario();
+            if(userID == 0)
+                userID = _usersService.ObtenerUsuario();
 
             var categorias = await _repositoryCategorias.Obtener(userID);
 

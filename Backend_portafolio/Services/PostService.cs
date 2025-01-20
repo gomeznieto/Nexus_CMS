@@ -15,7 +15,7 @@ namespace Backend_portafolio.Sevices
         Task CreatePost(Post viewModel);
         Task EditPost(PostViewModel viewModel);
         Task DeletePost(int id);
-        Task<List<Post>> GetAllPosts();
+        Task<List<Post>> GetAllPosts(int userID = 0);
         Task<List<Post>> GetAllPosts(string format, int pagina);
         Task<Post> GetPostById(int id);
         Task<PostViewModel> GetPostViewModel(string format, PostViewModel v = null);
@@ -77,12 +77,15 @@ namespace Backend_portafolio.Sevices
         //******************* OBTENER POSTS ******************
         //****************************************************
 
-        public async Task<List<Post>> GetAllPosts()
+        public async Task<List<Post>> GetAllPosts(int userID = 0)
         {
             try
             {
-                var usuarioID = _usersService.ObtenerUsuario();
-                return (await _repositoryPosts.Obtener(usuarioID)).ToList();
+                
+                if(userID == 0)
+                    userID = _usersService.ObtenerUsuario();
+
+                return (await _repositoryPosts.Obtener(userID)).ToList();
             }
             catch (Exception ex)
             {

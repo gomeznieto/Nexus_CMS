@@ -10,7 +10,7 @@ namespace Backend_portafolio.Sevices
         Task DeleteMediaType(int id);
         Task EditMediaType(MediaType viewModel);
         Task<bool> ExisteMediaType(string mediaType);
-        Task<IEnumerable<MediaType>> GetAllMediaType();
+        Task<IEnumerable<MediaType>> GetAllMediaType(int userID = 0);
         Task<MediaType> GetMediaTypeById(int id);
         MediaType GetMediaTypeViewModel();
     }
@@ -31,11 +31,13 @@ namespace Backend_portafolio.Sevices
         //****************************************************
         //*********************** GETS ***********************
         //****************************************************
-        public async Task<IEnumerable<MediaType>> GetAllMediaType()
+        public async Task<IEnumerable<MediaType>> GetAllMediaType(int userID = 0)
         {
             try
             {
-                var userID = _usersService.ObtenerUsuario();
+                if(userID == 0)
+                    userID = _usersService.ObtenerUsuario();
+
                 return await _repositoryMediatype.Obtener(userID);
             }
             catch (Exception ex)

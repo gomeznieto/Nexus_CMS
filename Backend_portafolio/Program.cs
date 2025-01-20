@@ -20,11 +20,13 @@ builder.Services.AddControllersWithViews(options =>
 });
 builder.Services.AddSession();
 
+
 //****************************************************
 //***************** USER SERVICES ********************
 //****************************************************
 builder.Services.AddTransient<IUserStore<User>, UsersStore>();
 builder.Services.AddTransient<SignInManager<User>>();
+
 
 //****************************************************
 //*********************** DATA ***********************
@@ -41,6 +43,7 @@ builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
 builder.Services.AddTransient<IRepositoryBio, RepositoryBio>();
 builder.Services.AddTransient<IRepositorySocialNetwork, RepositorySocialNetwork>();
 
+
 //****************************************************
 //********************* SERVICES *********************
 //****************************************************
@@ -56,6 +59,9 @@ builder.Services.AddTransient<IMediaService, MediaService>();
 builder.Services.AddTransient<IHomeService, HomeService>();
 builder.Services.AddTransient<IBioService, BioService>();
 builder.Services.AddTransient<INetworkService, NetworkService>();
+builder.Services.AddTransient<IApiService, ApiService>();
+builder.Services.AddTransient<ITokenService, TokenService>();
+
 
 //****************************************************
 //********************** AUTH ************************
@@ -102,17 +108,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseSession();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}");

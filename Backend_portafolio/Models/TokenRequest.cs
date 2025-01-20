@@ -1,4 +1,4 @@
-﻿namespace Backend_portafolio.Services
+﻿namespace Backend_portafolio.Models
 {
     public class TokenRequest
     {

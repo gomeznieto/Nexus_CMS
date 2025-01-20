@@ -1,12 +1,11 @@
 ﻿using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
-using Backend_portafolio.Helper;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
-using System.Runtime.CompilerServices;
+
 
 namespace Backend_portafolio.Services
 {
@@ -16,6 +15,7 @@ namespace Backend_portafolio.Services
         Task CreateUser(RegisterViewModel viewModel);
         Task EditUser(UserViewModel viewModel);
         Task<RegisterViewModel> GetRegisterViewModel(RegisterViewModel viewModel = null);
+        Task<User> GetUserByApiKey(string apiKey);
         Task<UserViewModel> GetUserViewModel();
         Task LoginUser(LoginViewModel viewModel);
         Task LogoutUser();
@@ -32,6 +32,7 @@ namespace Backend_portafolio.Services
         private readonly IRepositoryUsers _repositoryUsers;
         private readonly SignInManager<User> _signInManager;
         private readonly IMapper _mapper;
+        private readonly ITokenService _tokenService;
         private readonly IImageService _imageService;
         private readonly HttpContext _httpContext;
 
@@ -42,6 +43,7 @@ namespace Backend_portafolio.Services
             IHttpContextAccessor httpContextAccessor,
             SignInManager<User> MySignInManager,
             IMapper mapper,
+            ITokenService tokenService,
             IImageService imageService
             )
         {
@@ -51,6 +53,7 @@ namespace Backend_portafolio.Services
             _repositoryUsers = repositoryUsers;
             _signInManager = MySignInManager;
             _mapper = mapper;
+            _tokenService = tokenService;
             _imageService = imageService;
         }
 
@@ -65,15 +68,22 @@ namespace Backend_portafolio.Services
          */
         public int ObtenerUsuario()
         {
-            if (_httpContext.User.Identity.IsAuthenticated)
+            try
             {
-                var idClaim = _httpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault();
-                var id = int.Parse(idClaim.Value);
-                return id;
-            }
-            else
-            {
+                if (_httpContext.User.Identity.IsAuthenticated)
+                {
+                    var idClaim = _httpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault();
+                    var id = int.Parse(idClaim.Value);
+                    return id;
+                }
+
                 throw new ApplicationException("El usuario no está autenticado");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
             }
         }
 
@@ -149,20 +159,22 @@ namespace Backend_portafolio.Services
         {
             try
             {
+                User currentUser = await GetDataUser();
 
-                //Obtenemos el usuario autenticado que está creando al nuevo usuario
-                User currentUser = await _signInManager.UserManager.GetUserAsync(_httpContext.User);
-
+                // Validar que el usuario tenga permisos para poder crear un usuario
                 Role adminRole = (await _repositoryRole.Obtener()).FirstOrDefault(x => x.name == "admin");
 
                 if (adminRole != null && currentUser.role != adminRole.id)
                     throw new ApplicationException("No tienes permisos para registrar un nuevo usuario");
 
+                // Creamos el nuevo usuario
                 var newUSer = new User() { email = viewModel.Email, name = viewModel.Name, role = viewModel.role };
-                newUSer.apiKey = ApiKey.GenerateApiKey();
+
+                newUSer.apiKey = _tokenService.GenerateApiKey();
 
                 var result = await _userManager.CreateAsync(newUSer, password: viewModel.Password);
 
+                // SI no se pudo crear el usuario
                 if (!result.Succeeded)
                     throw new ApplicationException("Error al registrar el usuario");
 
@@ -287,9 +299,31 @@ namespace Backend_portafolio.Services
                 //Validar que la constraseña se haya guardado correctamente
                 currentUser = await _userManager.FindByIdAsync(currentUser.id.ToString());
                 var isPasswordChanged = await _userManager.CheckPasswordAsync(currentUser, viewModel.passwordNuevo);
-                
+
                 if (!isPasswordChanged)
                     throw new ApplicationException("Error al cambiar la contraseña");
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        //****************************************************
+        //*********************** API ************************
+        //****************************************************
+
+        public async Task<User> GetUserByApiKey(string apiKey)
+        {
+            try
+            {
+                var user = await _repositoryUsers.ObtenerUsuarioPorApiKey(apiKey);
+
+                if (user == null)
+                    throw new ApplicationException("Usuario no encontrado");
+
+                return user;
 
             }
             catch (Exception ex)
@@ -352,7 +386,7 @@ namespace Backend_portafolio.Services
             try
             {
 
-                if(newPass != repeatNewPass)
+                if (newPass != repeatNewPass)
                     throw new Exception("Las contraseñas no coinciden");
 
                 var userData = await GetDataUser();

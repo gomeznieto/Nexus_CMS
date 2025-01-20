@@ -26,6 +26,7 @@ namespace Backend_portafolio.Sevices
             CreateMap<SocialNetworkViewModel, SocialNetwork>();
 
             CreateMap<BioViewModel, Bio>();
+            CreateMap<User, UserApiViewModel>();
         }
     }
 }
