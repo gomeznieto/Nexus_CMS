@@ -32,8 +32,9 @@ namespace Backend_portafolio.Datos
         Task EditarBorrador(int id, bool editar);
         Task<IEnumerable<Post>> Obtener(int user_id);
         Task<int> ObtenerCantidadPorFormato(string formato);
+        Task<int> ObtenerCantidadPorUsuario(int user_id);
         Task<IEnumerable<Post>> ObtenerPorFormato(string name, int cant, int page, int user_id);
-        Task<Post> ObtenerPorId(int id);
+        Task<Post> ObtenerPorId(int id, int id_user);
     }
 
     public class RepositoryPosts : IRepositoryPosts
@@ -97,7 +98,7 @@ namespace Backend_portafolio.Datos
             return postList;
         }
 
-        public async Task<Post> ObtenerPorId(int id)
+        public async Task<Post> ObtenerPorId(int id, int user_id)
         {
             using var connection = new SqlConnection(_connectionString);
             return await connection.QueryFirstOrDefaultAsync<Post>($@"
@@ -107,7 +108,8 @@ namespace Backend_portafolio.Datos
 								INNER JOIN users U ON P.{POST.USER_ID} = U.id
 								INNER JOIN {FORMAT.TABLA}
 								F ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
-								WHERE P.{POST.ID} = @{POST.ID}", new { id });
+								WHERE P.{POST.ID} = @{POST.ID}
+                                AND P.{POST.USER_ID} = @{POST.USER_ID};", new { id, user_id });
         }
 
         public async Task<int> ObtenerCantidadPorFormato(string name)
@@ -118,6 +120,14 @@ namespace Backend_portafolio.Datos
 															INNER JOIN {FORMAT.TABLA} F
 															ON P.{POST.FORMAT_ID} = F.{FORMAT.ID}
 															WHERE F.{FORMAT.NOMBRE} = @{FORMAT.NOMBRE}", new { name });
+        }
+
+        public async Task<int> ObtenerCantidadPorUsuario(int user_id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QueryFirstAsync<int>($@"SELECT COUNT(P.{POST.ID}) 
+                                                            FROM {POST.TABLA} P
+                                                            WHERE P.{POST.USER_ID} = @{POST.USER_ID}", new { user_id });
         }
 
         public async Task Editar(Post post)

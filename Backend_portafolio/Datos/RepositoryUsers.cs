@@ -107,7 +107,7 @@ namespace Backend_portafolio.Datos
         {
             using var connection = new SqlConnection(_connectionString);
 
-            var user = connection.QuerySingleOrDefault<User>(
+            var user = await connection.QuerySingleOrDefaultAsync<User>(
                 "SELECT * FROM users WHERE apiKey = @apiKey",
                 new { apiKey });
 
@@ -116,13 +116,20 @@ namespace Backend_portafolio.Datos
 
         public async Task<User> ObtenerUsuarioPorApiKey(string apiKey)
         {
-            using var connection = new SqlConnection(_connectionString);
+            try
+            {
+                using var connection = new SqlConnection(_connectionString);
 
-            var user = connection.QuerySingleOrDefault<User>(
-                "SELECT * FROM users WHERE apiKey = @apiKey",
-                new { apiKey });
+                var user = await connection.QuerySingleOrDefaultAsync<User>(
+                    "SELECT * FROM users WHERE apiKey = @apiKey",
+                    new { apiKey });
 
-            return user;
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

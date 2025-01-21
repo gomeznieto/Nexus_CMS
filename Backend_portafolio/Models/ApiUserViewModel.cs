@@ -1,7 +1,7 @@
 ﻿using Backend_portafolio.Entities;
 namespace Backend_portafolio.Models
 {
-    public class UserApiViewModel
+    public class ApiUserViewModel
     {
         public string name { get; set; }
         public string img { get; set; }

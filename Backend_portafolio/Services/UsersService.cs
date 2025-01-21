@@ -11,50 +11,50 @@ namespace Backend_portafolio.Services
 {
     public interface IUsersService
     {
+        int ObtenerUsuario();
         Task ChangePassword(UserViewModel viewModel);
         Task CreateUser(RegisterViewModel viewModel);
         Task EditUser(UserViewModel viewModel);
-        Task<RegisterViewModel> GetRegisterViewModel(RegisterViewModel viewModel = null);
-        Task<User> GetUserByApiKey(string apiKey);
-        Task<UserViewModel> GetUserViewModel();
         Task LoginUser(LoginViewModel viewModel);
         Task LogoutUser();
-        int ObtenerUsuario();
         Task VerifyEmail(string email);
         Task verifyNewPassword(string newPass, string repeatNewPass);
         Task verifyPassword(string pass);
+        Task<RegisterViewModel> GetRegisterViewModel(RegisterViewModel viewModel = null);
+        Task<User> GetUserByApiKey(string apiKey);
+        Task<UserViewModel> GetUserViewModel();
     }
 
     public class UsersService : IUsersService
     {
-        private readonly UserManager<User> _userManager;
+        private readonly HttpContext _httpContext;
+        private readonly IImageService _imageService;
+        private readonly IMapper _mapper;
         private readonly IRepositoryRole _repositoryRole;
         private readonly IRepositoryUsers _repositoryUsers;
-        private readonly SignInManager<User> _signInManager;
-        private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
-        private readonly IImageService _imageService;
-        private readonly HttpContext _httpContext;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
 
         public UsersService(
-            UserManager<User> userManager,
+            IHttpContextAccessor httpContextAccessor,
+            IImageService imageService,
+            IMapper mapper,
             IRepositoryRole repositoryRole,
             IRepositoryUsers repositoryUsers,
-            IHttpContextAccessor httpContextAccessor,
-            SignInManager<User> MySignInManager,
-            IMapper mapper,
             ITokenService tokenService,
-            IImageService imageService
+            SignInManager<User> MySignInManager,
+            UserManager<User> userManager
             )
         {
             _httpContext = httpContextAccessor.HttpContext;
-            _userManager = userManager;
+            _imageService = imageService;
+            _mapper = mapper;
             _repositoryRole = repositoryRole;
             _repositoryUsers = repositoryUsers;
             _signInManager = MySignInManager;
-            _mapper = mapper;
             _tokenService = tokenService;
-            _imageService = imageService;
+            _userManager = userManager;
         }
 
 

@@ -8,50 +8,66 @@ namespace Backend_portafolio.Services
 {
     public interface IApiService
     {
-        Task<List<Categoria>> GetCategories(string apiKey);
-        Task<List<Format>> GetFormats(string apiKey);
-        Task<UserApiViewModel> GetUser(string apiKey);
+        Task<ApiResponse<List<Categoria>>> GetCategories(string apiKey);
+        Task<ApiResponse<List<Format>>> GetFormats(string apiKey);
+        Task<ApiResponse<ApiResponsePosts<ApiPostViewModel>>> GetPostById(string apiKey, int post_id);
+        Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetPosts(string apiKey);
+        Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetPostsPagination(string apiKey, int pageNumber, int pageSize);
+        Task<ApiResponse<ApiUserViewModel>> GetUser(string apiKey);
     }
     public class ApiService : IApiService
     {
-        private readonly IUsersService _usersService;
-        private readonly ITokenService _tokenService;
+        private readonly IBioService _bioService;
         private readonly ICategoriaService _categoriaService;
         private readonly IFormatService _formatService;
-        private readonly IBioService _bioService;
-        private readonly INetworkService _networkService;
         private readonly IMapper _mapper;
+        private readonly INetworkService _networkService;
+        private readonly IPostService _postService;
+        private readonly ITokenService _tokenService;
+        private readonly IMediaService _mediaService;
+        private readonly ILinkService _linkService;
+        private readonly IUsersService _usersService;
 
         public ApiService(
-            IUsersService usersService,
-            ITokenService tokenService,
+            IBioService bioService,
             ICategoriaService categoriaService,
             IFormatService formatService,
-            IBioService bioService,
+            IMapper mapper,
             INetworkService networkService,
-            IMapper mapper
+            IPostService postService,
+            ITokenService tokenService,
+            IMediaService mediaService,
+            ILinkService linkService,
+            IUsersService usersService
         )
         {
-            _usersService = usersService;
-            _tokenService = tokenService;
+            _bioService = bioService;
             _categoriaService = categoriaService;
             _formatService = formatService;
-            _bioService = bioService;
-            _networkService = networkService;
             _mapper = mapper;
+            _networkService = networkService;
+            _postService = postService;
+            _tokenService = tokenService;
+            _mediaService = mediaService;
+            _linkService = linkService;
+            _usersService = usersService;
         }
 
         //****************************************************
         //************************ USER **********************
         //****************************************************
 
-        public async Task <UserApiViewModel> GetUser(string apiKey)
+        /**
+         * Retorna un usuario por apiKey
+         * @param apiKey Clave
+        */
+        public async Task<ApiResponse<ApiUserViewModel>> GetUser(string apiKey)
         {
             try
             {
                 await _tokenService.ValidateApiKey(apiKey);
                 var user = await _usersService.GetUserByApiKey(apiKey);
-                var userApiViewModel = _mapper.Map<UserApiViewModel>(user);
+                var userApiViewModel = _mapper.Map<ApiUserViewModel>(user);
 
                 //Obtener Bio
                 userApiViewModel.Bios = await _bioService.GetAllBio(user.id);
@@ -59,7 +75,14 @@ namespace Backend_portafolio.Services
                 //Obtener Redes
                 userApiViewModel.Networks = await _networkService.GetSocialNetworksByUserId(user.id);
 
-                return userApiViewModel;
+                var result = new ApiResponse<ApiUserViewModel>()
+                {
+                    Success = true,
+                    Message = "",
+                    Data = userApiViewModel
+                };
+
+                return result;
             }
             catch (Exception)
             {
@@ -72,14 +95,27 @@ namespace Backend_portafolio.Services
         //******************** CATEGORIES ********************
         //****************************************************
 
-        public async Task<List<Categoria>> GetCategories(string apiKey)
+        /**
+         * Retorna una lista de categorías
+         * @param apiKey Clave
+        */
+        public async Task<ApiResponse<List<Categoria>>> GetCategories(string apiKey)
         {
             try
             {
                 await _tokenService.ValidateApiKey(apiKey);
                 var user = await _usersService.GetUserByApiKey(apiKey);
                 var categories = await _categoriaService.GetAllCategorias(user.id);
-                return categories.ToList();
+
+                var result = new ApiResponse<List<Categoria>>()
+                {
+                    Success = true,
+                    Message = "",
+                    Data = categories.ToList()
+                };
+
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -92,14 +128,26 @@ namespace Backend_portafolio.Services
         //********************** FORMATS *********************
         //****************************************************
 
-        public async Task<List<Format>> GetFormats(string apiKey)
+        /**
+         * Retorna una lista de formatos
+         * @param apiKey Clave
+        */
+        public async Task<ApiResponse<List<Format>>> GetFormats(string apiKey)
         {
             try
             {
                 await _tokenService.ValidateApiKey(apiKey);
                 var user = await _usersService.GetUserByApiKey(apiKey);
                 var formats = await _formatService.GetAllFormat(user.id);
-                return formats.ToList();
+                
+                var result = new ApiResponse<List<Format>>()
+                {
+                    Success = true,
+                    Message = "",
+                    Data = formats.ToList()
+                };
+
+                return result;
 
             }
             catch (Exception ex)
@@ -109,11 +157,172 @@ namespace Backend_portafolio.Services
         }
 
 
-        //TIPO DE ENTRADAS
+        //****************************************************
+        //*********************** PSOTS **********************
+        //****************************************************
 
-        //ENTRADAS POR TIPO
-        //// CON SU CATEGORIA
-        //// CON SU TIPO DE ENTRADA
+        /**
+         * Retorna una lista de publicaciones
+         * @param apiKey Clave
+        */
+        public async Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetPosts(string apiKey)
+        {
+            try
+            {
+                await _tokenService.ValidateApiKey(apiKey);
+                var user = await _usersService.GetUserByApiKey(apiKey);
+                var posts = await _postService.GetAllPosts(user.id);
+
+                var postsApiModels = _mapper.Map<List<ApiPostViewModel>>(posts);
+
+                foreach (var post in postsApiModels)
+                {
+                    post.media = _mapper.Map<List<ApiMediaViewModel>>
+                        (await _mediaService.GetMediaByPost(post.id));
+
+                    post.links = _mapper.Map<List<ApiLinkViewModel>>
+                        (await _linkService.GetLinkByPost(post.id));
+
+                    post.categories = _mapper.Map<List<ApiCategoryViewModel>>
+                        ((await _categoriaService.GetCategoriasByPost(post.id))
+                        .ToList()
+                        .Select(c => c.Categoria));
+                }
+
+                var data = new ApiResponsePosts<List<ApiPostViewModel>>()
+                {
+                    Items = postsApiModels,
+                    TotalRecords = posts.Count()
+                };
+
+                return new ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>()
+                {
+                    Success = true,
+                    Message = "",
+                    Data = data,
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        /**
+         * Retorna una publicación por id
+         * @param apiKey Clave
+         * @param post_id Id de la publicación
+        */
+        public async Task<ApiResponse<ApiResponsePosts<ApiPostViewModel>>> GetPostById(string apiKey, int post_id)
+        {
+            try
+            {
+                await _tokenService.ValidateApiKey(apiKey);
+                var user = await _usersService.GetUserByApiKey(apiKey);
+                var post = await _postService.GetPostById(post_id, user.id);
+
+                var postApiModel = _mapper.Map<ApiPostViewModel>(post);
+
+                postApiModel.media = _mapper.Map<List<ApiMediaViewModel>>
+                    (await _mediaService.GetMediaByPost(post_id));
+
+                postApiModel.links = _mapper.Map<List<ApiLinkViewModel>>
+                    (await _linkService.GetLinkByPost(post_id));
+
+                postApiModel.categories = _mapper.Map<List<ApiCategoryViewModel>>
+                    ((await _categoriaService.GetCategoriasByPost(post_id))
+                    .ToList()
+                    .Select(c => c.Categoria));
+
+                var data = new ApiResponsePosts<ApiPostViewModel>()
+                {
+                    Items = postApiModel,
+                    TotalRecords = 1
+                };
+
+                return new ApiResponse<ApiResponsePosts<ApiPostViewModel>>()
+                {
+                    Success = true,
+                    Message = "",
+                    Data = data
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        /**
+         * Retorna una lista de publicaciones paginadas
+         * @param apiKey Clave
+         * @param pageNumber Número de página
+         * @param pageSize Tamaño de la página
+        */
+        public async Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetPostsPagination(string apiKey, int pageNumber, int pageSize)
+        {
+            try
+            {
+                await _tokenService.ValidateApiKey(apiKey);
+                var user = await _usersService.GetUserByApiKey(apiKey);
+                var posts = await _postService.GetAllPosts(user.id);
+
+                var postsApiModels = _mapper.Map<List<ApiPostViewModel>>(posts);
+
+                foreach (var post in postsApiModels)
+                {
+                    post.media = _mapper.Map<List<ApiMediaViewModel>>
+                        (await _mediaService.GetMediaByPost(post.id));
+
+                    post.links = _mapper.Map<List<ApiLinkViewModel>>
+                        (await _linkService.GetLinkByPost(post.id));
+
+                    post.categories = _mapper.Map<List<ApiCategoryViewModel>>
+                        ((await _categoriaService.GetCategoriasByPost(post.id))
+                        .ToList()
+                        .Select(c => c.Categoria));
+                }
+
+                if (pageNumber < 1)
+                {
+                    pageNumber = 1;
+                }
+
+                if (pageSize < 1)
+                {
+                    pageSize = 10;
+                }
+
+                int totalPages = (int)Math.Ceiling((double)posts.Count() / pageSize);
+
+                if (pageNumber > totalPages)
+                {
+                    pageNumber = totalPages;
+                }
+
+                var postApiModelsPagination = postsApiModels.Skip(pageNumber).Take(pageSize).ToList();
+
+                var data = new ApiResponsePosts<List<ApiPostViewModel>>()
+                {
+                    Items = postApiModelsPagination,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalRecords = posts.Count(),
+                    TotalPages = totalPages
+                };
+
+                return new ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>()
+                {
+                    Success = true,
+                    Message = "",
+                    Data = data,
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
     }
 }

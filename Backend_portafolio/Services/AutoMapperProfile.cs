@@ -8,7 +8,9 @@ namespace Backend_portafolio.Sevices
     {
         public AutoMapperProfile()
         {
-            CreateMap<Post, PostViewModel>();
+            //****************************************************
+            //**************** VIEWMODEL TO ENTITY ***************
+            //****************************************************
 
             CreateMap<MediaForm, Media>()
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => int.Parse(src.id)))
@@ -21,12 +23,29 @@ namespace Backend_portafolio.Sevices
             CreateMap<UserViewModel, User>()
             .ForMember(dest => dest.emailNormalizado, opt => opt.MapFrom(src => src.email.ToUpper()));
 
-            CreateMap<User, UserViewModel>();
+            CreateMap<BioViewModel, Bio>();
 
             CreateMap<SocialNetworkViewModel, SocialNetwork>();
 
-            CreateMap<BioViewModel, Bio>();
-            CreateMap<User, UserApiViewModel>();
+
+            //****************************************************
+            //**************** ENTITY TO VIEWMODEL ***************
+            //****************************************************
+
+            CreateMap<User, UserViewModel>();
+
+            CreateMap<Post, PostViewModel>();
+
+
+            //****************************************************
+            //************************ API ***********************
+            //****************************************************
+
+            CreateMap<User, ApiUserViewModel>();
+            CreateMap<Post, ApiPostViewModel>();
+            CreateMap<Media, ApiMediaViewModel>();
+            CreateMap<Link, ApiLinkViewModel>();
+            CreateMap<Categoria, ApiCategoryViewModel>();
         }
     }
 }

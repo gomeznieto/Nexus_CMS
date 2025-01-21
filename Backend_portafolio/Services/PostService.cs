@@ -17,13 +17,14 @@ namespace Backend_portafolio.Sevices
         Task DeletePost(int id);
         Task<List<Post>> GetAllPosts(int userID = 0);
         Task<List<Post>> GetAllPosts(string format, int pagina);
-        Task<Post> GetPostById(int id);
+        Task<Post> GetPostById(int id, int user_id = 0);
         Task<PostViewModel> GetPostViewModel(string format, PostViewModel v = null);
         Task<PostViewModel> PrepareEditPostViewModel(int id);
         Task<PostViewModel> PrepareViewModel(PostViewModel viewModel);
         Task<List<Post>> SearchAllPost(string format, string buscar, int page);
         Task<int> GetCountPostByFormat(string format);
         Task EditarBorrador(int id, bool draft);
+        Task<int> GetCountPostByUser(int user_id);
     }
 
     public class PostService : IPostService
@@ -96,30 +97,60 @@ namespace Backend_portafolio.Sevices
         public async Task<List<Post>> GetAllPosts(string format, int pagina)
         {
 
-            // Usuario registrado
-            var usuarioID = _usersService.ObtenerUsuario();
-
-            //crear session de cantidad de post en caso de no haber sido ya creada
-            if (Session.GetCantidadPostsSession(_httpContext) == -1)
+            try
             {
-                Session.CantidadPostsSession(_httpContext, 10);
+                // Usuario registrado
+                var usuarioID = _usersService.ObtenerUsuario();
+
+                //Averiguar si el formato existe
+                var formato = await _formatService.Existe(format);
+
+                if (!formato)
+                    throw new Exception("¡El formato no existe!");
+
+                //crear session de cantidad de post en caso de no haber sido ya creada
+                if (Session.GetCantidadPostsSession(_httpContext) == -1)
+                {
+                    Session.CantidadPostsSession(_httpContext, 10);
+                }
+
+                //Obtener cantidades para generar paginación
+                var cantidadPorPagina = Session.GetCantidadPostsSession(_httpContext);
+                IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, pagina, usuarioID);
+
+                //Obtenemos categorias para mostrar en lista
+                foreach (var post in posts)
+                {
+                    post.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(post.id);
+                }
+
+                return posts.ToList();
             }
-
-            //Obtener cantidades para generar paginación
-            var cantidadPorPagina = Session.GetCantidadPostsSession(_httpContext);
-            IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, pagina, usuarioID);
-
-            //Obtenemos categorias para mostrar en lista
-            foreach (var post in posts)
+            catch (Exception ex)
             {
-                post.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(post.id);
-            }
 
-            return posts.ToList();
+                throw new Exception(ex.Message);
+            }
         }
-        public async Task<Post> GetPostById(int id)
+        public async Task<Post> GetPostById(int id, int user_id = 0)
         {
-            return await _repositoryPosts.ObtenerPorId(id);
+            try
+            {
+                if(user_id == 0)
+                    user_id = _usersService.ObtenerUsuario();
+
+                var post = await _repositoryPosts.ObtenerPorId(id, user_id);
+
+                if (post is null)
+                    throw new Exception("¡El post no existe!");
+
+                return post;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
         }
 
         //****************************************************
@@ -149,8 +180,10 @@ namespace Backend_portafolio.Sevices
 
         public async Task<PostViewModel> PrepareEditPostViewModel(int id)
         {
+            var userID = _usersService.ObtenerUsuario();
+
             // Obtenemos el post por id
-            var model = await GetPostById(id);
+            var model = await GetPostById(id, userID);
 
             //Mapeamos de Post a PostViewModel
             var modelView = _mapper.Map<PostViewModel>(model);
@@ -504,7 +537,9 @@ namespace Backend_portafolio.Sevices
         {
             try
             {
-                var post = await GetPostById(id);
+                var userID = _usersService.ObtenerUsuario();
+
+                var post = await GetPostById(id, userID);
 
                 if (post is null)
                     throw new Exception("¡El post no existe!");
@@ -542,10 +577,29 @@ namespace Backend_portafolio.Sevices
 
         public async Task<int> GetCountPostByFormat(string format)
         {
-            return await _repositoryPosts.ObtenerCantidadPorFormato(format);
+            try
+            {
+                return await _repositoryPosts.ObtenerCantidadPorFormato(format);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
+        public async Task<int> GetCountPostByUser(int user_id)
+        {
+            try
+            {
+                return await _repositoryPosts.ObtenerCantidadPorUsuario(user_id);
 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+
+            }
+        }
 
         //****************************************************
         //***************** METODOS PRIVADOS *****************

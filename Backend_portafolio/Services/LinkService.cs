@@ -10,8 +10,8 @@ namespace Backend_portafolio.Sevices
     {
         Task CreateLink(Link link);
         Task CreateLink(IEnumerable<Link> links);
-        Task<IEnumerable<Link>> GetAllLink(int postId);
-        Task<List<Link>> GetLinkByPost(int postId);
+        Task<IEnumerable<Link>> GetAllLink(int post_id);
+        Task<List<Link>> GetLinkByPost(int post_id);
         IEnumerable<Link> SerealizarJsonLink(string jsonLinks);
         List<LinkForm> SerealizarJsonLinkForm(string jsonLinks);
     }
@@ -27,15 +27,23 @@ namespace Backend_portafolio.Sevices
             _repositoryLink = repositoryLink;
         }
 
-        public async Task<IEnumerable<Link>> GetAllLink(int postId)
+        //****************************************************
+        //********************* GETS *************************
+        //****************************************************
+
+        public async Task<IEnumerable<Link>> GetAllLink(int post_id)
         {
-            return await _repositoryLink.ObtenerPorPost(postId);
+            return await _repositoryLink.ObtenerPorPost(post_id);
         }
 
-        public async Task<List<Link>> GetLinkByPost(int postId)
+        public async Task<List<Link>> GetLinkByPost(int post_id)
         {
-            return (List<Link>)await _repositoryLink.ObtenerPorPost(postId);
+            return (await _repositoryLink.ObtenerPorPost(post_id)).ToList();
         }
+
+        //****************************************************
+        //********************* CREATES ***********************
+        //****************************************************
 
         public async Task CreateLink(Link link)
         {
@@ -50,6 +58,9 @@ namespace Backend_portafolio.Sevices
             }
         }
 
+        //****************************************************
+        //********************* SERIALIZERS *******************
+        //****************************************************
         public List<LinkForm> SerealizarJsonLinkForm(string jsonLinks)
         {
             return JsonSerializer.Deserialize<List<LinkForm>>(jsonLinks, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
