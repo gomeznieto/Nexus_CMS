@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
@@ -11,7 +10,7 @@ namespace Backend_portafolio.Services
         Task<ApiResponse<List<Categoria>>> GetCategories(string apiKey);
         Task<ApiResponse<List<Format>>> GetFormats(string apiKey);
         Task<ApiResponse<ApiResponsePosts<ApiPostViewModel>>> GetPostById(string apiKey, int post_id);
-        Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetPosts(string apiKey);
+        Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetAllPosts(string apiKey);
         Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetPostsPagination(string apiKey, int pageNumber, int pageSize);
         Task<ApiResponse<ApiUserViewModel>> GetUser(string apiKey);
     }
@@ -32,24 +31,24 @@ namespace Backend_portafolio.Services
             IBioService bioService,
             ICategoriaService categoriaService,
             IFormatService formatService,
+            ILinkService linkService,
             IMapper mapper,
+            IMediaService mediaService,
             INetworkService networkService,
             IPostService postService,
             ITokenService tokenService,
-            IMediaService mediaService,
-            ILinkService linkService,
             IUsersService usersService
         )
         {
             _bioService = bioService;
             _categoriaService = categoriaService;
             _formatService = formatService;
+            _linkService = linkService;
             _mapper = mapper;
+            _mediaService = mediaService;
             _networkService = networkService;
             _postService = postService;
             _tokenService = tokenService;
-            _mediaService = mediaService;
-            _linkService = linkService;
             _usersService = usersService;
         }
 
@@ -165,7 +164,7 @@ namespace Backend_portafolio.Services
          * Retorna una lista de publicaciones
          * @param apiKey Clave
         */
-        public async Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetPosts(string apiKey)
+        public async Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetAllPosts(string apiKey)
         {
             try
             {

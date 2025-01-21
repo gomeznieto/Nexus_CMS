@@ -102,7 +102,7 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                var posts = await _apiService.GetPosts(apiKey);
+                var posts = await _apiService.GetAllPosts(apiKey);
                 return Ok(posts);
             }
             catch (Exception ex)

@@ -39,6 +39,7 @@ namespace Backend_portafolio.Sevices
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMediaService _mediaService;
         private readonly ILinkService _linkService;
+        private readonly IEncryptionService _encryptionService;
         private readonly ISourceService _sourceService;
         private readonly HttpContext _httpContext;
         private readonly IMapper _mapper;
@@ -56,6 +57,7 @@ namespace Backend_portafolio.Sevices
             IMediaService mediaService,
             ILinkService linkService,
             IHttpContextAccessor httpContextAccessor,
+            IEncryptionService encryptionService,
             IMapper mapper)
         {
             _repositoryCategorias = repositoryCategorias;
@@ -67,6 +69,7 @@ namespace Backend_portafolio.Sevices
             _mediaTypeService = mediaTypeService;
             _mediaService = mediaService;
             _linkService = linkService;
+            _encryptionService = encryptionService;
             _sourceService = sourceService;
             _usersService = usersService;
             _httpContext = httpContextAccessor.HttpContext;

@@ -96,6 +96,21 @@ builder.Services.AddHttpContextAccessor();
 //****************************************************
 builder.Services.AddAutoMapper(typeof(Program));
 
+
+//****************************************************
+//******************** ENCRYPTION ********************
+//****************************************************
+
+builder.Services.AddSingleton<IEncryptionService>(provider =>
+{
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    var encryptionKey = configuration["Encryption:Key"];
+    var encryptionIV = configuration["Encryption:IV"];
+
+    return new EncryptionService(encryptionKey, encryptionIV);
+});
+
+
 var app = builder.Build();
 
 

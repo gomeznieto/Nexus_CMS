@@ -95,9 +95,6 @@ namespace Backend_portafolio.Services
         {
             try
             {
-                //var userID = ObtenerUsuario();
-                //var user = await _repositoryUsers.BuscarPorId(userID);
-
                 User user = await _signInManager.UserManager.GetUserAsync(_httpContext.User);
                 return user;
             }
