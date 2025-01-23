@@ -7,7 +7,7 @@ namespace Backend_portafolio.Entities
     {
         public int id { get; set; }
         [Display(Name = "Rol")]
-        [Remote(action: "VerificarExisteFormato", controller: "Rol")]
+        [Remote(action: "VerificarExisteRole", controller: "Users")]
         public string name { get; set; }
     }
 }

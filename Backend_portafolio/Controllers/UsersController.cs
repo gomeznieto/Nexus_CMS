@@ -224,6 +224,21 @@ namespace Backend_portafolio.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ObtenerBio(int id)
+        {
+            try
+            {
+                var bio = await _bioService.GetBioById(id);
+                return Json(new { error = false, bio });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = true, mensaje = ex.Message });
+            }
+
+        }
+
 
         //****************************************************
         //*********************** USER ***********************
@@ -355,6 +370,90 @@ namespace Backend_portafolio.Controllers
             }
         }
 
+        //****************************************************
+        //********************** ROLE ************************
+        //****************************************************
+
+        [HttpGet]
+        public async Task<IActionResult> Roles()
+        {
+            try
+            {
+                var viewModel = await _usersService.GetRolesViewModel();
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Roles(RoleViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+            try
+            {
+                await _usersService.CreateRole(viewModel);
+                Session.CrearModalSuccess("Se ha creado el rol con éxito", "Users", HttpContext);
+                return RedirectToAction("Roles");
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BorrarRole(int id)
+        {
+            try
+            {
+                await _usersService.DeleteRole(id);
+                return Json(new { error = false, mensaje = "¡El rol ha sido borrado correctamente!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = true, mensaje = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditarRole(RoleViewModel viewModel)
+        {
+            try
+            {
+                await _usersService.EditRole(viewModel);
+                Session.CrearModalSuccess("El rol ha sido modificado exitosamente", "Users", HttpContext);
+                return RedirectToAction("Roles");
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerRol(int id)
+        {
+            try
+            {
+                var role = await _usersService.GetRoleById(id);
+                return Json(new { error = false, role });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = true, mensaje = ex.Message });
+            }
+
+        }
+
 
         //****************************************************
         //********************* FUNCIONES ********************
@@ -400,6 +499,19 @@ namespace Backend_portafolio.Controllers
             try
             {
                 await _usersService.verifyNewPassword(passwordNuevo, repetirPasswordNuevo);
+                return Json(true);
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+        }
+
+        public async Task<IActionResult> VerificarExisteRole(string name)
+        {
+            try
+            {
+                await _usersService.VerifyRole(name);
                 return Json(true);
             }
             catch (Exception ex)

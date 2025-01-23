@@ -12,6 +12,7 @@ namespace Backend_portafolio.Services
         Task DeleteBio(int id);
         Task EditBio(BioViewModel viewModel);
         Task<List<Bio>> GetAllBio(int userID = 0);
+        Task<Bio> GetBioById(int id);
         Task<BioViewModel> GetBioViewModel(BioViewModel viewModel = null);
     }
     public class BioService : IBioService
@@ -57,6 +58,19 @@ namespace Backend_portafolio.Services
                 viewModel.user_id = usuarioID;
                 viewModel.Bios = (await GetAllBio()).OrderByDescending(x => x.year).ToList();
                 return viewModel;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
+        }
+
+        public async Task<Bio> GetBioById(int id)
+        {
+            try
+            {
+                var usuarioID = _usersService.ObtenerUsuario();
+                return await _repositoryBio.ObtenerPorId(id, usuarioID);
             }
             catch (Exception ex)
             {

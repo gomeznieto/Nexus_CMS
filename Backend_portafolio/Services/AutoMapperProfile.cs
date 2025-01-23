@@ -27,6 +27,8 @@ namespace Backend_portafolio.Sevices
 
             CreateMap<SocialNetworkViewModel, SocialNetwork>();
 
+            CreateMap<RoleViewModel, Role>();
+
 
             //****************************************************
             //**************** ENTITY TO VIEWMODEL ***************
@@ -35,6 +37,9 @@ namespace Backend_portafolio.Sevices
             CreateMap<User, UserViewModel>();
 
             CreateMap<Post, PostViewModel>();
+
+            CreateMap<Role, RoleViewModel>();
+
 
 
             //****************************************************

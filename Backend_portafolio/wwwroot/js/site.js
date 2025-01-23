@@ -35,11 +35,6 @@ async function closeModalSuccess() {
     }
 }
 
-//MENU COLLAPSE
-$('.btn-expand-collapse').click(function (e) {
-    $('.navbar-primary').toggleClass('collapsed');
-});
-
 //MODEL RESPUESTA
 async function verificarRespuestaModal(urlPath) {
     const id = document.getElementsByName("id")[0].value;
@@ -542,6 +537,31 @@ async function cargarRedes(id) {
     // Cargar Icono
     let icon = document.getElementById("formIconEditar");
     icon.value = result.bio.icon;
+}
+
+async function cargarRoles(id) {
+
+    // Fetch
+    const urlPost = `/Users/ObtenerRol/${id}`;
+    const response = await fetch(urlPost);
+    const result = await response.json();
+
+    console.log(result)
+
+    // Verificar error
+    if (result.error) {
+        // Mostrar mensaje de error en el modal correspondiente
+        document.getElementById('mensajeModalError').innerText = result.mensaje;
+        document.getElementById('modalError').style.display = 'block';
+    }
+
+    // Cargar ID
+    let inputId = document.getElementById("formIdRole");
+    inputId.value = result.role.id;
+
+    // Cargar nombre del rol
+    let name = document.getElementById("inputFormRoleEditar");
+    name.value = result.role.name;
 }
 
 /* BARRAS NAVEGACION */
