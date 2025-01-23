@@ -39,9 +39,9 @@ namespace Backend_portafolio.Services
             throw new NotImplementedException();
         }
 
-        public async Task<User> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public async Task<User> FindByNameAsync(string usernameNormalizado, CancellationToken cancellationToken)
         {
-            return await _repositoryUsers.BuscarUsuarioPorEmail(normalizedUserName);
+            return await _repositoryUsers.BuscarUsuarioPorUsername(usernameNormalizado);
         }
 
         public Task<string> GetEmailAsync(User user, CancellationToken cancellationToken)
@@ -92,7 +92,8 @@ namespace Backend_portafolio.Services
 
         public Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            user.usernameNormalizado = normalizedName;
+            return Task.CompletedTask;
         }
 
         public Task SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
@@ -128,7 +129,7 @@ namespace Backend_portafolio.Services
 
         async Task<User> IUserStore<User>.FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
-            return await _repositoryUsers.BuscarUsuarioPorEmail(normalizedUserName);
+            return await _repositoryUsers.BuscarUsuarioPorUsername(normalizedUserName);
         }
 
         Task<string> IUserStore<User>.GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken)
@@ -148,7 +149,7 @@ namespace Backend_portafolio.Services
 
         Task<string> IUserStore<User>.GetUserNameAsync(User user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(user.email);
+            return Task.FromResult(user.username);
         }
 
         Task<bool> IUserPasswordStore<User>.HasPasswordAsync(User user, CancellationToken cancellationToken)
@@ -158,7 +159,7 @@ namespace Backend_portafolio.Services
 
         Task IUserStore<User>.SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
         {
-            user.emailNormalizado = normalizedName;
+            user.usernameNormalizado = normalizedName;
             return Task.CompletedTask;
         }
 

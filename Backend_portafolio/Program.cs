@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Backend_portafolio.Sevices;
+using Backend_portafolio.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -122,6 +123,33 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
+//*** TEST *****///
+
+// Crear el primer usuario administrador
+//using (var scope = app.Services.CreateScope())
+//{
+//    var services = scope.ServiceProvider;
+//    try
+//    {
+//        var userService = services.GetRequiredService<IUsersService>();
+//        await CreateAdminUserAsync(userService);
+//    }
+//    catch (Exception ex)
+//    {
+//        Console.WriteLine($"Error al crear el usuario administrador: {ex.Message}");
+//    }
+//}
+
+// Configuración del middleware
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+
+/// ***** FIN TEST ****///
+
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -134,3 +162,37 @@ app.MapControllerRoute(
 	pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+
+//// Método para crear el usuario administrador
+//static async Task CreateAdminUserAsync(IUsersService userService)
+//{
+//    // Verificar si ya existe el usuario administrador
+//    User adminUser = await userService.GetUserByUser("admin");
+
+//    if (adminUser == null)
+//    {
+//        // Crear el usuario administrador
+//        var newUser = new RegisterViewModel()
+//        {
+//            Username = "admin",
+//            Email = "admin@example.com",
+//            Password = "PasswordSegura123!",
+//            role = 1,
+//        };
+
+//        var result = await userService.CreateUserAsync(newUser);
+//        if (result)
+//        {
+//            Console.WriteLine("Primer usuario administrador creado con éxito.");
+//        }
+//        else
+//        {
+//            Console.WriteLine("Error al crear el usuario administrador.");
+//        }
+//    }
+//    else
+//    {
+//        Console.WriteLine("El usuario administrador ya existe.");
+//    }
+//}

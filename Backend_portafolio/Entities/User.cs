@@ -9,6 +9,8 @@ namespace Backend_portafolio.Entities
         public int id { get; set; }
         [Display(Name = "Nombre")]
         public string name { get; set; }
+        public  string username { get; set; }
+        public string usernameNormalizado { get; set; }
         public int role { get; set; }
         [Display(Name = "Imagen de Perfil")]
         public string img { get; set; }

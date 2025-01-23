@@ -23,6 +23,7 @@ namespace Backend_portafolio.Services
         Task<RegisterViewModel> GetRegisterViewModel(RegisterViewModel viewModel = null);
         Task<User> GetUserByApiKey(string apiKey);
         Task<UserViewModel> GetUserViewModel();
+        Task<User> GetUserByUser(string username);
     }
 
     public class UsersService : IUsersService
@@ -144,29 +145,43 @@ namespace Backend_portafolio.Services
             }
         }
 
+        public async Task<User> GetUserByUser(string username)
+        {
+            try
+            {
+                var user = await _repositoryUsers.BuscarUsuarioPorUsername(username);
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         //****************************************************
         //********************** CREATE **********************
         //****************************************************
 
-        /**
-         * Crea un nuevo usuario
-         * @param viewModel Modelo de vista de registro
-         */
+            /**
+             * Crea un nuevo usuario
+             * @param viewModel Modelo de vista de registro
+             */
         public async Task CreateUser(RegisterViewModel viewModel)
         {
             try
             {
                 User currentUser = await GetDataUser();
 
-                // Validar que el usuario tenga permisos para poder crear un usuario
+                // Validar que el usuario tenga permisos para poder crear un usuario. Solos Admin pueden crear
                 Role adminRole = (await _repositoryRole.Obtener()).FirstOrDefault(x => x.name == "admin");
 
                 if (adminRole != null && currentUser.role != adminRole.id)
                     throw new ApplicationException("No tienes permisos para registrar un nuevo usuario");
 
                 // Creamos el nuevo usuario
-                var newUSer = new User() { email = viewModel.Email, name = viewModel.Name, role = viewModel.role };
+                var newUSer = new User() { username = viewModel.Username, email = viewModel.Email, name = viewModel.Name, role = viewModel.role };
 
+                // generamos ApiKey para que poder acceder a la API
                 newUSer.apiKey = _tokenService.GenerateApiKey();
 
                 var result = await _userManager.CreateAsync(newUSer, password: viewModel.Password);
@@ -228,7 +243,7 @@ namespace Backend_portafolio.Services
         {
             try
             {
-                var result = await _signInManager.PasswordSignInAsync(viewModel.Email, viewModel.Password, viewModel.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(viewModel.Username, viewModel.Password, viewModel.RememberMe, lockoutOnFailure: false);
 
                 if (!result.Succeeded)
                 {
@@ -342,9 +357,14 @@ namespace Backend_portafolio.Services
         {
             try
             {
-                var existEmail = await _repositoryUsers.Existe(email);
+                var user = await GetDataUser();
 
-                if (!existEmail)
+                if(user.emailNormalizado == email.ToUpper())
+                    return;
+
+                var existEmail = await _repositoryUsers.ExistEmail(email);
+
+                if (existEmail)
                     throw new ApplicationException($"El email \"{email}\" ya existe!\nIntente con otro.");
             }
             catch (Exception ex)
@@ -364,7 +384,7 @@ namespace Backend_portafolio.Services
                 var userData = await GetDataUser();
                 var existePass = await _userManager.CheckPasswordAsync(userData, pass);
 
-                if (!existePass)
+                if (existePass)
                     throw new Exception("La contrasela es incorrecta");
             }
             catch (Exception ex)

@@ -9,6 +9,10 @@ namespace Backend_portafolio.Models
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Display(Name = "Nombre de Usuario")]
         public string Name { get; set; }
+        [Display(Name = "Nombre de Usuario")]
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+        // TODO: [Remote(action: "VerificarExisteUsername", controller: "Users")]
+        public string Username { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [EmailAddress(ErrorMessage = "El campo debe ser un correo electrónico válido")]
         [Remote(action: "VerificarExisteEmail", controller: "Users")]

@@ -21,7 +21,7 @@ namespace Backend_portafolio.Services
             }
 
             // Define la carpeta de subcarpetas y crea si no existe
-            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", root, subfolder, user.email);
+            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", root, subfolder, user.username);
             Directory.CreateDirectory(uploadsFolder);
 
             // Verifica la extensión del archivo
@@ -56,7 +56,7 @@ namespace Backend_portafolio.Services
                 BorrarArchivo(user.img);
             }
 
-            return $"/{root}/{subfolder}/{user.email}/{uniqueFileName}";
+            return $"/{root}/{subfolder}/{user.username}/{uniqueFileName}";
         }
 
         // Borra el archivo de la ruta que le indicamos

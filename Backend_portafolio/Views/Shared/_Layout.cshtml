@@ -207,23 +207,39 @@
                             @if (MySignInManager.IsSignedIn(User) && currentUser.role == 1)
                             {
                                 <li id="nav_items">
-                                    <a href="#subMenuMediaUsers" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
+                                    <a href="#subMenuUsers" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
                                         <i class="iconos fa-solid fa-user"></i>
                                         <span class="ms-1 item_size" id="itemTitle">Usuarios</span>
                                     </a>
-                                    <ul class="collapse nav flex-column ms-1" id="subMenuMediaUsers" data-bs-parent="#menu">
+                                    <ul class="collapse nav flex-column ms-1" id="subMenuUsers" data-bs-parent="#menu">
                                         <li class="w-100">
                                             <a asp-action="Register" asp-controller="Users" class="nav-link px-3 item_subNav">
                                                 <span class="item_size">
                                                     <i class="subiconos fa-regular fa-circle ms-2"></i>
-                                                    <span class="ms-2">Nuevo</span>
+                                                    <span class="ms-2">Crear</span>
                                                 </span>
                                             </a>
                                         </li>
                                         <li>
                                             <a asp-action="Crear" asp-controller="Users" class="nav-link px-3 item_subNav">
                                                 <span class="item_size">
-                                                    <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Listado</span>
+                                                    <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Apis</span>
+                                                </span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li id="nav_items">
+                                    <a href="#subMenuRole" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
+                                        <i class="iconos fa-solid fa-user"></i>
+                                        <span class="ms-1 item_size" id="itemTitle">Rols</span>
+                                    </a>
+                                    <ul class="collapse nav flex-column ms-1" id="subMenuRole" data-bs-parent="#menu">
+                                        <li class="w-100">
+                                            <a asp-action="Rol" asp-controller="Users" class="nav-link px-3 item_subNav">
+                                                <span class="item_size">
+                                                    <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                    <span class="ms-2">Crear</span>
                                                 </span>
                                             </a>
                                         </li>

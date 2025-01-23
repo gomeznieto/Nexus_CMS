@@ -1,11 +1,8 @@
-﻿using AutoMapper;
-using Backend_portafolio.Entities;
+﻿
 using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
-using Backend_portafolio.Datos;
 using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend_portafolio.Controllers
