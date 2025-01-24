@@ -1,0 +1,243 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@using Backend_portafolio.Entities
+@using Backend_portafolio.Helper
+
+@model UserViewModel
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+@{
+    //Obtener página desde parámetros de la url
+    if (!int.TryParse(ViewContext.HttpContext.Request.Query["page"], out int pageValue))
+    {
+        pageValue = 1;
+    }
+
+    //Cantidad de entradas por post
+    var cantidadPorPost = Session.GetCantidadUsersSession(HttpContextAccessor.HttpContext);
+
+    //Paginas de entradas
+    var paginas = (ViewBag.Cantidad / cantidadPorPost) + 1;
+}
+
+<h1 class="mb-3">Listado de Usuarios</h1>
+<p class="fs-6 mb-3">Nulla varius ex ut posuere consectetur. In tincidunt, nisi vitae. </p>
+<P>Cantidad de Entradas Totales: @ViewBag.Cantidad</P>
+<div class="d-flex flex-column flex-lg-row justify-content-lg-between lign-items-lg-center col-6 col-lg-12">
+
+    <!-- CREAR NUEVO -->
+    <select onchange="cambiarCantidadUserss(this.value)" class="form-select select-style w-25">
+        <option selected>Cantidad de Usuarios</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+    </select>
+
+    <!-- BUSCADOR-->
+    <form method="post" asp-action="Users" class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">
+        <input type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-action">Buscar</button>
+        </div>
+    </form>
+
+</div>
+
+<div class="w-100 p-1 row gap-3">
+    <!-- TABLA CON REDES SOCIALES-->
+    <div class=" mt-2 col-10 p-2">
+
+        @if (Model.Users.Count() is not 0)
+        {
+            <table class="table table-borderless">
+                <thead class="table-text-color text-uppercase border-bottom table-border-row-color">
+                    <tr class="table-titles">
+                        <th scope="col" class="col-1">Username</th>
+                        <th scope="col" class="col-4">Nombre</th>
+                        <th scope="col" class="col-4">E-Mail</th>
+                        <th scope="col" class="col-3">Rol</th>
+                    </tr>
+                </thead>
+                <tbody class="table-body">
+
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr class="@(user == Model.Users.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
+                            <td class="fw-bold">@user.username</td>
+                            <td>@user.name</td>
+                            <td>@user.email</td>
+                            <td><i class="fs-4 text-center"></i>@Model.RolesName.Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault()</td>
+                            <td class="d-flex gap-2 justify-content-center">
+                                <a class="btn btn-edit" onclick="showFormEditar(@user.id)">Editar</a>
+                                <a class="btn btn-delete" onclick="openModal({id: '@user.id', name: '@user.name'})" )>Borrar</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Aún no hay Redes Sociales agregadas</p>
+        }
+
+        <button class="btn btn-action" id="btnAddRedes" onclick="showForm()"><i class="fa-solid fa-plus me-2"></i>Editar Usuariosl</button>
+
+        @if(paginas > 1)
+        {
+        <nav class="w-100 d-flex justify-content-center">
+            <ul class="pagination justify-content-end">
+
+                @if (pageValue != 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link bg-pagination" href="/Users/Users/?page=@((pageValue - 1).ToString())"><i class="fa-solid fa-chevron-left"></i></a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= @paginas; i++)
+                {
+                    <li class="page-item"><a class="page-link @(pageValue == i ? "bg-pagination-active" : "bg-pagination")" href="/Users/Users/?page=@(i.ToString())">@(i)</a></li>
+                }
+
+                @if ((pageValue) < @paginas)
+                {
+                    <li class="page-item">
+                        <a class="page-link bg-pagination" href="/Users/Users/?format=page=@((pageValue + 1).ToString())"><i class="fa-solid fa-chevron-right"></i></a>
+                    </li>
+                }
+
+            </ul>
+        </nav>
+        }
+    </div>
+    
+    <!-- FIN TABLA CON REDES SOCIALES-->
+    <!-- AGREGAR RED SOCIAL -->
+    @* <div class="hide col-6" id="formAddRedes">
+        <h2>Crear</h2>
+        <form class="mt-2" asp-action="Redes" asp-controller="network">
+            <input type="hidden" asp-for="@Model.id" />
+            <!-- VALIDATION -->
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div class="mt-2">
+                <div class="mb-2">
+                    <input type="text" class="form-control" asp-for="@Model.name" placeholder="Ingrese el nombre de la Red Social" />
+                </div>
+                <div class="mb-2">
+                    <input type="text" class="form-control" asp-for="@Model.role" placeholder="Ingrese la dirección de la Red Social" />
+                </div>
+
+                <button type="submit" class="btn btn-action">Guardar</button>
+                <a class="btn btn-delete" onclick="hideForm()">Cancelar</a>
+            </div>
+            <span asp-validation-for="@Model.name" class="form-error"></span>
+            <span asp-validation-for="@Model.url" class="form-error"></span>
+            <span asp-validation-for="@Model.username" class="form-error"></span>
+            <span asp-validation-for="@Model.icon" class="form-error"></span>
+        </form>
+    </div> *@
+    <!-- FIN AGREGAR REDES SOCIALES-->
+    <!-- EDITAR RED SOCIAL -->
+    @* <div class="mt-2 col-6 p-2 hide" id="formEditar">
+        <h2>Editar</h2>
+        <form asp-action="EditarRedes" asp-controller="network">
+            <!-- VALIDATION -->
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <input type="hidden" id="formIdEditar" asp-for="@Model.id" />
+            <input type="hidden" id="formUserEditar" asp-for="@Model.user_id" />
+            <div class="mt-2">
+
+                <div class="mb-2">
+                    <input type="text" class="form-control" id="formNameEditar" asp-for="@Model.name" />
+                </div>
+                <div class="mb-2">
+                    <input type="text" class="form-control" id="formUrlEditar" asp-for="@Model.url" />
+                </div>
+                <div class="mb-2">
+                    <input type="text" class="form-control" id="formUsernameEditar" asp-for="@Model.username" />
+                </div>
+                <div class="mb-2">
+                    <input type="text" class="form-control" id="formIconEditar" asp-for="@Model.icon" />
+                </div>
+
+                <button type="submit" class="btn btn-edit">Editar</button>
+                <a class="btn btn-delete" onclick="hideFormEditar()">Cancelar</a>
+            </div>
+            <span asp-validation-for="@Model.name" class="form-error"></span>
+            <span asp-validation-for="@Model.url" class="form-error"></span>
+            <span asp-validation-for="@Model.username" class="form-error"></span>
+            <span asp-validation-for="@Model.icon" class="form-error"></span>
+        </form>
+    </div> *@
+</div>
+
+<!-- MODAL -->
+<partial name="_Modal" model='new { url = "/Network", action="BorrarRedes" }' />
+
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+}
+<script>
+
+    function showForm()
+    {
+        let formAdd = document.getElementById("formAddRedes");
+        let formEdit = document.getElementById("formEditar");
+
+        formAdd.classList.remove("hide");
+
+        if(!formEdit.classList.contains('hide'))
+            formEdit.classList.add('hide');
+    }
+
+    function hideForm()
+    {
+        let form = document.getElementById("formAddRedes");
+        form.classList.add("hide");
+
+        // Limpiar campos
+        let formNameEditar = document.getElementById("formNameEditar");
+        formNameEditar.ariaValueMax = "";
+        let formUrlEditar = document.getElementById("formUrlEditar");
+        formUrlEditar.ariaValueMax = "";
+        let formUsernameEditar = document.getElementById("formUsernameEditar");
+        formUsernameEditar.ariaValueMax = "";
+        let formIconEditar = document.getElementById("formIconEditar");
+        formIconEditar.ariaValueMax = "";
+
+    }
+
+    function showFormEditar(id)
+    {
+        let formAdd = document.getElementById("formAddRedes");
+        let formEdit = document.getElementById("formEditar");
+
+        cargarRedes(id);
+
+        formEdit.classList.remove("hide");
+
+        if(!formAdd.classList.contains('hide'))
+            formAdd.classList.add('hide');
+    }
+
+     function hideFormEditar()
+    {
+        let form = document.getElementById("formEditar");
+        form.classList.add("hide");
+
+        // Limpiar campos
+        let formNameEditar = document.getElementById("formNameEditar");
+        formNameEditar.ariaValueMax = "";
+        let formUrlEditar = document.getElementById("formUrlEditar");
+        formUrlEditar.ariaValueMax = "";
+        let formUsernameEditar = document.getElementById("formUsernameEditar");
+        formUsernameEditar.ariaValueMax = "";
+        let formIconEditar = document.getElementById("formIconEditar");
+        formIconEditar.ariaValueMax = "";
+
+    }
+
+</script>

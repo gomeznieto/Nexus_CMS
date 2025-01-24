@@ -18,6 +18,8 @@ namespace Backend_portafolio.Datos
         Task<User> BuscarUsuarioPorEmail(string emailNormalizado);
         Task<User> BuscarUsuarioPorUsername(string usernameNormalizado);
         Task<User> ObtenerUsuarioPorApiKey(string apiKey);
+        Task<List<User>> GetUsers(int page = 1, int cant = 10);
+        Task<int> CountAllUsers();
     }
 
     public class RepositoryUsers : IRepositoryUsers
@@ -26,6 +28,28 @@ namespace Backend_portafolio.Datos
         public RepositoryUsers(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("DevConnection");
+        }
+
+
+        public async Task<List<User>> GetUsers(int page = 1, int cant = 10)
+        {
+            try
+            {
+                using var connection = new SqlConnection(_connectionString);
+
+                var users = await connection.QueryAsync<User>($@"
+                SELECT * FROM users
+                ORDER BY id
+                OFFSET {(page - 1) * cant} ROWS
+				FETCH NEXT {cant} ROWS ONLY;
+                ");
+
+                return users.ToList();
+            }
+            catch (Exception)
+            {
+                throw new Exception("Error al obtener los usuarios");
+            }
         }
 
         // CREAR USUARIO
@@ -157,6 +181,23 @@ namespace Backend_portafolio.Datos
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<int> CountAllUsers()
+        {
+            try
+            {
+                using var connection = new SqlConnection(_connectionString);
+                var count = await connection.QuerySingleAsync<int>(@"
+                SELECT COUNT(*) FROM users
+                ");
+                return count;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Error al obtener la cantidad de usuarios");
+            }
+
         }
     }
 }

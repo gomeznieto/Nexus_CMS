@@ -62,6 +62,7 @@ builder.Services.AddTransient<IBioService, BioService>();
 builder.Services.AddTransient<INetworkService, NetworkService>();
 builder.Services.AddTransient<IApiService, ApiService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
+builder.Services.AddTransient<IRoleService, RoleService>();
 
 
 //****************************************************

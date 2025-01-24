@@ -37,11 +37,15 @@
                     }
                 }
             </tbody>
-        </table> <!-- FIN LISTADO -->
-
-        <!-- CREAR -->
+        </table> 
         <button class="btn btn-action" id="btnAddBio" onclick="showForm()"><i class="fa-solid fa-plus me-2"></i>Agregar Bio</button>
-        <form class="hide mt-4" id="formAddBio" asp-action="Bio" asp-controller="Users">
+    </div>
+    <!-- FIN LISTADO -->
+
+    <!-- CREAR -->
+    <div id="formAddBio" class="mt-2 col-6 p-2 hide">
+        <form asp-action="Bio" asp-controller="Bio">
+            <h2>Crear</h2>
             <!-- VALIDATION -->
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <div class="d-flex mt-2 gap-1">
@@ -55,7 +59,7 @@
                     </select>
                 </div>
                 <div class="col-6">
-                    <input type="text" class="form-control" id="inputFormBio" asp-for="@Model.work" />
+                    <input type="text" class="form-control" id="inputFormBio" asp-for="@Model.work" placeholder="Ingrese una breve descripción"/>
                 </div>
                 <div class="col-4">
                     <button type="submit" class="btn btn-action">Guardar</button>
@@ -65,42 +69,44 @@
             <span asp-validation-for="@Model.work" class="form-error"></span>
             <span asp-validation-for="@Model.year" class="form-error"></span>
         </form>
-        <!-- FIN CREAR-->
     </div>
+    <!-- FIN CREAR-->
 
     <!-- EDITAR -->
     <div class="mt-2 col-6 p-2 hide" id="formEditar">
         <h2>Editar</h2>
-        <form asp-action="Editar" asp-controller="Users">
+        <form asp-action="Editar" asp-controller="Bio">
             <!-- VALIDATION -->
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <input type="hidden" id="formIdEditar" asp-for="@Model.id" />
             <input type="hidden" id="formuserEditar" asp-for="@Model.user_id" />
             <div class="d-flex mt-2 gap-1">
 
-                <div>
-                    <select class="form-select" asp-for="@Model.year" id="formYearEditar">
+                <div class="col-2">
+                    <select class="form-select optSelect" asp-for="@Model.year" id="formYearEditar">
                         @for (int i = anios; i >= 50; i--)
                         {
                             <option value="@(i+1900)">@(i + 1900)</option>
                         }
                     </select>
                 </div>
-                <div>
+                <div class="col-6">
                     <input type="text" class="form-control" id="inputFormBioEditar" asp-for="@Model.work" />
                 </div>
-
-                <button type="submit" class="btn btn-edit">Editar</button>
-                <a class="btn btn-delete" onclick="hideFormEditar()">Cancelar</a>
+                <div class="col-4">
+                    <button type="submit" class="btn btn-edit">Editar</button>
+                    <a class="btn btn-delete" onclick="hideFormEditar()">Cancelar</a>
+                </div>
             </div>
             <span asp-validation-for="@Model.work" class="form-error"></span>
             <span asp-validation-for="@Model.year" class="form-error"></span>
         </form>
     </div>
 </div>
+<!-- FIN EDITAR -->
 
 <!-- MODAL -->
-<partial name="_Modal" model='new { url = "/Users", action="Borrar" }' />
+<partial name="_Modal" model='new { url = "/Bio", action="Borrar" }' />
 
 <!-- SCRIPTS -->
 @section Scripts
@@ -111,9 +117,13 @@
 
     function showForm()
     {
-        let btn = document.getElementById("btnAddBio");
-        let form = document.getElementById("formAddBio");
-        form.classList.remove("hide");
+        let formAdd = document.getElementById("formAddBio");
+        let formEdit = document.getElementById("formEditar");
+        
+        formAdd.classList.remove("hide");
+
+        if(!formEdit.classList.contains('hide'))
+            formEdit.classList.add("hide");
     }
 
     function hideForm()
@@ -128,12 +138,15 @@
 
     function showFormEditar(id)
     {
-        let btn = document.getElementById("btnAddBio");
-        let form = document.getElementById("formEditar");
+        let formEdit = document.getElementById("formEditar");
+        let formAdd = document.getElementById("formAddBio");
 
         cargarBio(id);
 
-        form.classList.remove("hide");
+        formEdit.classList.remove("hide");
+
+        if(!formAdd.classList.contains('hide'))
+            formAdd.classList.add("hide");
     }
 
      function hideFormEditar()

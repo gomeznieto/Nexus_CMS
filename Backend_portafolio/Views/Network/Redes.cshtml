@@ -5,9 +5,9 @@
 
 <h3>Redes</h3>
 <div class="w-100 p-1 row gap-3">
+        <!-- TABLA CON REDES SOCIALES-->
     <div class=" mt-2 col-6 p-2">
 
-        <!-- TABLA CON REDES SOCIALES-->
         @if (Model.Networks.Count() is not 0)
         {
             <table class="table table-borderless">
@@ -41,30 +41,30 @@
         {
             <p>Aún no hay Redes Sociales agregadas</p>
         }
-        <!-- FIN TABLA CON REDES SOCIALES-->
-        <!-- AGREGAR RED SOCIAL -->
+
         <button class="btn btn-action" id="btnAddRedes" onclick="showForm()"><i class="fa-solid fa-plus me-2"></i>Agregar Red Social</button>
-        <form class="hide" id="formAddRedes" asp-action="Redes" asp-controller="Users">
+    </div>
+    <!-- FIN TABLA CON REDES SOCIALES-->
+
+    <!-- AGREGAR RED SOCIAL -->
+    <div class="hide col-6" id="formAddRedes">
+        <h2>Crear</h2>
+        <form class="mt-2" asp-action="Redes" asp-controller="network">
             <input type="hidden" asp-for="@Model.user_id" />
             <!-- VALIDATION -->
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <div class="mt-2">
                 <div class="mb-2">
-                    <label asp-for="@Model.name" class="form-label"></label>
-                    <input type="text" class="form-control" asp-for="@Model.name" />
+                    <input type="text" class="form-control" asp-for="@Model.name" placeholder="Ingrese el nombre de la Red Social"/>
                 </div>
                 <div class="mb-2">
-                    <label asp-for="@Model.url" class="form-label"></label>
-
-                    <input type="text" class="form-control" asp-for="@Model.url" />
+                    <input type="text" class="form-control" asp-for="@Model.url" placeholder="Ingrese la dirección de la Red Social" />
                 </div>
                 <div class="mb-2">
-                    <label asp-for="@Model.username" class="form-label"></label>
-                    <input type="text" class="form-control" asp-for="@Model.username" />
+                    <input type="text" class="form-control" asp-for="@Model.username" placeholder="Ingrese el usuario de la Red Social" />
                 </div>
                 <div class="mb-2">
-                    <label asp-for="@Model.icon" class="form-label"></label>
-                    <input type="text" class="form-control" asp-for="@Model.icon" />
+                    <input type="text" class="form-control" asp-for="@Model.icon" placeholder="Ingrese el ícono de la Red Social" />
                 </div>
 
                 <button type="submit" class="btn btn-action">Guardar</button>
@@ -75,13 +75,13 @@
             <span asp-validation-for="@Model.username" class="form-error"></span>
             <span asp-validation-for="@Model.icon" class="form-error"></span>
         </form>
-        <!-- FIN AGREGAR REDES SOCIALES-->
     </div>
+    <!-- FIN AGREGAR REDES SOCIALES-->
 
     <!-- EDITAR RED SOCIAL -->
     <div class="mt-2 col-6 p-2 hide" id="formEditar">
         <h2>Editar</h2>
-        <form asp-action="EditarRedes" asp-controller="Users">
+        <form asp-action="EditarRedes" asp-controller="network">
             <!-- VALIDATION -->
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <input type="hidden" id="formIdEditar" asp-for="@Model.id" />
@@ -89,19 +89,15 @@
             <div class="mt-2">
 
                 <div class="mb-2">
-                    <label asp-for="@Model.name" class="form-label"></label>
                     <input type="text" class="form-control" id="formNameEditar" asp-for="@Model.name" />
                 </div>
                 <div class="mb-2">
-                    <label asp-for="@Model.url" class="form-label"></label>
                     <input type="text" class="form-control" id="formUrlEditar" asp-for="@Model.url" />
                 </div>
                 <div class="mb-2">
-                    <label asp-for="@Model.username" class="form-label"></label>
                     <input type="text" class="form-control" id="formUsernameEditar" asp-for="@Model.username" />
                 </div>
                 <div class="mb-2">
-                    <label asp-for="@Model.icon" class="form-label"></label>
                     <input type="text" class="form-control" id="formIconEditar" asp-for="@Model.icon" />
                 </div>
 
@@ -117,7 +113,7 @@
 </div>
 
 <!-- MODAL -->
-<partial name="_Modal" model='new { url = "/Users", action="BorrarRedes" }' />
+<partial name="_Modal" model='new { url = "/Network", action="BorrarRedes" }' />
 
 @section Scripts
 {
@@ -127,9 +123,13 @@
 
     function showForm()
     {
-        let btn = document.getElementById("btnAddRedes");
-        let form = document.getElementById("formAddRedes");
-        form.classList.remove("hide");
+        let formAdd = document.getElementById("formAddRedes");
+        let formEdit = document.getElementById("formEditar");
+
+        formAdd.classList.remove("hide");
+
+        if(!formEdit.classList.contains('hide'))
+            formEdit.classList.add('hide');
     }
 
     function hideForm()
@@ -151,12 +151,15 @@
 
     function showFormEditar(id)
     {
-        let btn = document.getElementById("btnAddRedes");
-        let form = document.getElementById("formEditar");
+        let formAdd = document.getElementById("formAddRedes");
+        let formEdit = document.getElementById("formEditar");
 
         cargarRedes(id);
 
-        form.classList.remove("hide");
+        formEdit.classList.remove("hide");
+
+        if(!formAdd.classList.contains('hide'))
+            formAdd.classList.add('hide');
     }
 
      function hideFormEditar()

@@ -7,8 +7,7 @@
 	ViewData["Title"] = "Entradas";
 
 	//Obtener página desde parámetros de la url
-	int pageValue;
-	if (!int.TryParse(ViewContext.HttpContext.Request.Query["page"], out pageValue))
+	if (!int.TryParse(ViewContext.HttpContext.Request.Query["page"], out int pageValue))
 	{
 		pageValue = 1;
 	}

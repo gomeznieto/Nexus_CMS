@@ -461,11 +461,22 @@ async function cambiarCantidadEntradas(cantidadEntradas) {
     }
 }
 
+async function cambiarCantidadUserss(cantidadUsers) {
+    //Mandar por fetch para guardar session con nueva cantidad por entrada
+    const url = `/Modals/ChangeNumberUsers/?cantidad=${cantidadUsers}`
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (result) {
+        location.reload();
+    }
+}
+
 /* BIOS */
 async function cargarBio(id) {
 
     // Fetch
-    const url = `/Users/ObtenerBio/${id}`;
+    const url = `/Bio/ObtenerBio/${id}`;
     const response = await fetch(url);
     const result = await response.json();
 
@@ -501,7 +512,7 @@ async function cargarBio(id) {
 async function cargarRedes(id) {
 
     // Fetch
-    const urlPost = `/Users/ObtenerRedes/${id}`;
+    const urlPost = `/network/ObtenerRedes/${id}`;
     const response = await fetch(urlPost);
     const result = await response.json();
 
@@ -542,7 +553,7 @@ async function cargarRedes(id) {
 async function cargarRoles(id) {
 
     // Fetch
-    const urlPost = `/Users/ObtenerRol/${id}`;
+    const urlPost = `/role/ObtenerRol/${id}`;
     const response = await fetch(urlPost);
     const result = await response.json();
 

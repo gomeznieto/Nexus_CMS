@@ -53,5 +53,20 @@ namespace Backend_portafolio.Controllers
 
 		}
 
-	}
+        public IActionResult ChangeNumberUsers(int cantidad)
+        {
+            try
+            {
+                Session.CantidadUsersSession(HttpContext, cantidad);
+                return Json(true);
+
+            }
+            catch (Exception)
+            {
+                return Json(false);
+            }
+
+        }
+
+    }
 }

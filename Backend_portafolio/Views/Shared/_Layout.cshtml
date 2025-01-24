@@ -213,6 +213,14 @@
                                     </a>
                                     <ul class="collapse nav flex-column ms-1" id="subMenuUsers" data-bs-parent="#menu">
                                         <li class="w-100">
+                                        <li class="w-100">
+                                            <a asp-action="users" asp-controller="Users" class="nav-link px-3 item_subNav">
+                                                <span class="item_size">
+                                                    <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                    <span class="ms-2">Lista</span>
+                                                </span>
+                                            </a>
+                                        </li>
                                             <a asp-action="Register" asp-controller="Users" class="nav-link px-3 item_subNav">
                                                 <span class="item_size">
                                                     <i class="subiconos fa-regular fa-circle ms-2"></i>
@@ -236,7 +244,7 @@
                                     </a>
                                     <ul class="collapse nav flex-column ms-1" id="subMenuRole" data-bs-parent="#menu">
                                         <li class="w-100">
-                                            <a asp-action="Roles" asp-controller="Users" class="nav-link px-3 item_subNav">
+                                            <a asp-action="Roles" asp-controller="Role" class="nav-link px-3 item_subNav">
                                                 <span class="item_size">
                                                     <i class="subiconos fa-regular fa-circle ms-2"></i>
                                                     <span class="ms-2">Crear</span>
@@ -257,8 +265,8 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                                 <li><a class="dropdown-item" asp-action="perfil" asp-controller="users">Perfil</a></li>
-                                <li><a class="dropdown-item" asp-action="bio" asp-controller="users">Bio</a></li>
-                                <li><a class="dropdown-item" asp-action="redes" asp-controller="users">Redes Sociales</a></li>
+                                <li><a class="dropdown-item" asp-action="bio" asp-controller="bio">Bio</a></li>
+                                <li><a class="dropdown-item" asp-action="redes" asp-controller="network">Redes Sociales</a></li>
                                 <li><a class="dropdown-item" asp-action="configuracion" asp-controller="users">Configuración</a></li>
                                 <li>
                                     <hr class="dropdown-divider">

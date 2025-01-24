@@ -6,6 +6,7 @@ using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using System.Data;
+using Backend_portafolio.Helper;
 
 
 namespace Backend_portafolio.Services
@@ -22,15 +23,12 @@ namespace Backend_portafolio.Services
         Task verifyNewPassword(string newPass, string repeatNewPass);
         Task verifyPassword(string pass);
         Task<RegisterViewModel> GetRegisterViewModel(RegisterViewModel viewModel = null);
+        Task<User> GetDataUser();
         Task<User> GetUserByApiKey(string apiKey);
-        Task<UserViewModel> GetUserViewModel();
         Task<User> GetUserByUser(string username);
-        Task VerifyRole(string role);
-        Task<RoleViewModel> GetRolesViewModel();
-        Task CreateRole(RoleViewModel viewModel);
-        Task DeleteRole(int id);
-        Task EditRole(RoleViewModel viewModel);
-        Task<Role> GetRoleById(int id);
+        Task<UserViewModel> GetUserViewModel(int page = 1);
+        Task<int> GetTotalCountUsers();
+        Task<UserViewModel> SearchUser(string search, int page = 1);
     }
 
     public class UsersService : IUsersService
@@ -69,6 +67,29 @@ namespace Backend_portafolio.Services
         //****************************************************
         //*********************** GETS ***********************
         //****************************************************
+
+        public async Task<List<User>> ObtenerUsuarios(int page = 1)
+        {
+            try
+            {
+                await VerifyAdmin();
+
+                //crear session de cantidad de post en caso de no haber sido ya creada
+                if (Session.GetCantidadUsersSession(_httpContext) == -1)
+                {
+                    Session.CantidadUsersSession(_httpContext, 10);
+                }
+
+                var cantidadPorPagina = Session.GetCantidadUsersSession(_httpContext);
+            
+                var users = await _repositoryUsers.GetUsers(page, cantidadPorPagina);
+                return users;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         /**
          * Obtiene el id del usuario autenticado
@@ -138,13 +159,37 @@ namespace Backend_portafolio.Services
          * Obtiene el modelo de vista de usuario
          * @return Modelo de vista de usuario
          */
-        public async Task<UserViewModel> GetUserViewModel()
+        public async Task<UserViewModel> GetUserViewModel(int page = 1)
         {
             try
             {
                 var user = await GetDataUser();
                 var userViewModel = _mapper.Map<UserViewModel>(user);
-                userViewModel.RoleName = (await _repositoryRole.Obtener()).Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
+                var roles = (await _repositoryRole.Obtener()).ToList();
+                userViewModel.RoleName = roles.Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
+                userViewModel.RolesName = roles;
+                userViewModel.Users = (await ObtenerUsuarios(page)).ToList();
+                return userViewModel;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<UserViewModel> SearchUser(string search, int page = 1)
+        {
+            try
+            {
+                var user = await GetDataUser();
+                var userViewModel = _mapper.Map<UserViewModel>(user);
+                var roles = (await _repositoryRole.Obtener()).ToList();
+                userViewModel.RoleName = roles.Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
+                userViewModel.RolesName = roles;
+                var allUsers = await ObtenerUsuarios(page);
+                var usersSearched = allUsers.Where(x => x.username.ToLower().Contains(search.ToLower()) || x.name.ToLower().Contains(search.ToLower()) || x.email.ToLower().Contains(search.ToLower())).ToList();
+                userViewModel.Users = usersSearched;
+
                 return userViewModel;
             }
             catch (Exception ex)
@@ -166,14 +211,28 @@ namespace Backend_portafolio.Services
             }
         }
 
+        public async Task<int> GetTotalCountUsers()
+        {
+            try
+            {
+                await VerifyAdmin();
+                var count = await _repositoryUsers.CountAllUsers();
+                return count;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         //****************************************************
         //********************** CREATE **********************
         //****************************************************
 
-            /**
-             * Crea un nuevo usuario
-             * @param viewModel Modelo de vista de registro
-             */
+        /**
+         * Crea un nuevo usuario
+         * @param viewModel Modelo de vista de registro
+         */
         public async Task CreateUser(RegisterViewModel viewModel)
         {
             try
@@ -331,135 +390,6 @@ namespace Backend_portafolio.Services
         }
 
         //****************************************************
-        //********************** ROLE ************************
-        //****************************************************
-
-        public async Task<RoleViewModel> GetRolesViewModel()
-        {
-            try
-            {
-                var roles = (await _repositoryRole.Obtener()).ToList();
-
-                PasarMayusculas(ref roles);
-
-                return new RoleViewModel()
-                {
-                    Roles = roles.ToList(),
-                };
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-        public async Task CreateRole(RoleViewModel viewModel)
-        {
-            try
-            {
-                var user = await GetDataUser();
-
-                if(user.role != 1)
-                    throw new ApplicationException("No tienes permisos para crear un nuevo rol");
-
-                var role = _mapper.Map<Role>(viewModel);
-
-                role.name = role.name.ToLower();
-
-                await _repositoryRole.Crear(role);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        private void PasarMayusculas(ref List<Role> roles)
-        {
-            foreach (var rol in roles)
-            {
-                rol.name = rol.name.ToUpper();
-            }
-        }
-
-        public async Task DeleteRole(int id)
-        {
-            try
-            {
-                var user = await GetDataUser();
-                if (user.role != 1)
-                    throw new ApplicationException("No tienes permisos para eliminar un rol");
-
-                var sePuedeBorrar = await _repositoryRole.SePuedeBorrar(id);
-
-                if (!sePuedeBorrar)
-                    throw new ApplicationException("No se puede eliminar el rol");
-
-                await _repositoryRole.Eliminar(id);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task EditRole(RoleViewModel viewModel)
-        {
-            try
-            {
-                var user = await GetDataUser();
-                if (user.role != 1)
-
-                    throw new ApplicationException("No tienes permisos para editar un rol");
-
-                var role = _mapper.Map<Role>(viewModel);
-
-                await _repositoryRole.Editar(role);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<Role> GetRoleById(int id)
-        {
-            try
-            {
-                var user = await GetDataUser();
-                if (user.role != 1)
-                    throw new ApplicationException("No tienes permisos para obtener un rol");
-
-                var role = await _repositoryRole.BuscarPorId(id);
-
-                if (role == null)
-                    throw new ApplicationException("Rol no encontrado");
-
-                return role;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task VerifyRole(string role)
-        {
-            try
-            {
-                var result = await _repositoryRole.Existe(role);
-
-                if (result)
-                    throw new ApplicationException("El rol ya existe. Intente con otro nombre.");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-
-        //****************************************************
         //*********************** API ************************
         //****************************************************
 
@@ -485,6 +415,18 @@ namespace Backend_portafolio.Services
         //****************************************************
         //********************* FUNCIONES ********************
         //****************************************************
+
+        /**
+         * Pasa a mayúsculas los nombres de los roles
+         * @param roles Lista de roles
+         */
+        private void PasarMayusculas(ref List<Role> roles)
+        {
+            foreach (var rol in roles)
+            {
+                rol.name = rol.name.ToUpper();
+            }
+        }
 
         /**
          * Verifica si un email ya existe
@@ -553,6 +495,23 @@ namespace Backend_portafolio.Services
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        private async Task VerifyAdmin()
+        {
+            try
+            {
+                var user = await GetDataUser();
+                var roles = await _repositoryRole.BuscarPorId(user.role);
+
+                if (roles.name.ToLower() != "admin")
+                    throw new ApplicationException("No se pudo obtener el usuario");
+            }
+            catch (Exception)
+            {
+
+                throw new ApplicationException("No se pudo obtener el usuario");
             }
         }
 

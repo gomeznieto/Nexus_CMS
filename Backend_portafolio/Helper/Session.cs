@@ -85,9 +85,27 @@ namespace Backend_portafolio.Helper
             httpContext.Session.SetString("CantidadPosts", formatsJson);
         }
 
+        public static void CantidadUsersSession(HttpContext httpContext, int cantidad)
+        {
+            var formatsJson = JsonSerializer.Serialize(cantidad);
+            httpContext.Session.SetString("CantidadUsers", formatsJson);
+        }
+
         public static int GetCantidadPostsSession(HttpContext httpContext)
         {
             var errorModal = httpContext.Session.GetString("CantidadPosts");
+
+            if (errorModal != null)
+            {
+                return JsonSerializer.Deserialize<int>(errorModal);
+            }
+
+            return -1;
+        }
+
+        public static int GetCantidadUsersSession(HttpContext httpContext)
+        {
+            var errorModal = httpContext.Session.GetString("CantidadUsers");
 
             if (errorModal != null)
             {
