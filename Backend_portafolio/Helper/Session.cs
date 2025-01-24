@@ -1,6 +1,7 @@
 ﻿using Backend_portafolio.Models;
 using System.Text.Json;
 using Backend_portafolio.Sevices;
+using Backend_portafolio.Entities;
 
 namespace Backend_portafolio.Helper
 {
@@ -113,6 +114,24 @@ namespace Backend_portafolio.Helper
             }
 
             return -1;
+        }
+
+        public static List<User> GetSearchedUserList(HttpContext httpContext)
+        {
+            var searchedListUser = httpContext.Session.GetString("searchedUserList");
+
+            if (searchedListUser != null)
+            {
+                return JsonSerializer.Deserialize<List<User>>(searchedListUser);
+            }
+
+            return null;
+        }
+
+        public static void SearchedUserList(HttpContext httpContext, List<User> userList)
+        {
+            var formatsJson = JsonSerializer.Serialize(userList);
+            httpContext.Session.SetString("searchedUserList", formatsJson);
         }
     }
 }

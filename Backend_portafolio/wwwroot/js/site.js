@@ -14,7 +14,7 @@ function closeModal() {
 }
 
 async function closeModalError() {
-    const url = `/Modals/DeleteErrorModal`;
+    const url = `/Session/DeleteErrorModal`;
     const response = await fetch(url);
     const result = await response.json();
 
@@ -25,7 +25,7 @@ async function closeModalError() {
 }
 
 async function closeModalSuccess() {
-    const url = `/Modals/DeleteSuccessModal`;
+    const url = `/Session/DeleteSuccessModal`;
     const response = await fetch(url);
     const result = await response.json();
 
@@ -452,7 +452,7 @@ function textFormat(format, text) {
 /* SELECCIONAR CANTIDAD DE ENTRADAS*/
 async function cambiarCantidadEntradas(cantidadEntradas) {
     //Mandar por fetch para guardar session con nueva cantidad por entrada
-    const url = `/Modals/ChangeNumberPosts/?cantidad=${cantidadEntradas}`
+    const url = `/Session/ChangeNumberPosts/?cantidad=${cantidadEntradas}`
     const response = await fetch(url);
     const result = await response.json();
 
@@ -462,14 +462,25 @@ async function cambiarCantidadEntradas(cantidadEntradas) {
 }
 
 async function cambiarCantidadUserss(cantidadUsers) {
+
+
     //Mandar por fetch para guardar session con nueva cantidad por entrada
-    const url = `/Modals/ChangeNumberUsers/?cantidad=${cantidadUsers}`
+    const url = `/Session/ChangeNumberUsers/?cantidad=${cantidadUsers}`
     const response = await fetch(url);
     const result = await response.json();
 
     if (result) {
-        location.reload();
+       
+        window.location.href = `/Users/users`
     }
+}
+
+async function buscarUsuarios() {
+    let rolerUsers = document.getElementById("roleUserList").value;
+    let SearchUsers = document.getElementById("searchUserList").value;
+
+    window.location.href = `/Users/users?role=${rolerUsers}&buscar=${SearchUsers}`;
+   
 }
 
 /* BIOS */

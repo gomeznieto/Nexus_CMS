@@ -135,7 +135,11 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                await _formatService.Existe(format);
+                var existeCategoria = await _formatService.Existe(format);
+
+                if (existeCategoria)
+                    throw new Exception($"El nombre {format} ya existe!");
+
                 return Json(true);
             }
             catch (Exception ex)

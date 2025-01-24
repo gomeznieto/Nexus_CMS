@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using System.Data;
 using Backend_portafolio.Helper;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 
 namespace Backend_portafolio.Services
@@ -28,7 +29,9 @@ namespace Backend_portafolio.Services
         Task<User> GetUserByUser(string username);
         Task<UserViewModel> GetUserViewModel(int page = 1);
         Task<int> GetTotalCountUsers();
-        Task<UserViewModel> SearchUser(string search, int page = 1);
+        Task<UserViewModel> SearchUser(string search, int role = 0, int page = 1);
+        Task<List<User>> ObtenerUsuarios(int page);
+        Task<List<User>> ObtenerUsuarios();
     }
 
     public class UsersService : IUsersService
@@ -68,7 +71,7 @@ namespace Backend_portafolio.Services
         //*********************** GETS ***********************
         //****************************************************
 
-        public async Task<List<User>> ObtenerUsuarios(int page = 1)
+        public async Task<List<User>> ObtenerUsuarios(int page)
         {
             try
             {
@@ -83,6 +86,24 @@ namespace Backend_portafolio.Services
                 var cantidadPorPagina = Session.GetCantidadUsersSession(_httpContext);
             
                 var users = await _repositoryUsers.GetUsers(page, cantidadPorPagina);
+                return users;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<User>> ObtenerUsuarios()
+        {
+            try
+            {
+                await VerifyAdmin();
+
+                var cantidadUsuarios = await _repositoryUsers.CountAllUsers();
+                var cantidadPorPagina = Session.GetCantidadUsersSession(_httpContext);
+
+                var users = await _repositoryUsers.GetUsers(1, cantidadUsuarios);
                 return users;
             }
             catch (Exception ex)
@@ -163,12 +184,18 @@ namespace Backend_portafolio.Services
         {
             try
             {
+                //Mappear el usuario
                 var user = await GetDataUser();
                 var userViewModel = _mapper.Map<UserViewModel>(user);
+
+                //Obtener roles
                 var roles = (await _repositoryRole.Obtener()).ToList();
+
                 userViewModel.RoleName = roles.Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
                 userViewModel.RolesName = roles;
+
                 userViewModel.Users = (await ObtenerUsuarios(page)).ToList();
+
                 return userViewModel;
             }
             catch (Exception ex)
@@ -177,18 +204,42 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public async Task<UserViewModel> SearchUser(string search, int page = 1)
+        public async Task<UserViewModel> SearchUser(string search, int role = 0, int page = 1)
         {
             try
             {
+
+                //crear session de cantidad de post en caso de no haber sido ya creada
+                if (Session.GetCantidadUsersSession(_httpContext) == -1)
+                {
+                    Session.CantidadUsersSession(_httpContext, 10);
+                }
+
+                var cantidadPorPagina = Session.GetCantidadUsersSession(_httpContext);
                 var user = await GetDataUser();
                 var userViewModel = _mapper.Map<UserViewModel>(user);
                 var roles = (await _repositoryRole.Obtener()).ToList();
+                var allUsers = await ObtenerUsuarios();
+
                 userViewModel.RoleName = roles.Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
                 userViewModel.RolesName = roles;
-                var allUsers = await ObtenerUsuarios(page);
-                var usersSearched = allUsers.Where(x => x.username.ToLower().Contains(search.ToLower()) || x.name.ToLower().Contains(search.ToLower()) || x.email.ToLower().Contains(search.ToLower())).ToList();
-                userViewModel.Users = usersSearched;
+                userViewModel.Users = allUsers;
+
+                // Usuario por Palabra
+                if (search != null)
+                {
+                    var usersSearched = userViewModel.Users.Where(x => x.username.ToLower().Contains(search.ToLower()) || x.name.ToLower().Contains(search.ToLower()) || x.email.ToLower().Contains(search.ToLower())).ToList();
+                    userViewModel.Users = usersSearched;
+                }
+
+                //Usuario por Role
+                if (role != 0)
+                {
+                    var usersSearched = userViewModel.Users.Where(x => x.role == role).ToList();
+                    userViewModel.Users = usersSearched;
+                }
+
+                userViewModel.Users = userViewModel.Users.Skip(cantidadPorPagina * page - 1).Take(cantidadPorPagina).ToList();
 
                 return userViewModel;
             }

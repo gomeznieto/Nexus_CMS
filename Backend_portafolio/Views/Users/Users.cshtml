@@ -14,6 +14,14 @@
         pageValue = 1;
     }
 
+    if (!int.TryParse(ViewContext.HttpContext.Request.Query["role"], out int roleValue))
+    {
+        roleValue = 0;
+    }
+
+    string buscarValue = ViewContext.HttpContext.Request.Query["buscar"];
+
+
     //Cantidad de entradas por post
     var cantidadPorPost = Session.GetCantidadUsersSession(HttpContextAccessor.HttpContext);
 
@@ -27,7 +35,7 @@
 <div class="d-flex flex-column flex-lg-row justify-content-lg-between lign-items-lg-center col-6 col-lg-12">
 
     <!-- CREAR NUEVO -->
-    <select onchange="cambiarCantidadUserss(this.value)" class="form-select select-style w-25">
+    <select id="cantidadUserList" class="form-select select-style w-25" onchange="cambiarCantidadUserss(this.value)">
         <option selected>Cantidad de Usuarios</option>
         <option value="5">5</option>
         <option value="10">10</option>
@@ -35,12 +43,20 @@
     </select>
 
     <!-- BUSCADOR-->
-    <form method="post" asp-action="Users" class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">
-        <input type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
+    @* <form method="post" asp-action="Users" class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2"> *@
+        <select id="roleUserList" name="role" class="form-select select-style w-25">
+            <option selected>Roles</option>
+            @foreach (var role in Model.RolesName)
+            {
+                <option value="@role.id">@role.name</option>
+            })
+        </select>
+
+        <input id="searchUserList" type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
         <div class="input-group-append">
-            <button type="submit" class="btn btn-action">Buscar</button>
+        <button type="submit" class="btn btn-action" onclick="buscarUsuarios()">Buscar</button>
         </div>
-    </form>
+    @* </form> *@
 
 </div>
 
@@ -84,35 +100,35 @@
 
         <button class="btn btn-action" id="btnAddRedes" onclick="showForm()"><i class="fa-solid fa-plus me-2"></i>Editar Usuariosl</button>
 
-        @if(paginas > 1)
+        @if (paginas > 1)
         {
-        <nav class="w-100 d-flex justify-content-center">
-            <ul class="pagination justify-content-end">
+            <nav class="w-100 d-flex justify-content-center">
+                <ul class="pagination justify-content-end">
 
-                @if (pageValue != 1)
-                {
-                    <li class="page-item">
-                        <a class="page-link bg-pagination" href="/Users/Users/?page=@((pageValue - 1).ToString())"><i class="fa-solid fa-chevron-left"></i></a>
-                    </li>
-                }
+                    @if (pageValue != 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link bg-pagination" href="/Users/Users/?buscar=@(buscarValue)&role=@(roleValue)&page=@((pageValue - 1).ToString())"><i class="fa-solid fa-chevron-left"></i></a>
+                        </li>
+                    }
 
-                @for (int i = 1; i <= @paginas; i++)
-                {
-                    <li class="page-item"><a class="page-link @(pageValue == i ? "bg-pagination-active" : "bg-pagination")" href="/Users/Users/?page=@(i.ToString())">@(i)</a></li>
-                }
+                    @for (int i = 1; i <= @paginas; i++)
+                    {
+                        <li class="page-item"><a class="page-link @(pageValue == i ? "bg-pagination-active" : "bg-pagination")" href="/Users/Users/?buscar=@(buscarValue)&role=@(roleValue)&page=@(i.ToString())">@(i)</a></li>
+                    }
 
-                @if ((pageValue) < @paginas)
-                {
-                    <li class="page-item">
-                        <a class="page-link bg-pagination" href="/Users/Users/?format=page=@((pageValue + 1).ToString())"><i class="fa-solid fa-chevron-right"></i></a>
-                    </li>
-                }
+                    @if ((pageValue) < @paginas)
+                    {
+                        <li class="page-item">
+                            <a class="page-link bg-pagination" href="/Users/Users/?buscar=@(buscarValue)&role=@(roleValue)&page=@((pageValue + 1).ToString())"><i class="fa-solid fa-chevron-right"></i></a>
+                        </li>
+                    }
 
-            </ul>
-        </nav>
+                </ul>
+            </nav>
         }
     </div>
-    
+
     <!-- FIN TABLA CON REDES SOCIALES-->
     <!-- AGREGAR RED SOCIAL -->
     @* <div class="hide col-6" id="formAddRedes">
@@ -177,7 +193,7 @@
 <partial name="_Modal" model='new { url = "/Network", action="BorrarRedes" }' />
 
 @section Scripts
-    {
+{
     <partial name="_ValidationScriptsPartial" />
 }
 <script>

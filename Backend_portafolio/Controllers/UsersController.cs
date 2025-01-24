@@ -128,33 +128,19 @@ namespace Backend_portafolio.Controllers
         //****************************************************
 
         [HttpGet]
-        public async Task<IActionResult>Users(int page = 1)
+        public async Task<IActionResult> Users(string buscar, int role, int page = 1)
         {
             try
             {
-                var viewModel = await _usersService.GetUserViewModel(page);
+                var viewModel = new UserViewModel();
+
+                if (buscar != null || role != 0)
+                    viewModel = await _usersService.SearchUser(buscar, role, page);
+                else
+                    viewModel = await _usersService.GetUserViewModel(page);
 
                 //Salida de la vista
-                ViewBag.Cantidad = await _usersService.GetTotalCountUsers();
-                ViewBag.Message = "No hay entradas para mostrar";
-
-                return View(viewModel);
-            }
-            catch (Exception ex)
-            {
-                Session.CrearModalError(ex.Message, "Users", HttpContext);
-                return RedirectToAction("Index", "Home");
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Users(string buscar, int page = 1)
-        {
-            try
-            {
-                var viewModel = await _usersService.SearchUser(buscar, page);
-
-                //Salida de la vista
+                //ViewBag.Cantidad = await _usersService.GetTotalCountUsers();
                 ViewBag.Cantidad = viewModel.Users.Count();
                 ViewBag.Message = "No hay entradas para mostrar";
 
@@ -166,6 +152,30 @@ namespace Backend_portafolio.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
+
+        //****************************************************
+        //********************* BUSCAR **********************
+        //****************************************************
+
+        //[HttpPost]
+        //public async Task<IActionResult> Users(string buscar, int role = 0, int page = 1)
+        //{
+        //    try
+        //    {
+        //        var viewModel = await _usersService.SearchUser(buscar, role, page);
+
+        //        //Salida de la vista
+        //        ViewBag.Cantidad = viewModel.Users.Count();
+        //        ViewBag.Message = "No hay entradas para mostrar";
+
+        //        return View(viewModel);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Session.CrearModalError(ex.Message, "Users", HttpContext);
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //}
 
         //****************************************************
         //********************* PROFILE **********************
@@ -230,7 +240,7 @@ namespace Backend_portafolio.Controllers
             }
         }
 
-    
+
         //****************************************************
         //********************* FUNCIONES ********************
         //****************************************************

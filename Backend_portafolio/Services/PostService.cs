@@ -218,6 +218,7 @@ namespace Backend_portafolio.Sevices
 
                 viewModel.formats = await ObtenerFormatos();
                 viewModel.format_id = int.Parse(viewModel.formats.Where(f => f.Text == format).Select(f => f.Value).FirstOrDefault());
+                viewModel.format = format;
 
                 if (viewModel.format_id == 0)
                     throw new Exception("¡El formato no existe!");

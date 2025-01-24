@@ -170,12 +170,8 @@ namespace Backend_portafolio.Sevices
             try
             {
                 var userID = _usersService.ObtenerUsuario();
-                var existeCategoria = await _repositoryFormat.Existe(name, userID);
-
-                if (existeCategoria)
-                    throw new Exception($"El nombre {name} ya existe!");
-
-                return existeCategoria;
+                var existsFormat = await _repositoryFormat.Existe(name, userID);
+                return existsFormat;
             }
             catch (Exception ex)
             {

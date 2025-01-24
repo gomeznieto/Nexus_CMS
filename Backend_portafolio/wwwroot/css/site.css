@@ -15,6 +15,7 @@
     --btn-color-border-focus: rgb(50, 105, 153);
     --text-color-error: rgb(252, 129, 129);
     --text-color-disabled: rgb(63, 68, 78);
+    --text-color-title: rgb(166, 131, 27);
     --bg-btn-action: #81E6D9;
     --bg-btn-action-hover: rgb(79, 209, 197);
     --bg-btn-delete: rgb(254, 178, 178);
@@ -55,6 +56,11 @@ body {
     background-color: var(--bg-color-primary);
     color: var(--text-color-primary);
     font-family: "Inter", sans-serif;
+    font-weight: 500
+}
+
+h1{
+    color: var(--text-color-title);
 }
 
 

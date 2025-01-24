@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend_portafolio.Controllers
 {
-	public class ModalsController:Controller
+	public class SessionController:Controller
 	{
 
 		[AllowAnonymous]
