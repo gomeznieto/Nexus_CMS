@@ -116,7 +116,6 @@ builder.Services.AddSingleton<IEncryptionService>(provider =>
 var app = builder.Build();
 
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
 	app.UseExceptionHandler("/Home/Error");
@@ -124,22 +123,26 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
-//*** TEST *****///
 
-// Crear el primer usuario administrador
-//using (var scope = app.Services.CreateScope())
-//{
-//    var services = scope.ServiceProvider;
-//    try
-//    {
-//        var userService = services.GetRequiredService<IUsersService>();
-//        await CreateAdminUserAsync(userService);
-//    }
-//    catch (Exception ex)
-//    {
-//        Console.WriteLine($"Error al crear el usuario administrador: {ex.Message}");
-//    }
-//}
+//****************************************************
+//****************** HOST BUILDER  *******************
+//****************************************************
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        var userService = services.GetRequiredService<IUsersService>();
+        var roleService = services.GetRequiredService<IRoleService>();
+
+        await CreateAdminUserAsync(userService, roleService);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error al crear el usuario administrador: {ex.Message}");
+    }
+}
 
 // Configuración del middleware
 if (!app.Environment.IsDevelopment())
@@ -165,35 +168,27 @@ app.MapControllerRoute(
 app.Run();
 
 
-//// Método para crear el usuario administrador
-//static async Task CreateAdminUserAsync(IUsersService userService)
-//{
-//    // Verificar si ya existe el usuario administrador
-//    User adminUser = await userService.GetUserByUser("admin");
+// Método para crear el usuario administrador
+static async Task CreateAdminUserAsync(IUsersService userService, IRoleService roleService)
+{
+	try
+	{
+        //Verificar si existe el rol de administrador
+        RoleViewModel roleViewModel = await roleService.GetRoleByName("admin");
+        User user = await userService.GetUserByUser("admin");
 
-//    if (adminUser == null)
-//    {
-//        // Crear el usuario administrador
-//        var newUser = new RegisterViewModel()
-//        {
-//            Username = "admin",
-//            Email = "admin@example.com",
-//            Password = "PasswordSegura123!",
-//            role = 1,
-//        };
+        if (roleViewModel == null)
+        {
+            await roleService.CreateAdminRole();
+        }
 
-//        var result = await userService.CreateUserAsync(newUser);
-//        if (result)
-//        {
-//            Console.WriteLine("Primer usuario administrador creado con éxito.");
-//        }
-//        else
-//        {
-//            Console.WriteLine("Error al crear el usuario administrador.");
-//        }
-//    }
-//    else
-//    {
-//        Console.WriteLine("El usuario administrador ya existe.");
-//    }
-//}
+        if (user == null)
+        {
+            await userService.CreateAdminUser();
+        }
+    }
+	catch (Exception ex)
+	{
+        throw new Exception(ex.Message);
+	}
+}

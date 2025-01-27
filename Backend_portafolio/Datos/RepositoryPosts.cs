@@ -62,7 +62,7 @@ namespace Backend_portafolio.Datos
         {
             using var connection = new SqlConnection(_connectionString);
 
-            var query = $@"SELECT P.{POST.ID}, P.{POST.TITULO}, P.{POST.DESCRIPCION}, P.{POST.COVER}, P.{POST.CREADO}, P.{POST.CATEGORIA_ID}, P.{POST.FORMAT_ID}, P.{POST.USER_ID}, P.{POST.BORRADOR}, P.{POST.MODIFICADO},
+            var query = $@"SELECT P.{POST.ID}, P.{POST.TITULO}, P.{POST.DESCRIPCION}, P.{POST.COVER}, P.{POST.CREADO}, P.{POST.FORMAT_ID}, P.{POST.USER_ID}, P.{POST.BORRADOR}, P.{POST.MODIFICADO},
 						U.{POST.NOMBRE} as {POST.USER}, F.{FORMAT.NOMBRE} as {POST.FORMAT}
 						FROM {POST.TABLA} P
 						INNER JOIN users U ON P.{POST.USER_ID} = U.id

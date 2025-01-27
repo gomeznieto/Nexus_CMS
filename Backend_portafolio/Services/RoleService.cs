@@ -13,6 +13,8 @@ namespace Backend_portafolio.Services
         Task DeleteRole(int id);
         Task EditRole(RoleViewModel viewModel);
         Task<Role> GetRoleById(int id);
+        Task<RoleViewModel> GetRoleByName(string roleName);
+        Task CreateAdminRole();
     }
     public class RoleService : IRoleService
     {
@@ -76,6 +78,25 @@ namespace Backend_portafolio.Services
             }
         }
 
+        public async Task<RoleViewModel>GetRoleByName(string roleName)
+        {
+            try
+            {
+                var role = await _repositoryRole.BuscarPorNombre(roleName);
+
+                if (role == null)
+                    return null;
+
+
+                var roleViewModel = _mapper.Map<RoleViewModel>(role);
+                return roleViewModel;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         //****************************************************
         //********************** CREATE **********************
         //****************************************************
@@ -98,6 +119,31 @@ namespace Backend_portafolio.Services
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task CreateAdminRole()
+        {
+
+            try
+            {
+                var isThereAdminRole = await _repositoryRole.BuscarPorNombre("admin");
+
+                if (isThereAdminRole != null)
+                    return;
+
+                var role = new Role()
+                {
+                    name = "admin"
+                };
+
+                await _repositoryRole.Crear(role);
+
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
 

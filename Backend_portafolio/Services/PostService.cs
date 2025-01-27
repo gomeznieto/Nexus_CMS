@@ -85,7 +85,6 @@ namespace Backend_portafolio.Sevices
         {
             try
             {
-                
                 if(userID == 0)
                     userID = _usersService.ObtenerUsuario();
 

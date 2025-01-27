@@ -34,6 +34,7 @@ namespace Backend_portafolio.Services
         Task<List<UserViewModel>> ObtenerUsuarios();
         Task<UserDataListViewModel> GetUserDataList(int page = 1);
         Task EditUserByAdmin(UserDataListViewModel viewModel);
+        Task CreateAdminUser();
     }
 
     public class UsersService : IUsersService
@@ -337,6 +338,31 @@ namespace Backend_portafolio.Services
                 if (!result.Succeeded)
                     throw new ApplicationException("Error al registrar el usuario");
 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task CreateAdminUser()
+        {
+            var provisoryPassword = "123456";
+
+            try
+            {
+                var countUsers = await _repositoryUsers.CountAllUsers();
+                var adminRole = await _repositoryRole.BuscarPorNombre("admin");
+
+                if (countUsers > 0)
+                    return;
+
+                var newUser = new User();
+                newUser.username = "admin";
+                newUser.email = "";
+                newUser.name = "admin";
+                newUser.role = adminRole.id;
+                var result = await _userManager.CreateAsync(_mapper.Map<User>(newUser), password: provisoryPassword);
             }
             catch (Exception ex)
             {
