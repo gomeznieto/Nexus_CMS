@@ -132,16 +132,15 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                var viewModel = new UserViewModel();
+                var viewModel = new UserDataListViewModel();
 
                 if (buscar != null || role != 0)
                     viewModel = await _usersService.SearchUser(buscar, role, page);
                 else
-                    viewModel = await _usersService.GetUserViewModel(page);
+                    viewModel = await _usersService.GetUserDataList(page);
 
                 //Salida de la vista
                 //ViewBag.Cantidad = await _usersService.GetTotalCountUsers();
-                ViewBag.Cantidad = viewModel.Users.Count();
                 ViewBag.Message = "No hay entradas para mostrar";
 
                 return View(viewModel);
@@ -153,29 +152,6 @@ namespace Backend_portafolio.Controllers
             }
         }
 
-        //****************************************************
-        //********************* BUSCAR **********************
-        //****************************************************
-
-        //[HttpPost]
-        //public async Task<IActionResult> Users(string buscar, int role = 0, int page = 1)
-        //{
-        //    try
-        //    {
-        //        var viewModel = await _usersService.SearchUser(buscar, role, page);
-
-        //        //Salida de la vista
-        //        ViewBag.Cantidad = viewModel.Users.Count();
-        //        ViewBag.Message = "No hay entradas para mostrar";
-
-        //        return View(viewModel);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Session.CrearModalError(ex.Message, "Users", HttpContext);
-        //        return RedirectToAction("Index", "Home");
-        //    }
-        //}
 
         //****************************************************
         //********************* PROFILE **********************
@@ -198,7 +174,7 @@ namespace Backend_portafolio.Controllers
         }
 
         //****************************************************
-        //******************* EDIT REGISTER ******************
+        //************* EDIT REGISTER BY USER  ***************
         //****************************************************
 
         [HttpPost]
@@ -216,6 +192,29 @@ namespace Backend_portafolio.Controllers
                 return RedirectToAction("Perfil");
             }
         }
+
+
+        //****************************************************
+        //************* EDIT REGISTER BY ADMIN  **************
+        //****************************************************
+
+        [HttpPost]
+        public async Task<IActionResult>EditRole(UserDataListViewModel viewModel)
+        {
+            try
+            {
+                await _usersService.EditUserByAdmin(viewModel);
+                Session.CrearModalSuccess("El Usuario ha sido editado exitosamente", "Users", HttpContext);
+                return RedirectToAction("Users");
+            }
+            catch (Exception ex)
+            {
+
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Users");
+            }
+        }
+
 
         //****************************************************
         //******************** EDIT PASS *********************
@@ -269,7 +268,11 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                await _usersService.verifyPassword(password);
+                var result = await _usersService.verifyPassword(password);
+
+                if (!result)
+                    throw new Exception("La contrasela es incorrecta");
+
                 return Json(true);
             }
             catch (Exception ex)

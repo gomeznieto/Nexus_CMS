@@ -22,16 +22,18 @@ namespace Backend_portafolio.Services
         Task LogoutUser();
         Task VerifyEmail(string email);
         Task verifyNewPassword(string newPass, string repeatNewPass);
-        Task verifyPassword(string pass);
+        Task<bool> verifyPassword(string pass);
         Task<RegisterViewModel> GetRegisterViewModel(RegisterViewModel viewModel = null);
         Task<User> GetDataUser();
         Task<User> GetUserByApiKey(string apiKey);
         Task<User> GetUserByUser(string username);
-        Task<UserViewModel> GetUserViewModel(int page = 1);
+        Task<UserViewModel> GetUserViewModel();
         Task<int> GetTotalCountUsers();
-        Task<UserViewModel> SearchUser(string search, int role = 0, int page = 1);
+        Task<UserDataListViewModel> SearchUser(string search, int role = 0, int page = 1);
         Task<List<User>> ObtenerUsuarios(int page);
-        Task<List<User>> ObtenerUsuarios();
+        Task<List<UserViewModel>> ObtenerUsuarios();
+        Task<UserDataListViewModel> GetUserDataList(int page = 1);
+        Task EditUserByAdmin(UserDataListViewModel viewModel);
     }
 
     public class UsersService : IUsersService
@@ -84,7 +86,7 @@ namespace Backend_portafolio.Services
                 }
 
                 var cantidadPorPagina = Session.GetCantidadUsersSession(_httpContext);
-            
+
                 var users = await _repositoryUsers.GetUsers(page, cantidadPorPagina);
                 return users;
             }
@@ -94,16 +96,22 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public async Task<List<User>> ObtenerUsuarios()
+        public async Task<List<UserViewModel>> ObtenerUsuarios()
         {
             try
             {
                 await VerifyAdmin();
 
+                //crear session de cantidad de post en caso de no haber sido ya creada
+                if (Session.GetCantidadUsersSession(_httpContext) == -1)
+                {
+                    Session.CantidadUsersSession(_httpContext, 10);
+                }
+
                 var cantidadUsuarios = await _repositoryUsers.CountAllUsers();
                 var cantidadPorPagina = Session.GetCantidadUsersSession(_httpContext);
 
-                var users = await _repositoryUsers.GetUsers(1, cantidadUsuarios);
+                var users = _mapper.Map<List<UserViewModel>>(await _repositoryUsers.GetUsers(1, cantidadUsuarios));
                 return users;
             }
             catch (Exception ex)
@@ -180,7 +188,7 @@ namespace Backend_portafolio.Services
          * Obtiene el modelo de vista de usuario
          * @return Modelo de vista de usuario
          */
-        public async Task<UserViewModel> GetUserViewModel(int page = 1)
+        public async Task<UserViewModel> GetUserViewModel()
         {
             try
             {
@@ -194,8 +202,6 @@ namespace Backend_portafolio.Services
                 userViewModel.RoleName = roles.Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
                 userViewModel.RolesName = roles;
 
-                userViewModel.Users = (await ObtenerUsuarios(page)).ToList();
-
                 return userViewModel;
             }
             catch (Exception ex)
@@ -204,42 +210,65 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public async Task<UserViewModel> SearchUser(string search, int role = 0, int page = 1)
+        public async Task<UserDataListViewModel> GetUserDataList(int page = 1)
         {
             try
             {
 
-                //crear session de cantidad de post en caso de no haber sido ya creada
-                if (Session.GetCantidadUsersSession(_httpContext) == -1)
-                {
-                    Session.CantidadUsersSession(_httpContext, 10);
-                }
-
+                var userDataListViewModel = new UserDataListViewModel();
+                userDataListViewModel.totalUserList = (await ObtenerUsuarios()).Select(x => _mapper.Map<UserViewModel>(x)).ToList();
                 var cantidadPorPagina = Session.GetCantidadUsersSession(_httpContext);
-                var user = await GetDataUser();
-                var userViewModel = _mapper.Map<UserViewModel>(user);
+                userDataListViewModel.countUsers = userDataListViewModel.totalUserList.Count;
+                userDataListViewModel.usersList = userDataListViewModel.totalUserList.Skip(cantidadPorPagina * (page - 1)).Take(cantidadPorPagina).ToList();
+
+                var roles = (await _repositoryRole.Obtener()).ToList();
+
+                userDataListViewModel.roles = roles;
+
+                return userDataListViewModel;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<UserDataListViewModel> SearchUser(string search, int role = 0, int page = 1)
+        {
+            try
+            {
+                var cantidadPorPagina = Session.GetCantidadUsersSession(_httpContext);
+
                 var roles = (await _repositoryRole.Obtener()).ToList();
                 var allUsers = await ObtenerUsuarios();
 
-                userViewModel.RoleName = roles.Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault();
-                userViewModel.RolesName = roles;
-                userViewModel.Users = allUsers;
+                var userViewModel = new UserDataListViewModel();
+                userViewModel.roles = roles;
+                userViewModel.totalUserList = allUsers;
 
                 // Usuario por Palabra
                 if (search != null)
                 {
-                    var usersSearched = userViewModel.Users.Where(x => x.username.ToLower().Contains(search.ToLower()) || x.name.ToLower().Contains(search.ToLower()) || x.email.ToLower().Contains(search.ToLower())).ToList();
-                    userViewModel.Users = usersSearched;
+                    var usersSearched = userViewModel.totalUserList
+                        .Where(
+                        x => x.username.ToLower().Contains(search.ToLower()) ||
+                                x.name.ToLower().Contains(search.ToLower()) ||
+                                x.email.ToLower().Contains(search.ToLower())
+                        )
+                        .ToList();
+                    userViewModel.totalUserList = usersSearched;
                 }
 
                 //Usuario por Role
                 if (role != 0)
                 {
-                    var usersSearched = userViewModel.Users.Where(x => x.role == role).ToList();
-                    userViewModel.Users = usersSearched;
+                    var usersSearched = userViewModel.totalUserList.Where(x => x.role == role).ToList();
+                    userViewModel.totalUserList = usersSearched;
                 }
 
-                userViewModel.Users = userViewModel.Users.Skip(cantidadPorPagina * page - 1).Take(cantidadPorPagina).ToList();
+                userViewModel.countUsers = userViewModel.totalUserList.Count;
+                userViewModel.usersList = userViewModel.totalUserList.Skip(cantidadPorPagina * (page - 1)).Take(cantidadPorPagina).ToList();
 
                 return userViewModel;
             }
@@ -339,6 +368,42 @@ namespace Backend_portafolio.Services
 
                 if (!result.Succeeded)
                     throw new ApplicationException("Error al editar el usuario");
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task EditUserByAdmin(UserDataListViewModel viewModel)
+        {
+            try
+            {
+                var user = await _repositoryUsers.BuscarPorId(viewModel.id);
+
+                // Editar Role
+                if(user.role != viewModel.role)
+                {
+                    user.role = viewModel.role;
+                    await _repositoryUsers.EditarUsuario(user);
+                }
+
+                //Reestablecer la contraseña
+                if(viewModel.recoveryPass)
+                {
+                    var newPassword = _userManager.PasswordHasher.HashPassword(user, user.username + ".pass");
+                    user.passwordHash = newPassword;
+                    await _repositoryUsers.EditarUsuario(user);
+                }
+
+                //Reestablecer la ApiKey
+                if(viewModel.recoveryApikey)
+                {
+                    user.apiKey = _tokenService.GenerateApiKey();
+                    await _repositoryUsers.EditarUsuario(user);
+                }
 
 
             }
@@ -489,7 +554,7 @@ namespace Backend_portafolio.Services
             {
                 var user = await GetDataUser();
 
-                if(user.emailNormalizado == email.ToUpper())
+                if (user.emailNormalizado == email.ToUpper())
                     return;
 
                 var existEmail = await _repositoryUsers.ExistEmail(email);
@@ -507,15 +572,14 @@ namespace Backend_portafolio.Services
          * Verifica la contraseña de un usuario
          * @param pass Contraseña
          */
-        public async Task verifyPassword(string pass)
+        public async Task<bool> verifyPassword(string pass)
         {
             try
             {
                 var userData = await GetDataUser();
-                var existePass = await _userManager.CheckPasswordAsync(userData, pass);
+                return await _userManager.CheckPasswordAsync(userData, pass);
 
-                if (existePass)
-                    throw new Exception("La contrasela es incorrecta");
+                
             }
             catch (Exception ex)
             {

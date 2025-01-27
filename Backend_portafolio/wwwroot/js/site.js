@@ -461,7 +461,7 @@ async function cambiarCantidadEntradas(cantidadEntradas) {
     }
 }
 
-async function cambiarCantidadUserss(cantidadUsers) {
+async function cambiarCantidadUsers(cantidadUsers) {
 
 
     //Mandar por fetch para guardar session con nueva cantidad por entrada
@@ -471,7 +471,7 @@ async function cambiarCantidadUserss(cantidadUsers) {
 
     if (result) {
        
-        window.location.href = `/Users/users`
+        location.reload();
     }
 }
 
@@ -660,3 +660,11 @@ function actionBar() {
     let subMenuMediaUsers = document.getElementById("subMenuMediaUsers");
     subMenuMediaUsers.classList.toggle("collapse-absolute");
 }
+
+/* TOAST */
+
+function openToast() {
+    var x = document.getElementById("snackbar");
+    x.className = "show";
+    setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
+} 

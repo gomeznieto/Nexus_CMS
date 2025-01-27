@@ -14,7 +14,7 @@ namespace Backend_portafolio.Models
         public List<Role> RolesName { get; set; }
         public List<Bio> Bios { get; set; }
         public List<SocialNetwork> Networks { get; set; }
-        public List<User> Users{ get; set; }
+        //public List<User> Users{ get; set; }
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Remote(action: "VerficarExistePass", controller: "Users")]
