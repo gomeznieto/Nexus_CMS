@@ -26,8 +26,8 @@ namespace Backend_portafolio.Controllers
         [HttpGet]
         public async Task<IActionResult> Register()
         {
-            var viewModel = await _usersService.GetRegisterViewModel();
-            return View(viewModel);
+                var viewModel = await _usersService.GetRegisterViewModel();
+                return View(viewModel);
         }
 
         [HttpPost]
@@ -36,12 +36,14 @@ namespace Backend_portafolio.Controllers
             if (!ModelState.IsValid)
             {
                 viewModel = await _usersService.GetRegisterViewModel(viewModel);
+                Session.CrearModalError(ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).FirstOrDefault(), "Users", HttpContext);
                 return View(viewModel);
             }
 
             try
             {
                 await _usersService.CreateUser(viewModel);
+                Session.CrearModalSuccess("El Usuario ha sido Creado exitosamente", "Users", HttpContext);
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
@@ -111,7 +113,9 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                var viewModel = await _usersService.GetUserViewModel();
+                //var viewModel = await _usersService.GetUserViewModel();
+                var viewModel = await _usersService.GetPasswordViewModel();
+
                 return View(viewModel);
 
             }
@@ -139,8 +143,6 @@ namespace Backend_portafolio.Controllers
                 else
                     viewModel = await _usersService.GetUserDataList(page);
 
-                //Salida de la vista
-                //ViewBag.Cantidad = await _usersService.GetTotalCountUsers();
                 ViewBag.Message = "No hay entradas para mostrar";
 
                 return View(viewModel);
@@ -178,8 +180,15 @@ namespace Backend_portafolio.Controllers
         //****************************************************
 
         [HttpPost]
-        public async Task<IActionResult> EditarUser(UserViewModel ViewModel)
+        public async Task<IActionResult> Perfil(UserViewModel ViewModel)
         {
+
+            if (!ModelState.IsValid)
+            {
+                var viewModel = await _usersService.GetUserViewModel(ViewModel);
+                return View(ViewModel);
+            }
+
             try
             {
                 await _usersService.EditUser(ViewModel);
@@ -220,7 +229,7 @@ namespace Backend_portafolio.Controllers
         //******************** EDIT PASS *********************
         //****************************************************
         [HttpPost]
-        public async Task<IActionResult> EditarPass(UserViewModel viewModel)
+        public async Task<IActionResult> EditarPass(PasswordViewModel viewModel)
         {
 
             if (!ModelState.IsValid)

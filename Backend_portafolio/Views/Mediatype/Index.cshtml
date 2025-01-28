@@ -2,39 +2,46 @@
 @model IEnumerable<MediaType>
 
 @{
-	ViewData["Title"] = "Tipos de Media";
+    ViewData["Title"] = "Tipos de Media";
 }
 
 <h1 class="mb-3">Listado de Tipos de Media</h1>
 <p class="fs-6 mb-3">Categorias que se utilizan para organizar las entradas.</p>
 
-<a asp-action="Crear" class="btn btn-action mb-3">Crear nuevo tipo de media</a>
-<div class="border-table">
-	<table class="table table-borderless">
-		<thead class="table-text-color text-uppercase border-bottom table-border-row-color">
-			<tr class="table-titles">
-				<th class="col-10">Media types</th>
-				<th class="col-2">Acciones</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var mediatype in Model)
-			{
-				<tr class="@(mediatype == Model.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
-					<td>
-						@mediatype.name
-					</td>
-					<td class="d-flex gap-2">
-						<a class="btn btn-edit" asp-action="Editar" asp-route-id="@mediatype.id">Editar</a>
-						<a class="btn btn-delete" onclick="openModal({id: '@mediatype.id', name: '@mediatype.name'})">Borrar</a>
-					</td>
-				</tr>
-			}
-		</tbody>
+<a asp-action="Crear" class="btn btn-action mb-3"><i class="fa-solid fa-plus me-2"></i>Crear nuevo tipo de media</a>
+@if (Model.Count() > 0)
+{
 
-	</table>
-</div>
+    <div class="border-table">
+        <table class="table table-borderless">
+            <thead class="table-text-color text-uppercase border-bottom table-border-row-color">
+                <tr class="table-titles">
+                    <th class="col-10">Media types</th>
+                    <th class="col-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var mediatype in Model)
+                {
+                    <tr class="@(mediatype == Model.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
+                        <td>
+                            @mediatype.name
+                        </td>
+                        <td class="d-flex gap-2">
+                            <a class="btn btn-edit" asp-action="Editar" asp-route-id="@mediatype.id">Editar</a>
+                            <a class="btn btn-delete" onclick="openModal({id: '@mediatype.id', name: '@mediatype.name'})">Borrar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
 
+        </table>
+    </div>
+}
+else
+{
+    <partial name="_EmptyList" model='new { message = "Media Types"}' />
+}
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Mediatype", action = "Borrar" }' />
 

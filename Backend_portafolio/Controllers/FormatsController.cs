@@ -1,10 +1,7 @@
 ﻿using Backend_portafolio.Entities;
-using Backend_portafolio.Datos;
-using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Mvc;
 using Backend_portafolio.Sevices;
 using Backend_portafolio.Helper;
-using Microsoft.AspNetCore.Http;
 
 namespace Backend_portafolio.Controllers
 {
@@ -98,6 +95,7 @@ namespace Backend_portafolio.Controllers
             try
             {
                 await _formatService.EditFormat(model);
+                Session.CrearModalSuccess("El formato se ha editado correctamente", "Formats", HttpContext);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)

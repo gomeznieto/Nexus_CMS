@@ -59,8 +59,8 @@ namespace Backend_portafolio.Datos
             using var connection = new SqlConnection(_connectionString);
 
             var id = await connection.QuerySingleAsync<int>(@"
-            INSERT INTO users (name, username, usernameNormalizado, email, emailNormalizado, passwordHash, role, apiKey) 
-            VALUES (@name, @username, @usernameNormalizado, @email, @emailNormalizado, @passwordHash, @role, @apiKey);
+            INSERT INTO users (name, username, usernameNormalizado, email, emailNormalizado, passwordHash, role, apiKey, securityStamp) 
+            VALUES (@name, @username, @usernameNormalizado, @email, @emailNormalizado, @passwordHash, @role, @apiKey, NEWID());
             SELECT SCOPE_IDENTITY();
             ", user);
 

@@ -7,7 +7,7 @@
 <h1 class="mb-5">Editar @Model.name</h1>
 
 @* ERRORES *@
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div asp-validation-summary="ModelOnly" class="validate-error"></div>
 
 @* FORMULARIO *@
 <form asp-controller="Formats" asp-action="Editar">
@@ -16,7 +16,7 @@
 	<div class="mb-3">
 		<div class="flex-column">
 			<input type="text" asp-for="name" class="form-control" />
-			<span asp-validation-for="name" class="text-danger"></span>
+			<span asp-validation-for="name" class="validate-error"></span>
 		</div>
 		<button type="submit" class="btn btn-edit mt-3">Actualizar</button>
 		<a asp-action="Index" class="btn btn-delete mt-3">cancelar</a>

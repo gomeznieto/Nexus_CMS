@@ -668,3 +668,13 @@ function openToast() {
     x.className = "show";
     setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
 } 
+
+/* HANDLE LINKS */
+
+function handleLinkClickCloseModal(event, url) {
+    event.preventDefault();
+
+    closeModalError();
+
+    window.location.href = url;
+}

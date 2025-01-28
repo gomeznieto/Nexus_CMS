@@ -9,7 +9,9 @@ namespace Backend_portafolio.Entities
         public int id { get; set; }
         [Display(Name = "Nombre")]
         public string name { get; set; }
-        public  string username { get; set; }
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+
+        public string username { get; set; }
         public string usernameNormalizado { get; set; }
         public int role { get; set; }
         [Display(Name = "Imagen de Perfil")]
@@ -20,8 +22,9 @@ namespace Backend_portafolio.Entities
         public string about { get; set; }
         [Display(Name = "Hobbies")]
         public string hobbies { get; set; }
-        [Display(Name = "E-Mail")]
+        [Display(Name = "Email")]
         [Remote(action: "VerificarExisteEmail", controller: "Users")]
+        [Required(ErrorMessage = "El campo {0} es requerido")]
         public string email { get; set; }
         public string emailNormalizado { get; set; }
         public string passwordHash { get; set; }

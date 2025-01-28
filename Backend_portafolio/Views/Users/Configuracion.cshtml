@@ -1,4 +1,4 @@
-﻿@model UserViewModel
+﻿@model PasswordViewModel
 
 @{
     ViewData["Title"] = "Configuración";
@@ -9,7 +9,7 @@
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <div class="w-100 p-1 row gap-3">
     <form asp-action="EditarPass" asp-controller="Users" class="mt-2 col-6 p-2">
-        <!-- PASS ANTERIOR-->
+        <input type="hidden" asp-for="id" />        <!-- PASS ANTERIOR-->
         <div class="mt-3">
             <label>Contraseña Anterior</label>
             <div class="input-group input-group-sm flex-nowrap">

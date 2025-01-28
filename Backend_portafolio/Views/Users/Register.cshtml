@@ -4,32 +4,36 @@
     ViewData["title"] = "Registro de usuarios";
 }
 
+<!-- ERRORES -->
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+
 <h1>Registro</h1>
-<form asp-action="Register">
+<form asp-action="Register" class="col-10">
+    <!-- NOMBRE -->
     <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+        <label asp-for="Name" class="form-label required-label label"></label>
+        <input asp-for="Name" class="form-control" placeholder="Ingrese el nombre"/>
+        <span asp-validation-for="Name" class="validate-error"></span>
     </div>
+
+    <!-- USERNAME -->
     <div class="mb-3">
-        <label asp-for="Username" class="form-label"></label>
-        <input asp-for="Username" class="form-control" />
-        <span asp-validation-for="Username" class="text-danger"></span>
+        <label asp-for="Username" class="form-label required-label label"></label>
+        <input asp-for="Username" class="form-control" placeholder="Ingrese el username" />
+        <span asp-validation-for="Username" class="validate-error"></span>
     </div>
+
+    <!-- EMAIL -->
     <div class="mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control"/>
-        <span asp-validation-for="Email" class="text-danger"></span>
+        <label asp-for="Email" class="form-label required-label label"></label>
+        <input asp-for="Email" class="form-control" placeholder="Ingrese el Email"/>
+        <span asp-validation-for="Email" class="validate-error"></span>
     </div>
+
+    <!-- ROLS -->
     <div class="mb-3">
-        <label asp-for="Password" class="form-label"></label>
-        <input asp-for="Password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <h3 class="fs-5">Rol</h3>
+        <label class="form-label required-label label">Rol</label>
         <select class="form-select select-style" asp-for="role">
             <option disabled selected>Seleccione rol</option>
             @foreach (var role in Model.roles)
@@ -37,9 +41,12 @@
                 <option value="@role.id">@role.name</option>
             }
         </select>
-        <span asp-validation-for="role" class="text-danger"></span>
+        <span asp-validation-for="role" class="validate-error"></span>
     </div>
+
+    <!-- BOTONES -->
     <button class="btn btn-action">Registrar</button>
+    <a href="Users/Users" class="btn btn-delete">Cancelar</a>
 </form>
 
 @section Scripts {

@@ -8,6 +8,7 @@ namespace Backend_portafolio.Entities
         public int id { get; set; }
         [Display(Name = "Formato de Entrada")]
         [Remote(action: "VerificarExisteFormato", controller: "Formats")]
+        [Required(ErrorMessage = "El campo {0} es requerido")]
         public string name { get; set; }
         public int user_id { get; set; }
     }

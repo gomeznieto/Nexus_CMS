@@ -7,7 +7,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using System.Data;
 using Backend_portafolio.Helper;
-using Microsoft.AspNetCore.Mvc.Formatters;
 
 
 namespace Backend_portafolio.Services
@@ -15,7 +14,7 @@ namespace Backend_portafolio.Services
     public interface IUsersService
     {
         int ObtenerUsuario();
-        Task ChangePassword(UserViewModel viewModel);
+        Task ChangePassword(PasswordViewModel viewModel);
         Task CreateUser(RegisterViewModel viewModel);
         Task EditUser(UserViewModel viewModel);
         Task LoginUser(LoginViewModel viewModel);
@@ -27,7 +26,7 @@ namespace Backend_portafolio.Services
         Task<User> GetDataUser();
         Task<User> GetUserByApiKey(string apiKey);
         Task<User> GetUserByUser(string username);
-        Task<UserViewModel> GetUserViewModel();
+        Task<UserViewModel> GetUserViewModel(UserViewModel userViewModel = null);
         Task<int> GetTotalCountUsers();
         Task<UserDataListViewModel> SearchUser(string search, int role = 0, int page = 1);
         Task<List<User>> ObtenerUsuarios(int page);
@@ -35,6 +34,7 @@ namespace Backend_portafolio.Services
         Task<UserDataListViewModel> GetUserDataList(int page = 1);
         Task EditUserByAdmin(UserDataListViewModel viewModel);
         Task CreateAdminUser();
+        Task<PasswordViewModel> GetPasswordViewModel();
     }
 
     public class UsersService : IUsersService
@@ -189,13 +189,14 @@ namespace Backend_portafolio.Services
          * Obtiene el modelo de vista de usuario
          * @return Modelo de vista de usuario
          */
-        public async Task<UserViewModel> GetUserViewModel()
+        public async Task<UserViewModel> GetUserViewModel(UserViewModel userViewModel = null)
         {
             try
             {
-                //Mappear el usuario
                 var user = await GetDataUser();
-                var userViewModel = _mapper.Map<UserViewModel>(user);
+                //Mappear el usuario
+                if (userViewModel == null)
+                    userViewModel = _mapper.Map<UserViewModel>(user);
 
                 //Obtener roles
                 var roles = (await _repositoryRole.Obtener()).ToList();
@@ -232,6 +233,24 @@ namespace Backend_portafolio.Services
             {
 
                 throw;
+            }
+        }
+
+        public async Task<PasswordViewModel> GetPasswordViewModel()
+        {
+            try
+            {
+                var userID = ObtenerUsuario();
+                var viewModel = new PasswordViewModel()
+                {
+                    id = userID
+                };
+
+                return viewModel;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
 
@@ -332,7 +351,7 @@ namespace Backend_portafolio.Services
                 // generamos ApiKey para que poder acceder a la API
                 newUSer.apiKey = _tokenService.GenerateApiKey();
 
-                var result = await _userManager.CreateAsync(newUSer, password: viewModel.Password);
+                var result = await _userManager.CreateAsync(newUSer, password: viewModel.Username + ".pass");
 
                 // SI no se pudo crear el usuario
                 if (!result.Succeeded)
@@ -383,12 +402,14 @@ namespace Backend_portafolio.Services
         {
             try
             {
-                User currentUser = await _signInManager.UserManager.GetUserAsync(_httpContext.User);
+                User currentUser = await GetDataUser();
                 User userEdit = _mapper.Map<User>(viewModel);
 
                 userEdit.img = viewModel.ImageFile != null
                     ? await _imageService.UploadImageAsync(viewModel.ImageFile, currentUser, "profile-images")
                     : currentUser.img;
+                userEdit.passwordHash = userEdit.passwordHash == null ? currentUser.passwordHash : userEdit.passwordHash;
+
 
                 var result = await _userManager.UpdateAsync(userEdit);
 
@@ -494,15 +515,18 @@ namespace Backend_portafolio.Services
          * Cambia la contraseña de un usuario
          * @param viewModel Modelo de vista de usuario
          */
-        public async Task ChangePassword(UserViewModel viewModel)
+        public async Task ChangePassword(PasswordViewModel viewModel)
         {
             try
             {
-                User currentUser = await _signInManager.UserManager.GetUserAsync(_httpContext.User);
+                User currentUser = await GetDataUser();
 
                 // Validar que el usuario exista
                 if (currentUser == null)
                     throw new ApplicationException("Usuario no encontrado");
+
+                if(viewModel.id != currentUser.id)
+                    throw new ApplicationException("No puede modificar la contraseña de otro usuario");
 
                 // Validar la contraseña actual
                 var isValidPassword = await _userManager.CheckPasswordAsync(currentUser, viewModel.password);

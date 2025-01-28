@@ -7,15 +7,15 @@
 
 <h1 class="mb-3">Crear Formato de Entrada</h1>
 <p class="mb-5 fs-6">El Formato es la manera de agrupar distintas entradas (Blog, Tutorial, Viaje, Proyecto...) </p>
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div asp-validation-summary="ModelOnly" class="validate-error"></div>
 @* FORMULARIO *@
 <form asp-controller="Formats" asp-action="Crear">
 	<input type="hidden" asp-for="user_id" />
 	<div class="mb-3">
 		<div class="flex-column">
 			<input type="text" asp-for="name" class="form-control" placeholder="Ingrese el Formato que quiere crear" />
-			<span asp-validation-for="name" class="text-danger"></span>
 		</div>
+		<span asp-validation-for="name" class="validate-error"></span>
 		<button type="submit" class="btn btn-action mt-3">Crear</button>
 		<a asp-action="Index" class="btn btn-delete mt-3">cancelar</a>
 	</div>

@@ -117,6 +117,9 @@ namespace Backend_portafolio.Sevices
                     throw new Exception("Formato no encontrado");
 
                 await _repositoryFormat.Editar(format);
+
+                //Actualizar Session de Formatos para barra de navegacion
+                await Helper.Session.UpdateSession(_httpContext, this, userID);
             }
             catch (Exception ex)
             {

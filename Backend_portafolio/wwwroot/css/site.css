@@ -248,6 +248,8 @@ table thead{
 }
 
 /* FORM */
+form input[type="email"],
+form input[type="password"],
 form input[type="text"] {
     border-color: var(--text-color-menu);
     background-color: var(--bg-color-primary);
@@ -705,3 +707,31 @@ form label {
         opacity: 0;
     }
 } 
+
+/* VALIDATE ERROR */
+
+.validate-error {
+    text-align: left;
+    color: var(--text-color-error);
+    margin-top: 5px;
+    font-weight: 200;
+    font-style: italic;
+}
+
+
+/* LABEL FORM*/
+
+.label {
+    display: flex;
+    justify-content: start;
+    align-items: start;
+}
+
+.required-label::after {
+    color: var(--text-color-error);
+    font-size: 10px;
+    margin-left: 5px;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: "\2a";
+}

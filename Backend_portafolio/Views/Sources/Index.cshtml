@@ -4,42 +4,51 @@
 @model IEnumerable<Source>
 
 @{
-	ViewData["Title"] = "Tipos de Media";
+    ViewData["Title"] = "Tipos de Media";
 }
 
 <h1 class="mb-3">Listado de Fuentes</h1>
 <p class="fs-6 mb-3">Fuentes de links que se pueden utilizar en las entradas.</p>
 
-<a asp-action="Crear" class="btn btn-action mb-3">Crear nueva fuente</a>
-<div class="border-table">
-	<table class="table table-borderless">
-		<thead class="table-text-color text-uppercase border-bottom table-border-row-color">
-			<tr class="table-titles">
-				<th class="col-7">Fuente</th>
-				<th class="col-3">Icono</th>
-				<th class="col-2">Acciones</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var source in Model)
-			{
-				<tr class="@(source == Model.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
-					<td>
-						@source.name
-					</td>
-					<td>
-						<i class="@source.icon fs-4"></i>
-					</td>
-					<td class="d-flex gap-2">
-						<a class="btn btn-edit" asp-action="Editar" asp-route-id="@source.id">Editar</a>
-						<a class="btn btn-delete" onclick="openModal({id: '@source.id', name: '@source.name'})">Borrar</a>
-					</td>
-				</tr>
-			}
-		</tbody>
+<a asp-action="Crear" class="btn btn-action mb-3"><i class="fa-solid fa-plus me-2"></i>Crear nueva fuente</a>
+@if (Model.Count() > 0)
+{
 
-	</table>
-</div>
+    <div class="border-table">
+        <table class="table table-borderless">
+            <thead class="table-text-color text-uppercase border-bottom table-border-row-color">
+                <tr class="table-titles">
+                    <th class="col-7">Fuente</th>
+                    <th class="col-3">Icono</th>
+                    <th class="col-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var source in Model)
+                {
+                    <tr class="@(source == Model.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
+                        <td>
+                            @source.name
+                        </td>
+                        <td>
+                            <i class="@source.icon fs-4"></i>
+                        </td>
+                        <td class="d-flex gap-2">
+                            <a class="btn btn-edit" asp-action="Editar" asp-route-id="@source.id">Editar</a>
+                            <a class="btn btn-delete" onclick="openModal({id: '@source.id', name: '@source.name'})">Borrar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+}
+else
+{
+    <partial name="_EmptyList" model='new { message = "Fuentes"}' />
+
+}
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Sources", action = "Borrar" }' />

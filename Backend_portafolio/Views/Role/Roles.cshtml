@@ -4,81 +4,79 @@
     ViewData["Title"] = "Roles";
 }
 
-<h1 class="mb-3">Crear Roles</h1>
-<p class="fs-6 mb-5">Con los roles podemos definir diferentes acciones para los usuarios</p>
+<h1 class="mb-3">Roles</h1>
+<p class="fs-6">Con los roles podemos definir diferentes acciones para los usuarios</p>
 
-<div class="w-100 p-1 row gap-3">
-
-    <div class=" mt-2 col-6 p-2">
-        <table class="table table-borderless">
-            <thead class="table-text-color text-uppercase border-bottom table-border-row-color">
-                <tr class="table-titles">
-                    <th scope="col" class="col-1">Rol</th>
-                </tr>
-            </thead>
-            <tbody class="table-body">
-                @foreach (var rol in Model.Roles)
+<div class="col-6 col-md-10">
+    <table class="table table-borderless">
+        <thead class="table-text-color text-uppercase border-bottom table-border-row-color">
+            <tr class="table-titles">
+                <th scope="col">Rol</th>
+            </tr>
+        </thead>
+        <tbody class="table-body">
+            @foreach (var rol in Model.Roles)
+            {
+                if (Model.Roles.Count() != 0)
                 {
-                    if (Model.Roles.Count() != 0)
-                    {
-                        <tr class="@(rol == Model.Roles.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
-                            <td>@rol.name</td>
-                            <td class="d-flex gap-2 justify-content-center">
-                                <a class="btn btn-edit" onclick="showFormEditar(@rol.id)">Editar</a>
-                                <a class="btn btn-delete" onclick="openModal({id: '@rol.id', name: '@rol.name'})" )>Borrar</a>
-                            </td>
-                        </tr>
-                    }
+                    <tr class="@(rol == Model.Roles.LastOrDefault() ? "border-bottom-0" : "border-bottom table-border-row-color")">
+                        <td class="col-8">@rol.name</td>
+                        <td class="d-flex gap-2 justify-content-center col-4">
+                            <a class="btn btn-edit" onclick="showFormEditar(@rol.id)">Editar</a>
+                            <a class="btn btn-delete" onclick="openModal({id: '@rol.id', name: '@rol.name'})" )>Borrar</a>
+                        </td>
+                    </tr>
                 }
-            </tbody>
-        </table> <!-- FIN LISTADO -->
-        <!-- BOTON CREAR -->
-        <button class="btn btn-action" onclick="showForm()"><i class="fa-solid fa-plus me-2"></i>Agregar Rol</button>
-        <!-- FIN BOTON CREAR -->
-    </div>
-
+            }
+        </tbody>
+    </table> <!-- FIN LISTADO -->
+    <!-- BOTON CREAR -->
+    <button class="btn btn-action mt-2" onclick="showForm()"><i class="fa-solid fa-plus me-2"></i>Agregar Rol</button>
+    <!-- FIN BOTON CREAR -->
     <!-- CREAR -->
-    <div id="formAddRole" class="hide mt-2 col-6 p-2">
-        <h2>Crear</h2>
-        <form asp-action="Roles" asp-controller="Role">
-            <!-- VALIDATION -->
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-            <div class="d-flex mt-2 gap-1">
-                <div class="col-8">
-                    <input type="text" class="form-control" id="inputFormRole" asp-for="@Model.name" placeholder="Ingrese el nombre del Rol" />
-                </div>
-                <div class="col-4">
-                    <button type="submit" class="btn btn-action">Guardar</button>
-                    <a class="btn btn-delete" onclick="hideForm()">Cancelar</a>
-                </div>
-            </div>
-            <span asp-validation-for="@Model.name" class="form-error"></span>
-        </form>
-
-        <!-- FIN CREAR-->
-    </div>
-
-    <!-- EDITAR -->
-    <div class="mt-2 col-6 p-2 hide" id="formEditar">
-        <h2>Editar</h2>
-        <form asp-action="EditarRole" asp-controller="Role">
-            <!-- VALIDATION -->
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-            <input type="hidden" id="formIdRole" asp-for="@Model.id" />
-            <div class="d-flex mt-2 gap-1">
-                <div class="col-8">
-                    <input type="text" class="form-control" id="inputFormRoleEditar" asp-for="@Model.name" />
-                </div>
-                <div class="col-4">
-                    <button type="submit" class="btn btn-edit">Editar</button>
-                    <a class="btn btn-delete" onclick="hideFormEditar()">Cancelar</a>
-                </div>
-            </div>
-            <span asp-validation-for="@Model.name" class="form-error"></span>
-        </form>
-    </div> <!-- FIN EDITAR -->
-
 </div>
+
+<div id="formAddRole" class="hide mt-4 col-6 col-md-10 p-2">
+    <h3>Crear</h3>
+    <div asp-validation-summary="ModelOnly" class="validate-error"></div>
+    <form asp-action="Roles" asp-controller="Role">
+        <!-- VALIDATION -->
+        <div class="d-flex mt-2 gap-1">
+            <div class="col-8">
+                <input type="text" class="form-control" id="inputFormRole" asp-for="@Model.name" placeholder="Ingrese el nombre del Rol" />
+            </div>
+            <div class="col-4">
+                <button type="submit" class="btn btn-action">Guardar</button>
+                <a class="btn btn-delete" onclick="hideForm()">Cancelar</a>
+            </div>
+        </div>
+        <span asp-validation-for="name" class="validate-error"></span>
+    </form>
+
+    <!-- FIN CREAR-->
+</div>
+
+<!-- EDITAR -->
+<div class="mt-4 col-6 col-md-10  p-2 hide" id="formEditar">
+    <h3>Editar</h3>
+
+    <div asp-validation-summary="ModelOnly" class="validate-error"></div>
+
+    <form asp-action="EditarRole" asp-controller="Role">
+        <!-- VALIDATION -->
+        <input type="hidden" id="formIdRole" asp-for="@Model.id" />
+        <div class="d-flex mt-2 gap-1">
+            <div class="col-8">
+                <input type="text" class="form-control" id="inputFormRoleEditar" asp-for="@Model.name" />
+            </div>
+            <div class="col-4">
+                <button type="submit" class="btn btn-edit">Editar</button>
+                <a class="btn btn-delete" onclick="hideFormEditar()">Cancelar</a>
+            </div>
+        </div>
+        <span asp-validation-for="name" class="validate-error"></span>
+    </form>
+</div> <!-- FIN EDITAR -->
 
 <!-- MODAL -->
 <partial name="_Modal" model='new { url = "/Role", action="BorrarRole" }' />
