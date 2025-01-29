@@ -21,13 +21,11 @@ builder.Services.AddControllersWithViews(options =>
 });
 builder.Services.AddSession();
 
-
 //****************************************************
 //***************** USER SERVICES ********************
 //****************************************************
-builder.Services.AddTransient<IUserStore<User>, UsersStore>();
-builder.Services.AddTransient<SignInManager<User>>();
-
+builder.Services.AddScoped<IUserStore<UserViewModel>, UsersStore>();
+builder.Services.AddScoped<SignInManager<UserViewModel>>();
 
 //****************************************************
 //*********************** DATA ***********************
@@ -68,7 +66,7 @@ builder.Services.AddTransient<IRoleService, RoleService>();
 //****************************************************
 //********************** AUTH ************************
 //****************************************************
-builder.Services.AddIdentityCore<User>(opciones =>
+builder.Services.AddIdentityCore<UserViewModel>(opciones =>
 {
 	opciones.Password.RequireUppercase = false;
 	opciones.Password.RequireLowercase = false;
@@ -175,7 +173,7 @@ static async Task CreateAdminUserAsync(IUsersService userService, IRoleService r
 	{
         //Verificar si existe el rol de administrador
         RoleViewModel roleViewModel = await roleService.GetRoleByName("admin");
-        User user = await userService.GetUserByUser("admin");
+        UserViewModel user = await userService.GetUserByUser("admin");
 
         if (roleViewModel == null)
         {

@@ -2,21 +2,20 @@
 @using Microsoft.AspNetCore.Http
 @using System.Text.Json;
 @using Microsoft.AspNetCore.Identity
-@using Backend_portafolio.Entities
-@inject SignInManager<User> MySignInManager
+@inject SignInManager<UserViewModel> MySignInManager
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
     // ENTRADAS JSON
     string formatsJson = string.Empty;
-    List<Format> formats = null;
+    List<FormatViewModel> formats = null;
 
     var currentUser = await MySignInManager.UserManager.GetUserAsync(User);
 
     @if (MySignInManager.IsSignedIn(User))
     {
         formatsJson = HttpContextAccessor.HttpContext.Session.GetString("Formats");
-        formats = JsonSerializer.Deserialize<List<Format>>(formatsJson);
+        formats = JsonSerializer.Deserialize<List<FormatViewModel>>(formatsJson);
     }
 
     //  modal

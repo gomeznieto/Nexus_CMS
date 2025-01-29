@@ -1,5 +1,4 @@
 ﻿using Backend_portafolio.Datos;
-using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
@@ -7,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using System.Data;
 using Backend_portafolio.Helper;
+using Backend_portafolio.Entities;
 
 
 namespace Backend_portafolio.Services
@@ -23,13 +23,13 @@ namespace Backend_portafolio.Services
         Task verifyNewPassword(string newPass, string repeatNewPass);
         Task<bool> verifyPassword(string pass);
         Task<RegisterViewModel> GetRegisterViewModel(RegisterViewModel viewModel = null);
-        Task<User> GetDataUser();
-        Task<User> GetUserByApiKey(string apiKey);
-        Task<User> GetUserByUser(string username);
+        Task<UserViewModel> GetDataUser();
+        Task<UserViewModel> GetUserByApiKey(string apiKey);
+        Task<UserViewModel> GetUserByUser(string username);
         Task<UserViewModel> GetUserViewModel(UserViewModel userViewModel = null);
         Task<int> GetTotalCountUsers();
         Task<UserDataListViewModel> SearchUser(string search, int role = 0, int page = 1);
-        Task<List<User>> ObtenerUsuarios(int page);
+        Task<List<UserViewModel>> ObtenerUsuarios(int page);
         Task<List<UserViewModel>> ObtenerUsuarios();
         Task<UserDataListViewModel> GetUserDataList(int page = 1);
         Task EditUserByAdmin(UserDataListViewModel viewModel);
@@ -45,8 +45,8 @@ namespace Backend_portafolio.Services
         private readonly IRepositoryRole _repositoryRole;
         private readonly IRepositoryUsers _repositoryUsers;
         private readonly ITokenService _tokenService;
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<UserViewModel> _signInManager;
+        private readonly UserManager<UserViewModel> _userManager;
 
         public UsersService(
             IHttpContextAccessor httpContextAccessor,
@@ -55,8 +55,8 @@ namespace Backend_portafolio.Services
             IRepositoryRole repositoryRole,
             IRepositoryUsers repositoryUsers,
             ITokenService tokenService,
-            SignInManager<User> MySignInManager,
-            UserManager<User> userManager
+            SignInManager<UserViewModel> MySignInManager,
+            UserManager<UserViewModel> userManager
             )
         {
             _httpContext = httpContextAccessor.HttpContext;
@@ -74,7 +74,7 @@ namespace Backend_portafolio.Services
         //*********************** GETS ***********************
         //****************************************************
 
-        public async Task<List<User>> ObtenerUsuarios(int page)
+        public async Task<List<UserViewModel>> ObtenerUsuarios(int page)
         {
             try
             {
@@ -89,7 +89,8 @@ namespace Backend_portafolio.Services
                 var cantidadPorPagina = Session.GetCantidadUsersSession(_httpContext);
 
                 var users = await _repositoryUsers.GetUsers(page, cantidadPorPagina);
-                return users;
+
+                return _mapper.Map<List<UserViewModel>>(users);
             }
             catch (Exception ex)
             {
@@ -150,11 +151,11 @@ namespace Backend_portafolio.Services
          * Obtiene los datos del usuario autenticado
          * @return Usuario
          */
-        public async Task<User> GetDataUser()
+        public async Task<UserViewModel> GetDataUser()
         {
             try
             {
-                User user = await _signInManager.UserManager.GetUserAsync(_httpContext.User);
+                UserViewModel user = (await _signInManager.UserManager.GetUserAsync(_httpContext.User));
                 return user;
             }
             catch (Exception ex)
@@ -173,7 +174,7 @@ namespace Backend_portafolio.Services
             try
             {
                 viewModel = viewModel ?? new RegisterViewModel();
-                var roles = (await _repositoryRole.Obtener()).ToList();
+                var roles = _mapper.Map<List<RoleViewModel>>((await _repositoryRole.Obtener()).ToList());
                 PasarMayusculas(ref roles);
                 viewModel.roles = roles;
 
@@ -298,12 +299,12 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public async Task<User> GetUserByUser(string username)
+        public async Task<UserViewModel> GetUserByUser(string username)
         {
             try
             {
                 var user = await _repositoryUsers.BuscarUsuarioPorUsername(username);
-                return user;
+                return _mapper.Map<UserViewModel>(user);
             }
             catch (Exception ex)
             {
@@ -337,16 +338,16 @@ namespace Backend_portafolio.Services
         {
             try
             {
-                User currentUser = await GetDataUser();
+                UserViewModel currentUser = await GetDataUser();
 
                 // Validar que el usuario tenga permisos para poder crear un usuario. Solos Admin pueden crear
-                Role adminRole = (await _repositoryRole.Obtener()).FirstOrDefault(x => x.name == "admin");
+                RoleViewModel adminRole = _mapper.Map<RoleViewModel>((await _repositoryRole.Obtener()).FirstOrDefault(x => x.name == "admin"));
 
                 if (adminRole != null && currentUser.role != adminRole.id)
                     throw new ApplicationException("No tienes permisos para registrar un nuevo usuario");
 
                 // Creamos el nuevo usuario
-                var newUSer = new User() { username = viewModel.Username, email = viewModel.Email, name = viewModel.Name, role = viewModel.role };
+                var newUSer = new UserViewModel() { username = viewModel.Username, email = viewModel.Email, name = viewModel.Name, role = viewModel.role };
 
                 // generamos ApiKey para que poder acceder a la API
                 newUSer.apiKey = _tokenService.GenerateApiKey();
@@ -376,12 +377,12 @@ namespace Backend_portafolio.Services
                 if (countUsers > 0)
                     return;
 
-                var newUser = new User();
+                var newUser = new UserViewModel();
                 newUser.username = "admin";
                 newUser.email = "";
                 newUser.name = "admin";
                 newUser.role = adminRole.id;
-                var result = await _userManager.CreateAsync(_mapper.Map<User>(newUser), password: provisoryPassword);
+                var result = await _userManager.CreateAsync(newUser, password: provisoryPassword);
             }
             catch (Exception ex)
             {
@@ -402,8 +403,8 @@ namespace Backend_portafolio.Services
         {
             try
             {
-                User currentUser = await GetDataUser();
-                User userEdit = _mapper.Map<User>(viewModel);
+                UserViewModel currentUser = await GetDataUser();
+                UserViewModel userEdit = _mapper.Map<UserViewModel>(viewModel);
 
                 userEdit.img = viewModel.ImageFile != null
                     ? await _imageService.UploadImageAsync(viewModel.ImageFile, currentUser, "profile-images")
@@ -440,7 +441,7 @@ namespace Backend_portafolio.Services
                 //Reestablecer la contraseña
                 if(viewModel.recoveryPass)
                 {
-                    var newPassword = _userManager.PasswordHasher.HashPassword(user, user.username + ".pass");
+                    var newPassword = _userManager.PasswordHasher.HashPassword(_mapper.Map<UserViewModel>(user), user.username + ".pass");
                     user.passwordHash = newPassword;
                     await _repositoryUsers.EditarUsuario(user);
                 }
@@ -519,7 +520,7 @@ namespace Backend_portafolio.Services
         {
             try
             {
-                User currentUser = await GetDataUser();
+                UserViewModel currentUser = await GetDataUser();
 
                 // Validar que el usuario exista
                 if (currentUser == null)
@@ -535,7 +536,7 @@ namespace Backend_portafolio.Services
                     throw new ApplicationException("Contraseña incorrecta");
 
                 // Editamso la pass
-                bool result = await _repositoryUsers.EditarPass(currentUser, viewModel.passwordNuevo);
+                bool result = await _repositoryUsers.EditarPass(_mapper.Map<User>(currentUser), viewModel.passwordNuevo);
 
                 // Validar que se haya moficado
                 if (!result)
@@ -559,7 +560,7 @@ namespace Backend_portafolio.Services
         //*********************** API ************************
         //****************************************************
 
-        public async Task<User> GetUserByApiKey(string apiKey)
+        public async Task<UserViewModel> GetUserByApiKey(string apiKey)
         {
             try
             {
@@ -568,7 +569,7 @@ namespace Backend_portafolio.Services
                 if (user == null)
                     throw new ApplicationException("Usuario no encontrado");
 
-                return user;
+                return _mapper.Map<UserViewModel>(user);
 
             }
             catch (Exception ex)
@@ -586,7 +587,7 @@ namespace Backend_portafolio.Services
          * Pasa a mayúsculas los nombres de los roles
          * @param roles Lista de roles
          */
-        private void PasarMayusculas(ref List<Role> roles)
+        private void PasarMayusculas(ref List<RoleViewModel> roles)
         {
             foreach (var rol in roles)
             {

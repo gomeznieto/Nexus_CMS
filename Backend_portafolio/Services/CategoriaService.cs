@@ -5,19 +5,20 @@ using Backend_portafolio.Entities;
 using Backend_portafolio.Services;
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
+using AutoMapper;
 
 namespace Backend_portafolio.Sevices
 {
     public interface ICategoriaService
     {
-        Task<IEnumerable<Categoria>> GetAllCategorias(int userID = 0);
-        Task<List<Categoria>> GetCategoryByName(string buscar);
-        Categoria GetViewModel();
+        Task<IEnumerable<CategoryViewModel>> GetAllCategorias(int userID = 0);
+        Task<List<CategoryViewModel>> GetCategoryByName(string buscar);
+        CategoryViewModel GetViewModel();
         Task<IEnumerable<Category_Post>> GetCategoriasByPost(int post_id);
-        Task<Categoria> GetCategoriaById(int id);
+        Task<CategoryViewModel> GetCategoriaById(int id);
         Task CreateCategoriesForm(int id, List<CategoryForm> categoriesForms);
-        Task CreateCategories(Categoria category);
-        Task EditCategory(Categoria category);
+        Task CreateCategories(CategoryViewModel category);
+        Task EditCategory(CategoryViewModel category);
         Task DeleteCategory(int id);
         Task<bool> Existe(string name);
         public List<CategoryForm> SerealizarJsonCategoryForm(string jsonCategoria);
@@ -28,14 +29,17 @@ namespace Backend_portafolio.Sevices
     {
         private readonly IUsersService _usersService;
         private readonly IRepositoryCategorias _repositoryCategorias;
+        private readonly IMapper _mapper;
 
         public CategoriaService(
             IUsersService usersService,
-            IRepositoryCategorias repositoryCategorias
+            IRepositoryCategorias repositoryCategorias,
+            IMapper mapper
         )
         {
             _usersService = usersService;
             _repositoryCategorias = repositoryCategorias;
+            _mapper = mapper;
         }
 
         //****************************************************
@@ -43,18 +47,18 @@ namespace Backend_portafolio.Sevices
         //****************************************************
 
         // Obtener todas las categorías
-        public async Task<IEnumerable<Categoria>> GetAllCategorias(int userID = 0)
+        public async Task<IEnumerable<CategoryViewModel>> GetAllCategorias(int userID = 0)
         {
             if(userID == 0)
                 userID = _usersService.ObtenerUsuario();
 
-            var categorias = await _repositoryCategorias.Obtener(userID);
+            var categorias = _mapper.Map<IEnumerable<CategoryViewModel>>(await _repositoryCategorias.Obtener(userID));
 
             return categorias;
         }
 
         // Obtener una categoría por id
-        public async Task<Categoria> GetCategoriaById(int id)
+        public async Task<CategoryViewModel> GetCategoriaById(int id)
         {
             try
             {
@@ -63,7 +67,7 @@ namespace Backend_portafolio.Sevices
                 if (categoria == null)
                     throw new Exception("Ha surgido un error. ¡Intente más tarde!");
 
-                return categoria;
+                return _mapper.Map<CategoryViewModel>(categoria);
             }
             catch (Exception e)
             {
@@ -80,7 +84,7 @@ namespace Backend_portafolio.Sevices
 
 
         // Obtener categorías por nombre
-        public async Task<List<Categoria>> GetCategoryByName(string buscar)
+        public async Task<List<CategoryViewModel>> GetCategoryByName(string buscar)
         {
             var userID = _usersService.ObtenerUsuario();
             var categorias = await GetAllCategorias();
@@ -94,20 +98,20 @@ namespace Backend_portafolio.Sevices
         }
 
         // Obtener el modelo de vista
-        public Categoria GetViewModel()
+        public CategoryViewModel GetViewModel()
         {
             var userID = _usersService.ObtenerUsuario();
             var viewModel = new Categoria();
             viewModel.user_id = userID;
 
-            return viewModel;
+            return _mapper.Map<CategoryViewModel>(viewModel) ;
         }
 
         //****************************************************
         //********************** CREATE **********************
         //****************************************************
 
-        public async Task CreateCategories(Categoria category)
+        public async Task CreateCategories(CategoryViewModel category)
         {
             try
             {
@@ -127,7 +131,7 @@ namespace Backend_portafolio.Sevices
 
                 category.name = category.name.Trim();
 
-                await _repositoryCategorias.Crear(category);
+                await _repositoryCategorias.Crear(_mapper.Map<Categoria>(category));
 
             }
             catch (Exception)
@@ -167,7 +171,7 @@ namespace Backend_portafolio.Sevices
         //*********************** EDIT ***********************
         //****************************************************
 
-        public async Task EditCategory(Categoria category)
+        public async Task EditCategory(CategoryViewModel category)
         {
             try
             {
@@ -182,7 +186,7 @@ namespace Backend_portafolio.Sevices
                     throw new Exception("La categoría ya existe");
                 }
                 category.name = category.name.Trim();
-                await _repositoryCategorias.Editar(category);
+                await _repositoryCategorias.Editar(_mapper.Map<Categoria>(category));
             }
             catch (Exception)
             {

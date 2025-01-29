@@ -1,15 +1,16 @@
 ﻿using Backend_portafolio.Entities;
+using Backend_portafolio.Models;
 
 namespace Backend_portafolio.Services
 {
     public interface IImageService
     {
-        Task<string> UploadImageAsync(IFormFile imageFile, User user, string subfolder = "images");
+        Task<string> UploadImageAsync(IFormFile imageFile, UserViewModel user, string subfolder = "images");
     }
     public class ImageService : IImageService
     {
         //Guarda un archivo que le pasemos en la carpeta del Usuario
-        public async Task<string> UploadImageAsync(IFormFile imageFile, User user, string subfolder)
+        public async Task<string> UploadImageAsync(IFormFile imageFile, UserViewModel user, string subfolder)
         {
             // Carpeta raíz
             string root = "img";

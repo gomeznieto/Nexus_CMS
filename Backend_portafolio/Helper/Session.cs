@@ -13,7 +13,7 @@ namespace Backend_portafolio.Helper
 			try
 			{
 				var formats = await formatService.GetAllFormat();
-				var formatsJson = JsonSerializer.Serialize(formats.ToList());
+				var formatsJson = JsonSerializer.Serialize(formats);
 				httpContext.Session.SetString("Formats", formatsJson);
 			}
 			catch (Exception)

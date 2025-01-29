@@ -3,6 +3,7 @@ using Backend_portafolio.Helper;
 using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Mvc;
 using Backend_portafolio.Sevices;
+using Backend_portafolio.Models;
 
 namespace Backend_portafolio.Controllers
 {
@@ -73,7 +74,7 @@ namespace Backend_portafolio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(Categoria categoria)
+        public async Task<IActionResult> Crear(CategoryViewModel categoria)
         {
 
             if (!ModelState.IsValid)
@@ -112,7 +113,7 @@ namespace Backend_portafolio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Editar(Categoria categoria)
+        public async Task<IActionResult> Editar(CategoryViewModel categoria)
         {
             //Validar errores del Model
             if (!ModelState.IsValid)

@@ -116,7 +116,7 @@ namespace Backend_portafolio.Datos
 						ON CP.{CATEGORIA_POST.CATEGORY_ID} = C.{CATEGORIA.ID}
 						WHERE CP.{CATEGORIA_POST.POST_ID} = @{POST.ID}";
 
-            return await connection.QueryAsync<Category_Post, Categoria, Category_Post>(query, (category_Post, categoria) =>
+            return await connection.QueryAsync<Category_Post, CategoryViewModel, Category_Post>(query, (category_Post, categoria) =>
             {
                 category_Post.Categoria = categoria;
                 return category_Post;

@@ -1,32 +1,37 @@
 ﻿using Backend_portafolio.Entities;
 using Backend_portafolio.Datos;
 using Backend_portafolio.Services;
+using Backend_portafolio.Models;
+using AutoMapper;
 
 namespace Backend_portafolio.Sevices
 {
     public interface IFormatService
     {
-        Task CreateFormat(Format format);
+        Task CreateFormat(FormatViewModel format);
         Task DeleteFormat(int id);
-        Task EditFormat(Format format);
+        Task EditFormat(FormatViewModel format);
         Task<bool> Existe(string name);
-        Task<List<Format>> GetAllFormat(int userID = 0);
-        Task<Format> GetFormatById(int id);
-        Format GetFormatViewModel();
+        Task<List<FormatViewModel>> GetAllFormat(int userID = 0);
+        Task<FormatViewModel> GetFormatById(int id);
+        FormatViewModel GetFormatViewModel();
     }
 
     public class FormatService : IFormatService
     {
         private readonly IRepositoryFormat _repositoryFormat;
+        private readonly IMapper _mapper;
         private readonly IUsersService _usersService;
         private readonly HttpContext _httpContext;
         public FormatService(
             IRepositoryFormat repositoryFormat,
             IHttpContextAccessor httpContextAccessor,
+            IMapper mapper,
            IUsersService usersService
         )
         {
             _repositoryFormat = repositoryFormat;
+            _mapper = mapper;
             _usersService = usersService;
             _httpContext = httpContextAccessor.HttpContext;
 
@@ -37,16 +42,16 @@ namespace Backend_portafolio.Sevices
         //****************************************************
 
         // Obtener todos los formatos
-        public async Task<List<Format>> GetAllFormat(int userID = 0)
+        public async Task<List<FormatViewModel>> GetAllFormat(int userID = 0)
         {
             if (userID == 0)
                 userID = _usersService.ObtenerUsuario();
 
-            return (await _repositoryFormat.Obtener(userID)).ToList();
+            return _mapper.Map<List<FormatViewModel>>((await _repositoryFormat.Obtener(userID)).ToList());
         }
 
         // Obtener un formato por id
-        public async Task<Format> GetFormatById(int id)
+        public async Task<FormatViewModel> GetFormatById(int id)
         {
             try
             {
@@ -55,7 +60,7 @@ namespace Backend_portafolio.Sevices
                 if (format == null)
                     throw new Exception("Formato no encontrado");
 
-                return format;
+                return _mapper.Map<FormatViewModel>(format);
             }
             catch (Exception ex)
             {
@@ -64,9 +69,9 @@ namespace Backend_portafolio.Sevices
         }
 
         // Obtener un formato para la vista con el usuario actual
-        public Format GetFormatViewModel()
+        public FormatViewModel GetFormatViewModel()
         {
-            var viewModel = new Format();
+            var viewModel = new FormatViewModel();
             var userId = _usersService.ObtenerUsuario();
             viewModel.user_id = userId;
 
@@ -78,7 +83,7 @@ namespace Backend_portafolio.Sevices
         //****************************************************
 
         // Crear un formato
-        public async Task CreateFormat(Format format)
+        public async Task CreateFormat(FormatViewModel format)
         {
             try
             {
@@ -87,7 +92,7 @@ namespace Backend_portafolio.Sevices
                 if (userId != format.user_id)
                     throw new Exception("No puedes crear un formato para otro usuario");
 
-                await _repositoryFormat.Crear(format);
+                await _repositoryFormat.Crear(_mapper.Map<Format>(format));
 
                 //Actualizar Session de Formatos para barra de navegacion
                 await Helper.Session.UpdateSession(_httpContext, this, userId);
@@ -104,7 +109,7 @@ namespace Backend_portafolio.Sevices
 
 
         // Editar un formato
-        public async Task EditFormat(Format format)
+        public async Task EditFormat(FormatViewModel format)
         {
             try
             {
@@ -116,7 +121,7 @@ namespace Backend_portafolio.Sevices
                 if (existeFormato == null)
                     throw new Exception("Formato no encontrado");
 
-                await _repositoryFormat.Editar(format);
+                await _repositoryFormat.Editar(_mapper.Map<Format>(format));
 
                 //Actualizar Session de Formatos para barra de navegacion
                 await Helper.Session.UpdateSession(_httpContext, this, userID);

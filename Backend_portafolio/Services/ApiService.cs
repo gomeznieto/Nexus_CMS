@@ -7,8 +7,8 @@ namespace Backend_portafolio.Services
 {
     public interface IApiService
     {
-        Task<ApiResponse<List<Categoria>>> GetCategories(string apiKey);
-        Task<ApiResponse<List<Format>>> GetFormats(string apiKey);
+        Task<ApiResponse<List<CategoryViewModel>>> GetCategories(string apiKey);
+        Task<ApiResponse<List<FormatViewModel>>> GetFormats(string apiKey);
         Task<ApiResponse<ApiResponsePosts<ApiPostViewModel>>> GetPostById(string apiKey, int post_id);
         Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetAllPosts(string apiKey);
         Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetPostsPagination(string apiKey, int pageNumber, int pageSize);
@@ -98,7 +98,7 @@ namespace Backend_portafolio.Services
          * Retorna una lista de categorías
          * @param apiKey Clave
         */
-        public async Task<ApiResponse<List<Categoria>>> GetCategories(string apiKey)
+        public async Task<ApiResponse<List<CategoryViewModel>>> GetCategories(string apiKey)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace Backend_portafolio.Services
                 var user = await _usersService.GetUserByApiKey(apiKey);
                 var categories = await _categoriaService.GetAllCategorias(user.id);
 
-                var result = new ApiResponse<List<Categoria>>()
+                var result = new ApiResponse<List<CategoryViewModel>>()
                 {
                     Success = true,
                     Message = "",
@@ -131,7 +131,7 @@ namespace Backend_portafolio.Services
          * Retorna una lista de formatos
          * @param apiKey Clave
         */
-        public async Task<ApiResponse<List<Format>>> GetFormats(string apiKey)
+        public async Task<ApiResponse<List<FormatViewModel>>> GetFormats(string apiKey)
         {
             try
             {
@@ -139,7 +139,7 @@ namespace Backend_portafolio.Services
                 var user = await _usersService.GetUserByApiKey(apiKey);
                 var formats = await _formatService.GetAllFormat(user.id);
                 
-                var result = new ApiResponse<List<Format>>()
+                var result = new ApiResponse<List<FormatViewModel>>()
                 {
                     Success = true,
                     Message = "",

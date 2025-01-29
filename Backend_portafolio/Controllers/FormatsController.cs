@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Backend_portafolio.Sevices;
 using Backend_portafolio.Helper;
+using Backend_portafolio.Models;
 
 namespace Backend_portafolio.Controllers
 {
@@ -49,7 +50,7 @@ namespace Backend_portafolio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(Format viewModel)
+        public async Task<IActionResult> Crear(FormatViewModel viewModel)
         {
             if (!ModelState.IsValid)
                 return View(viewModel);
@@ -57,6 +58,7 @@ namespace Backend_portafolio.Controllers
             try
             {
                 await _formatService.CreateFormat(viewModel);
+                Session.CrearModalSuccess("El Formato se ha creado exitosamente", "Format", HttpContext);
                 return RedirectToAction("Index");
             }
             catch (Exception)
@@ -87,7 +89,7 @@ namespace Backend_portafolio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Editar(Format model)
+        public async Task<IActionResult> Editar(FormatViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);

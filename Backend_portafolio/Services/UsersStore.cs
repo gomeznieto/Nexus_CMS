@@ -1,25 +1,30 @@
 ﻿using Backend_portafolio.Entities;
 using Backend_portafolio.Datos;
 using Microsoft.AspNetCore.Identity;
+using Backend_portafolio.Models;
+using AutoMapper;
 
 namespace Backend_portafolio.Services
 {
-    public class UsersStore : IUserStore<User>, IUserEmailStore<User>, IUserPasswordStore<User>
+    public class UsersStore : IUserStore<UserViewModel>, IUserEmailStore<UserViewModel>, IUserPasswordStore<UserViewModel>
     {
         public readonly IRepositoryUsers _repositoryUsers;
-        public UsersStore(IRepositoryUsers repositoryUsers)
+        private readonly IMapper _mapper;
+
+        public UsersStore(IRepositoryUsers repositoryUsers, IMapper mapper)
         {
             _repositoryUsers = repositoryUsers;
+            _mapper = mapper;
         }
 
-        public async Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> CreateAsync(UserViewModel user, CancellationToken cancellationToken)
         {
-            user.id = await _repositoryUsers.CrearUsuario(user);
+            user.id = await _repositoryUsers.CrearUsuario(_mapper.Map<User>(user));
 
             return IdentityResult.Success;
         }
 
-        public Task<IdentityResult> DeleteAsync(User user, CancellationToken cancellationToken)
+        public Task<IdentityResult> DeleteAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -29,90 +34,90 @@ namespace Backend_portafolio.Services
             throw new NotImplementedException();
         }
 
-        public async Task<User> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        public async Task<UserViewModel> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
-            return await _repositoryUsers.BuscarUsuarioPorEmail(normalizedEmail);
+            return _mapper.Map<UserViewModel>(await _repositoryUsers.BuscarUsuarioPorEmail(normalizedEmail));
         }
 
-        public Task<User> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        public Task<UserViewModel> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<User> FindByNameAsync(string usernameNormalizado, CancellationToken cancellationToken)
+        public async Task<UserViewModel> FindByNameAsync(string usernameNormalizado, CancellationToken cancellationToken)
         {
-            return await _repositoryUsers.BuscarUsuarioPorUsername(usernameNormalizado);
+            return _mapper.Map<UserViewModel>(await _repositoryUsers.BuscarUsuarioPorUsername(usernameNormalizado));
         }
 
-        public Task<string> GetEmailAsync(User user, CancellationToken cancellationToken)
+        public Task<string> GetEmailAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.email);
         }
 
-        public async Task<bool> GetEmailConfirmedAsync(User user, CancellationToken cancellationToken)
+        public async Task<bool> GetEmailConfirmedAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             return true;
         }
 
-        public Task<string> GetNormalizedEmailAsync(User user, CancellationToken cancellationToken)
+        public Task<string> GetNormalizedEmailAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string> GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken)
+        public Task<string> GetNormalizedUserNameAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken)
+        public Task<string> GetUserIdAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.id.ToString());
         }
 
-        public Task<string> GetUserNameAsync(User user, CancellationToken cancellationToken)
+        public Task<string> GetUserNameAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task SetEmailAsync(User user, string email, CancellationToken cancellationToken)
+        public Task SetEmailAsync(UserViewModel user, string email, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task SetEmailConfirmedAsync(User user, bool confirmed, CancellationToken cancellationToken)
+        public Task SetEmailConfirmedAsync(UserViewModel user, bool confirmed, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task SetNormalizedEmailAsync(User user, string normalizedEmail, CancellationToken cancellationToken)
+        public Task SetNormalizedEmailAsync(UserViewModel user, string normalizedEmail, CancellationToken cancellationToken)
         {
             user.emailNormalizado = normalizedEmail;
             return Task.CompletedTask;
         }
 
-        public Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
+        public Task SetNormalizedUserNameAsync(UserViewModel user, string normalizedName, CancellationToken cancellationToken)
         {
             user.usernameNormalizado = normalizedName;
             return Task.CompletedTask;
         }
 
-        public Task SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
+        public Task SetUserNameAsync(UserViewModel user, string userName, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IdentityResult> UpdateAsync(User user, CancellationToken cancellationToken)
+        public Task<IdentityResult> UpdateAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        async Task<IdentityResult> IUserStore<User>.CreateAsync(User user, CancellationToken cancellationToken)
+        async Task<IdentityResult> IUserStore<UserViewModel>.CreateAsync(UserViewModel user, CancellationToken cancellationToken)
         {
-            user.id = await _repositoryUsers.CrearUsuario(user);
+            user.id = await _repositoryUsers.CrearUsuario(_mapper.Map<User>(user));
             return IdentityResult.Success;
         }
 
-        Task<IdentityResult> IUserStore<User>.DeleteAsync(User user, CancellationToken cancellationToken)
+        Task<IdentityResult> IUserStore<UserViewModel>.DeleteAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -122,61 +127,61 @@ namespace Backend_portafolio.Services
 
         }
 
-        async Task<User> IUserStore<User>.FindByIdAsync(string userId, CancellationToken cancellationToken)
+        async Task<UserViewModel> IUserStore<UserViewModel>.FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            return await _repositoryUsers.BuscarPorId(Int32.Parse(userId));
+            return _mapper.Map<UserViewModel>(await _repositoryUsers.BuscarPorId(Int32.Parse(userId)));
         }
 
-        async Task<User> IUserStore<User>.FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        async Task<UserViewModel> IUserStore<UserViewModel>.FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
-            return await _repositoryUsers.BuscarUsuarioPorUsername(normalizedUserName);
+            return _mapper.Map<UserViewModel>(await _repositoryUsers.BuscarUsuarioPorUsername(normalizedUserName));
         }
 
-        Task<string> IUserStore<User>.GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken)
+        Task<string> IUserStore<UserViewModel>.GetNormalizedUserNameAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        Task<string> IUserPasswordStore<User>.GetPasswordHashAsync(User user, CancellationToken cancellationToken)
+        Task<string> IUserPasswordStore<UserViewModel>.GetPasswordHashAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.passwordHash);
         }
 
-        Task<string> IUserStore<User>.GetUserIdAsync(User user, CancellationToken cancellationToken)
+        Task<string> IUserStore<UserViewModel>.GetUserIdAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.id.ToString());
         }
 
-        Task<string> IUserStore<User>.GetUserNameAsync(User user, CancellationToken cancellationToken)
+        Task<string> IUserStore<UserViewModel>.GetUserNameAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.username);
         }
 
-        Task<bool> IUserPasswordStore<User>.HasPasswordAsync(User user, CancellationToken cancellationToken)
+        Task<bool> IUserPasswordStore<UserViewModel>.HasPasswordAsync(UserViewModel user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        Task IUserStore<User>.SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
+        Task IUserStore<UserViewModel>.SetNormalizedUserNameAsync(UserViewModel user, string normalizedName, CancellationToken cancellationToken)
         {
             user.usernameNormalizado = normalizedName;
             return Task.CompletedTask;
         }
 
-        Task IUserPasswordStore<User>.SetPasswordHashAsync(User user, string passwordHash, CancellationToken cancellationToken)
+        Task IUserPasswordStore<UserViewModel>.SetPasswordHashAsync(UserViewModel user, string passwordHash, CancellationToken cancellationToken)
         {
             user.passwordHash = passwordHash;
             return Task.CompletedTask;
         }
 
-        Task IUserStore<User>.SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
+        Task IUserStore<UserViewModel>.SetUserNameAsync(UserViewModel user, string userName, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        async Task<IdentityResult> IUserStore<User>.UpdateAsync(User user, CancellationToken cancellationToken)
+        async Task<IdentityResult> IUserStore<UserViewModel>.UpdateAsync(UserViewModel user, CancellationToken cancellationToken)
         {
-            await _repositoryUsers.EditarUsuario(user);
+            await _repositoryUsers.EditarUsuario(_mapper.Map<User>(user));
 
             return IdentityResult.Success;
         }

@@ -52,7 +52,7 @@ namespace Backend_portafolio.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException(ex.Message);
+                throw new Exception(ex.Message);
             }
 
         }
@@ -78,7 +78,7 @@ namespace Backend_portafolio.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
 

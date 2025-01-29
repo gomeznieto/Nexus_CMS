@@ -6,6 +6,6 @@ namespace Backend_portafolio.Models
 	{
         public int id { get; set; }
         public int post_id { get; set; }
-        public virtual Categoria Categoria { get; set; }
+        public virtual CategoryViewModel Categoria { get; set; }
     }
 }

@@ -29,6 +29,9 @@ namespace Backend_portafolio.Sevices
 
             CreateMap<RoleViewModel, Role>();
 
+            CreateMap<CategoryViewModel, Categoria>();
+            CreateMap<FormatViewModel, Format>();
+
 
             //****************************************************
             //**************** ENTITY TO VIEWMODEL ***************
@@ -39,6 +42,10 @@ namespace Backend_portafolio.Sevices
             CreateMap<Post, PostViewModel>();
 
             CreateMap<Role, RoleViewModel>();
+
+            CreateMap<Categoria, CategoryViewModel>();
+
+            CreateMap<Format, FormatViewModel>();
 
 
 

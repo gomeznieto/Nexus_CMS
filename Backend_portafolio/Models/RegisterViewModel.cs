@@ -22,6 +22,6 @@ namespace Backend_portafolio.Models
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Display(Name = "Rol")]
         public int role { get; set; }
-        public List<Role> roles { get; set; }
+        public List<RoleViewModel> roles { get; set; }
     }
 }
