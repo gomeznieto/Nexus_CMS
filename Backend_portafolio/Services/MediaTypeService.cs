@@ -1,44 +1,49 @@
-﻿using Backend_portafolio.Datos;
+﻿using AutoMapper;
+using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
+using Backend_portafolio.Models;
 using Backend_portafolio.Services;
 
 namespace Backend_portafolio.Sevices
 {
     public interface IMediaTypeService
     {
-        Task CreateMediaType(MediaType viewModel);
+        Task CreateMediaType(MediaTypeViewModel viewModel);
         Task DeleteMediaType(int id);
-        Task EditMediaType(MediaType viewModel);
+        Task EditMediaType(MediaTypeViewModel viewModel);
         Task<bool> ExisteMediaType(string mediaType);
-        Task<IEnumerable<MediaType>> GetAllMediaType(int userID = 0);
-        Task<MediaType> GetMediaTypeById(int id);
-        MediaType GetMediaTypeViewModel();
+        Task<IEnumerable<MediaTypeViewModel>> GetAllMediaType(int userID = 0);
+        Task<MediaTypeViewModel> GetMediaTypeById(int id);
+        MediaTypeViewModel GetMediaTypeViewModel();
     }
     public class MediaTypeService : IMediaTypeService
     {
         private readonly IRepositoryMediatype _repositoryMediatype;
+        private readonly IMapper _mapper;
         private readonly IUsersService _usersService;
 
         public MediaTypeService(
             IRepositoryMediatype repositoryMediatype,
+            IMapper mapper,
             IUsersService usersService
             )
         {
             _repositoryMediatype = repositoryMediatype;
+            _mapper = mapper;
             _usersService = usersService;
         }
 
         //****************************************************
         //*********************** GETS ***********************
         //****************************************************
-        public async Task<IEnumerable<MediaType>> GetAllMediaType(int userID = 0)
+        public async Task<IEnumerable<MediaTypeViewModel>> GetAllMediaType(int userID = 0)
         {
             try
             {
                 if(userID == 0)
                     userID = _usersService.ObtenerUsuario();
 
-                return await _repositoryMediatype.Obtener(userID);
+                return _mapper.Map<IEnumerable<MediaTypeViewModel>>(await _repositoryMediatype.Obtener(userID));
             }
             catch (Exception ex)
             {
@@ -46,11 +51,11 @@ namespace Backend_portafolio.Sevices
             }
         }
 
-        public async Task<MediaType> GetMediaTypeById(int id)
+        public async Task<MediaTypeViewModel> GetMediaTypeById(int id)
         {
             try
             {
-                return await _repositoryMediatype.ObtenerPorId(id);
+                return _mapper.Map<MediaTypeViewModel>(await _repositoryMediatype.ObtenerPorId(id));
             }
             catch (Exception ex)
             {
@@ -58,18 +63,18 @@ namespace Backend_portafolio.Sevices
             }
         }
 
-        public MediaType GetMediaTypeViewModel()
+        public MediaTypeViewModel GetMediaTypeViewModel()
         {
             var userID = _usersService.ObtenerUsuario();
             var viewModel = new MediaType();
             viewModel.user_id = userID;
-            return viewModel;
+            return _mapper.Map<MediaTypeViewModel>(viewModel);
         }
 
         //****************************************************
         //********************** CREATE **********************
         //****************************************************
-        public async Task CreateMediaType(MediaType viewModel)
+        public async Task CreateMediaType(MediaTypeViewModel viewModel)
         {
             try
             {
@@ -87,7 +92,7 @@ namespace Backend_portafolio.Sevices
                     throw new ApplicationException("El media type ya existe");
                 }
 
-                await _repositoryMediatype.Crear(viewModel);
+                await _repositoryMediatype.Crear(_mapper.Map<MediaType>(viewModel));
             }
             catch (Exception ex)
             {
@@ -107,7 +112,7 @@ namespace Backend_portafolio.Sevices
         //*********************** EDIT ***********************
         //****************************************************
 
-        public async Task EditMediaType(MediaType viewModel)
+        public async Task EditMediaType(MediaTypeViewModel viewModel)
         {
             try
             {
@@ -127,7 +132,7 @@ namespace Backend_portafolio.Sevices
                     throw new ApplicationException("El media type ya existe");
                 }
 
-                await _repositoryMediatype.Editar(viewModel);
+                await _repositoryMediatype.Editar(_mapper.Map<MediaType>(viewModel));
 
             }
             catch (Exception ex)

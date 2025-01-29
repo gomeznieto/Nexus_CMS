@@ -15,13 +15,13 @@ namespace Backend_portafolio.Sevices
         Task CreatePost(Post viewModel);
         Task EditPost(PostViewModel viewModel);
         Task DeletePost(int id);
-        Task<List<Post>> GetAllPosts(int userID = 0);
-        Task<List<Post>> GetAllPosts(string format, int pagina);
-        Task<Post> GetPostById(int id, int user_id = 0);
+        Task<List<PostViewModel>> GetAllPosts(int userID = 0);
+        Task<List<PostViewModel>> GetAllPosts(string format, int pagina);
+        Task<PostViewModel> GetPostById(int id, int user_id = 0);
         Task<PostViewModel> GetPostViewModel(string format, PostViewModel v = null);
         Task<PostViewModel> PrepareEditPostViewModel(int id);
         Task<PostViewModel> PrepareViewModel(PostViewModel viewModel);
-        Task<List<Post>> SearchAllPost(string format, string buscar, int page);
+        Task<List<PostViewModel>> SearchAllPost(string format, string buscar, int page);
         Task<int> GetCountPostByFormat(string format);
         Task EditarBorrador(int id, bool draft);
         Task<int> GetCountPostByUser(int user_id);
@@ -81,14 +81,14 @@ namespace Backend_portafolio.Sevices
         //******************* OBTENER POSTS ******************
         //****************************************************
 
-        public async Task<List<Post>> GetAllPosts(int userID = 0)
+        public async Task<List<PostViewModel>> GetAllPosts(int userID = 0)
         {
             try
             {
                 if(userID == 0)
                     userID = _usersService.ObtenerUsuario();
 
-                return (await _repositoryPosts.Obtener(userID)).ToList();
+                return _mapper.Map<List<PostViewModel>>((await _repositoryPosts.Obtener(userID)).ToList());
             }
             catch (Exception ex)
             {
@@ -96,7 +96,7 @@ namespace Backend_portafolio.Sevices
             }
         }
 
-        public async Task<List<Post>> GetAllPosts(string format, int pagina)
+        public async Task<List<PostViewModel>> GetAllPosts(string format, int pagina)
         {
 
             try
@@ -118,7 +118,7 @@ namespace Backend_portafolio.Sevices
 
                 //Obtener cantidades para generar paginación
                 var cantidadPorPagina = Session.GetCantidadPostsSession(_httpContext);
-                IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, pagina, usuarioID);
+                IEnumerable<PostViewModel> posts = _mapper.Map<IEnumerable<PostViewModel>>(await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, pagina, usuarioID));
 
                 //Obtenemos categorias para mostrar en lista
                 foreach (var post in posts)
@@ -134,7 +134,7 @@ namespace Backend_portafolio.Sevices
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<Post> GetPostById(int id, int user_id = 0)
+        public async Task<PostViewModel> GetPostById(int id, int user_id = 0)
         {
             try
             {
@@ -146,7 +146,7 @@ namespace Backend_portafolio.Sevices
                 if (post is null)
                     throw new Exception("¡El post no existe!");
 
-                return post;
+                return _mapper.Map<PostViewModel>(post);
             }
             catch (Exception ex)
             {
@@ -159,7 +159,7 @@ namespace Backend_portafolio.Sevices
         //******************* BUSCAR POSTS *******************
         //****************************************************
 
-        public async Task<List<Post>> SearchAllPost(string format, string buscar, int page)
+        public async Task<List<PostViewModel>> SearchAllPost(string format, string buscar, int page)
         {
             // Usuario registrado
             var usuarioID = _usersService.ObtenerUsuario();
@@ -173,7 +173,7 @@ namespace Backend_portafolio.Sevices
                 posts = posts.Where(p => p.title.ToUpper().Contains(buscar.ToUpper()));
             }
 
-            return posts.ToList();
+            return _mapper.Map<List<PostViewModel>>(posts.ToList());
         }
 
         //****************************************************
@@ -331,7 +331,7 @@ namespace Backend_portafolio.Sevices
                 viewModel.created_at = DateTime.Now;
 
                 // Creamos el post
-                await _repositoryPosts.Crear(viewModel);
+                await _repositoryPosts.Crear(_mapper.Map<Post>(viewModel));
 
                 // SUBIR MEDIA
                 if (!viewModel.mediaListString.IsNullOrEmpty())
@@ -415,7 +415,7 @@ namespace Backend_portafolio.Sevices
                 viewModel.modify_at = DateTime.Now;
 
                 // Creamos el post
-                await _repositoryPosts.Editar(viewModel);
+                await _repositoryPosts.Editar(_mapper.Map<Post>(viewModel));
 
                 // Verificamos si se modificaron los datos de media
                 if (!viewModel.mediaListString.IsNullOrEmpty() && viewModel.mediaListString != "[]")

@@ -2,13 +2,13 @@
 
 namespace Backend_portafolio.Models
 {
-    public class HomeViewModel : Post
+    public class HomeViewModel : PostViewModel
     {
         // Quick Draft
         public List<FormatViewModel> formatList { get; set; }
 
         // Última actividad
-        public List<Post> ultimosPosts { get; set; }
+        public List<PostViewModel> ultimosPosts { get; set; }
 
     }
 }

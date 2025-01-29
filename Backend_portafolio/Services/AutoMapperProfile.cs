@@ -30,8 +30,12 @@ namespace Backend_portafolio.Sevices
             CreateMap<RoleViewModel, Role>();
 
             CreateMap<CategoryViewModel, Categoria>();
+
             CreateMap<FormatViewModel, Format>();
 
+            CreateMap<PostViewModel, Post>();
+
+            CreateMap<MediaTypeViewModel, MediaType>();
 
             //****************************************************
             //**************** ENTITY TO VIEWMODEL ***************
@@ -47,6 +51,7 @@ namespace Backend_portafolio.Sevices
 
             CreateMap<Format, FormatViewModel>();
 
+            CreateMap<MediaType, MediaTypeViewModel>();
 
 
             //****************************************************

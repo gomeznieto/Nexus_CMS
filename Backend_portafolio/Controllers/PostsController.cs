@@ -50,7 +50,7 @@ namespace Backend_portafolio.Controllers
             try
             {
                 // Obtener todos los posts
-                IEnumerable<Post> posts = await _postService.GetAllPosts(format, page);
+                IEnumerable<PostViewModel> posts = await _postService.GetAllPosts(format, page);
 
                 //Salida de la vista
                 ViewBag.Format = format;
