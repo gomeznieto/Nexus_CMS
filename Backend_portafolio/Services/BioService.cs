@@ -12,22 +12,25 @@ namespace Backend_portafolio.Services
         Task DeleteBio(int id);
         Task EditBio(BioViewModel viewModel);
         Task<List<Bio>> GetAllBio(int userID = 0);
-        Task<Bio> GetBioById(int id);
+        Task<BioViewModel> GetBioById(int id);
         Task<BioViewModel> GetBioViewModel(BioViewModel viewModel = null);
     }
     public class BioService : IBioService
     {
 
         private readonly IUsersService _usersService;
+        private readonly IMapper _mapper;
         private readonly IRepositoryBio _repositoryBio;
 
 
         public BioService(
             IUsersService usersService,
+            IMapper mapper,
             IRepositoryBio repositoryBio
         )
         {
             _usersService = usersService;
+            _mapper = mapper;
             _repositoryBio = repositoryBio;
         }
 
@@ -65,12 +68,12 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public async Task<Bio> GetBioById(int id)
+        public async Task<BioViewModel> GetBioById(int id)
         {
             try
             {
                 var usuarioID = _usersService.ObtenerUsuario();
-                return await _repositoryBio.ObtenerPorId(id, usuarioID);
+                return _mapper.Map<BioViewModel>(await _repositoryBio.ObtenerPorId(id, usuarioID));
             }
             catch (Exception ex)
             {
@@ -91,7 +94,7 @@ namespace Backend_portafolio.Services
                 if (userID != viewModel.user_id)
                     throw new ApplicationException("No puedes crear una bio para otro usuario");
 
-                await _repositoryBio.Agregar(viewModel);
+                await _repositoryBio.Agregar(_mapper.Map<Bio>(viewModel));
 
             }
             catch (Exception ex)
@@ -147,7 +150,7 @@ namespace Backend_portafolio.Services
                 if (bio == null)
                     throw new ApplicationException("Bio no encontrada");
 
-                await _repositoryBio.Editar(viewModel);
+                await _repositoryBio.Editar(_mapper.Map<Bio>(viewModel));
 
             }
             catch (Exception ex)

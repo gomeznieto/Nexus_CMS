@@ -1,4 +1,4 @@
-﻿using Backend_portafolio.Entities;
+﻿using Backend_portafolio.Models;
 using Backend_portafolio.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Backend_portafolio.Sevices;
@@ -47,7 +47,7 @@ namespace Backend_portafolio.Controllers
         }
 
 		[HttpPost]
-		public async Task<IActionResult> Crear(Source viewModel)
+		public async Task<IActionResult> Crear(SourceViewModel viewModel)
 		{
 			if (!ModelState.IsValid)
 				return View(viewModel);
@@ -86,7 +86,7 @@ namespace Backend_portafolio.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Editar(Source viewModel)
+		public async Task<IActionResult> Editar(SourceViewModel viewModel)
 		{
 			if (!ModelState.IsValid)
 				return View(viewModel);

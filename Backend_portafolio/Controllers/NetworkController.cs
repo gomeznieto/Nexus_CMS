@@ -56,7 +56,7 @@ namespace Backend_portafolio.Controllers
             catch (Exception ex)
             {
                 Session.CrearModalError(ex.Message, "Users", HttpContext);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Redes", "Network");
             }
         }
 

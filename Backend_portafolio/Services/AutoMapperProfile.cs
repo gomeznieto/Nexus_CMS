@@ -37,6 +37,9 @@ namespace Backend_portafolio.Sevices
 
             CreateMap<MediaTypeViewModel, MediaType>();
 
+            CreateMap<SourceViewModel, Source>();
+
+
             //****************************************************
             //**************** ENTITY TO VIEWMODEL ***************
             //****************************************************
@@ -52,6 +55,12 @@ namespace Backend_portafolio.Sevices
             CreateMap<Format, FormatViewModel>();
 
             CreateMap<MediaType, MediaTypeViewModel>();
+
+            CreateMap<SocialNetwork, SocialNetworkViewModel>();
+
+            CreateMap<Bio, BioViewModel>();
+
+            CreateMap<Source, SourceViewModel>();
 
 
             //****************************************************

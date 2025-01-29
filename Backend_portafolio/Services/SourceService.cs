@@ -1,31 +1,36 @@
 ﻿using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Services;
+using Backend_portafolio.Models;
+using AutoMapper;
 
 namespace Backend_portafolio.Sevices
 {
     public interface ISourceService
     {
-        Task CreateSource(Source viewModel);
+        Task CreateSource(SourceViewModel viewModel);
         Task DeleteSource(int id);
-        Task EditSource(Source viewModel);
+        Task EditSource(SourceViewModel viewModel);
         Task<bool> Existe(string source);
-        Task<IEnumerable<Source>> GetAllSource();
+        Task<IEnumerable<SourceViewModel>> GetAllSource();
         Task<Source> GetSourceById(int id);
-        Source GetSourceViewModel();
+        SourceViewModel GetSourceViewModel();
     }
 
     public class SourceService : ISourceService
     {
         private readonly IRepositorySource _repositorySource;
+        private readonly IMapper _mapper;
         private readonly IUsersService _usersService;
 
         public SourceService(
             IRepositorySource repositorySource,
+            IMapper mapper,
             IUsersService usersService
             )
         {
             _repositorySource = repositorySource;
+            _mapper = mapper;
             _usersService = usersService;
         }
 
@@ -34,12 +39,12 @@ namespace Backend_portafolio.Sevices
         //*********************** GETS ***********************
         //****************************************************
 
-        public async Task<IEnumerable<Source>> GetAllSource()
+        public async Task<IEnumerable<SourceViewModel>> GetAllSource()
         {
             try
             {
                 var userId = _usersService.ObtenerUsuario();
-                return await _repositorySource.Obtener(userId);
+                return _mapper.Map<IEnumerable<SourceViewModel>>(await _repositorySource.Obtener(userId));
             }
             catch (Exception ex)
             {
@@ -64,19 +69,19 @@ namespace Backend_portafolio.Sevices
             }
         }
 
-        public Source GetSourceViewModel()
+        public SourceViewModel GetSourceViewModel()
         {
             var userId = _usersService.ObtenerUsuario();
             var viewModel = new Source();
             viewModel.user_id = userId;
-            return viewModel;
+            return _mapper.Map<SourceViewModel>(viewModel);
         }
 
         //****************************************************
         //********************** CREATE **********************
         //****************************************************
 
-        public async Task CreateSource(Source viewModel)
+        public async Task CreateSource(SourceViewModel viewModel)
         {
             try
             {
@@ -90,7 +95,7 @@ namespace Backend_portafolio.Sevices
                 if(!existe)
                     throw new ApplicationException("El recurso ya existe");
 
-                await _repositorySource.Crear(viewModel);
+                await _repositorySource.Crear(_mapper.Map<Source>(viewModel));
 
             }
             catch (Exception ex)
@@ -104,7 +109,7 @@ namespace Backend_portafolio.Sevices
         //*********************** EDIT ***********************
         //****************************************************
 
-        public async Task EditSource(Source viewModel)
+        public async Task EditSource(SourceViewModel viewModel)
         {
            try
             {
@@ -118,7 +123,7 @@ namespace Backend_portafolio.Sevices
                 if (userID != viewModel.user_id)
                     throw new ApplicationException("El usuario no tiene permisos para realizar esta acción");
 
-                await _repositorySource.Editar(viewModel);
+                await _repositorySource.Editar(_mapper.Map<Source>(viewModel));
             }
             catch (Exception ex)
             {

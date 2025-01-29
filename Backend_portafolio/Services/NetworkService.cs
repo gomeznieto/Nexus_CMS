@@ -7,11 +7,11 @@ namespace Backend_portafolio.Services
 {
     public interface INetworkService
     {
-        Task CreteSocialNetwork(SocialNetwork socialNetwork);
+        Task CreteSocialNetwork(SocialNetworkViewModel socialNetwork);
         Task DeleteSocialNetwork(int id);
         Task EditSocialNetwork(SocialNetworkViewModel viewModel);
-        Task<SocialNetwork> GetSocialNetworkById(int id);
-        Task<List<SocialNetwork>> GetSocialNetworksByUserId(int userId);
+        Task<SocialNetworkViewModel> GetSocialNetworkById(int id);
+        Task<List<SocialNetworkViewModel>> GetSocialNetworksByUserId(int userId);
         Task<SocialNetworkViewModel> GetSocialNetworkViewModel(SocialNetworkViewModel viewModel = null);
     }
 
@@ -49,7 +49,7 @@ namespace Backend_portafolio.Services
                     viewModel = new SocialNetworkViewModel();
 
                 var userId = _usersService.ObtenerUsuario();
-                viewModel.Networks = await GetSocialNetworksByUserId(userId);
+                viewModel.Networks = _mapper.Map<List<SocialNetwork>>(await GetSocialNetworksByUserId(userId));
                 viewModel.user_id = userId;
 
                 return viewModel;
@@ -65,12 +65,12 @@ namespace Backend_portafolio.Services
          * @param userId Id del usuario
          * @return Lista de redes sociales
          */
-        public async Task<List<SocialNetwork>> GetSocialNetworksByUserId(int userId)
+        public async Task<List<SocialNetworkViewModel>> GetSocialNetworksByUserId(int userId)
         {
             try
             {
                 var socialNetworkList = await _repositorySocialNetwork.ObtenerPorUsuario(userId);
-                return socialNetworkList.ToList();
+                return _mapper.Map<List<SocialNetworkViewModel>>(socialNetworkList);
             }
             catch (Exception ex)
             {
@@ -83,7 +83,7 @@ namespace Backend_portafolio.Services
          * @param id Id de la red social
          * @return Red social
          */
-        public async Task<SocialNetwork> GetSocialNetworkById(int id)
+        public async Task<SocialNetworkViewModel> GetSocialNetworkById(int id)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace Backend_portafolio.Services
                 if(socialNetwork is null)
                     throw new Exception("La red social no existe");
 
-                return socialNetwork;
+                return _mapper.Map<SocialNetworkViewModel>(socialNetwork);
             }
             catch (Exception ex)
             {
@@ -105,16 +105,16 @@ namespace Backend_portafolio.Services
         //********************** CREATE **********************
         //****************************************************
 
-        public async Task CreteSocialNetwork(SocialNetwork socialNetwork)
+        public async Task CreteSocialNetwork(SocialNetworkViewModel viewmodel)
         {
             try
             {
                 var userId = _usersService.ObtenerUsuario();
 
-                if(socialNetwork.user_id != userId)
+                if(viewmodel.user_id != userId)
                     throw new Exception("No puedes crear una red social para otro usuario");
 
-                var result = await _repositorySocialNetwork.Agregar(socialNetwork);
+                var result = await _repositorySocialNetwork.Agregar(_mapper.Map<SocialNetwork>(viewmodel));
 
                 if (result == 0)
                     throw new Exception("No se pudo crear la red social");
