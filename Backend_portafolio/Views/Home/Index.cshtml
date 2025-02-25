@@ -11,11 +11,12 @@
 
 <div>
     <h1>Panel de Control</h1>
+    <!-- COLUMNA 1 -->
     <div class="d-flex w-100 flex-lg-row flex-column">
-        <!-- COLUMAN 1 -->
         <div class=" col-lg-6 col-12 d-flex flex-column gap-2 me-4">
+
+            <!-- RESUMEN -->
             <div class="border-section">
-                <!-- RESUMEN -->
                 <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Resumen</p>
                 <ul class="list-group list-unstyled">
                     <li><p><i class="fa-solid fa-file iconos_home me-3"></i><span class="fw-bold">Cantidad de posts: </span>@Model.ultimosPosts.Count()</p></li>
@@ -26,9 +27,9 @@
                     }
                 </ul>
             </div>
-
+            <!-- FIN RESUMEN -->
+            <!-- ULTIMAS ENTRADAS-->
             <div class="border-section">
-                <!-- ULTIMAS ENTRADAS-->
                 <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Último post</p>
                 <ul class="list-group list-unstyled">
                     @foreach (var format in Model.formatList)
@@ -63,14 +64,27 @@
                     }
                 </ul>
             </div>
+            <!-- FIN ULTIMAS ENTRADAS-->
+            <!-- BUSCADOR DE POST -->
+            <div class="border-section">
+                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Buscador</p>
+                <form method="post" asp-controller="Posts" asp-action="Index" class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">
+                    <input type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-action">Buscar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- FIN BUSCADOR DE POST -->
         </div>
-        <!-- COLUMAN 2 -->
+        <!-- FIN COLUMNA 1 -->
+        <!-- COLUMNA 2 -->
         <div class="col-lg-6 col-12 d-flex flex-column gap-2">
             <!-- ENTRADA RAPIDA -->
-                <div class="border-section">
-            @if(Model.formatList.Count() > 0)
-            {
-                
+            <div class="border-section">
+                @if (Model.formatList.Count() > 0)
+                {
+
                     <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Entrada rápida</p>
                     <form asp-action="Index" method="post" class="mt-2">
 
@@ -112,22 +126,17 @@
                         <button type="submit" class="btn btn-action" onclick="BorradorHome();">Borrador</button>
                         <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-trash"></i> Limpiar</a>
                     </form>
-            }
-            else
-            {
-                <p>Antes de comenzar a publicar entradas, primero debe crear un Formato</p>
-            }
-                </div> <!-- FIN ENTRADA RAPIDA -->
-            <div class="border-section">
-                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Buscador</p>
+                }
+                else
+                {
+                    <p>Antes de comenzar a publicar entradas, primero debe crear un Formato</p>
+                }
             </div>
+            <!-- FIN ENTRADA RAPIDA -->
         </div>
+        <!-- FIN COLUMNA 2 -->
     </div>
 
-
-
-
-    <!-- BORRADOR RAPIDO -->
 
 </div>
 

@@ -78,6 +78,7 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
+
                 // Usuario registrado
                 var posts = await _postService.SearchAllPost(format, buscar, page);
 

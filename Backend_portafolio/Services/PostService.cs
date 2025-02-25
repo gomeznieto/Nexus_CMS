@@ -85,7 +85,7 @@ namespace Backend_portafolio.Sevices
         {
             try
             {
-                if(userID == 0)
+                if (userID == 0)
                     userID = _usersService.ObtenerUsuario();
 
                 return _mapper.Map<List<PostViewModel>>((await _repositoryPosts.Obtener(userID)).ToList());
@@ -138,7 +138,7 @@ namespace Backend_portafolio.Sevices
         {
             try
             {
-                if(user_id == 0)
+                if (user_id == 0)
                     user_id = _usersService.ObtenerUsuario();
 
                 var post = await _repositoryPosts.ObtenerPorId(id, user_id);
@@ -165,8 +165,17 @@ namespace Backend_portafolio.Sevices
             var usuarioID = _usersService.ObtenerUsuario();
 
             var cantidadPorPagina = Session.GetCantidadPostsSession(_httpContext);
+            IEnumerable<Post> posts;
 
-            IEnumerable<Post> posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page, usuarioID);
+            // En caso de que el formato sea nulo, obtenemos todas las entradas
+            if (format is null)
+            {
+                posts = await _repositoryPosts.Obtener(usuarioID);
+            }
+            else
+            {
+               posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page, usuarioID);
+            }
 
             if (!buscar.IsNullOrEmpty())
             {
