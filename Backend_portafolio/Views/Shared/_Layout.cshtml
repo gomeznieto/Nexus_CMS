@@ -35,6 +35,7 @@
     <!-- STYLES -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tooltip.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Backend_portafolio.styles.css" asp-append-version="true" />
 
     <!-- EXTERNAL CDN -->
@@ -46,195 +47,251 @@
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div class="row flex-nowrap">
-            @if (MySignInManager.IsSignedIn(User))
-            {
-                <div class="menu_width px-sm-2 px-0 menu-color" id="lateralBar" collapse="false">
-                    <!-- MENU -->
-                    <div class="d-flex flex-column align-items-center align-items-sm-start justify-content-lg-between pt-2 min-vh-100">
+    <div class="@(MySignInManager.IsSignedIn(User) ? "content" : "")" id="lateral-bar-content">
+        @if (MySignInManager.IsSignedIn(User))
+        {
 
-                        <!-- * TITULO -->
-                        <div class="nav-title-page nav-title-page-dimension" id="navTitle">
-                            <a href="/">
-                                <span class="fs-6 item_size text-white" id="itemTitle">PANEL</span>
+            <!-- MENU -->
+            <div class="sub-menu-grid menu-color ">
+
+                <!-- * TITULO -->
+                <div class="nav-title-page" id="navTitle">
+                    <a href="/" class="text-decoration-none">
+                        <span class="fs-6 item_size text-white" id="itemTitle">PANEL</span>
+                    </a>
+                    <i class="menu-hamb fa-solid fa-bars d-none d-lg-block" id="btnBars"></i>
+                </div>
+                <div class="menu-control">
+                    <ul class="nav flex-column" id="menu">
+
+                        <!-- * HOME -->
+                        <li>
+                            <a href="/" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-house"></i>
+                                <span class="ms-1 item_size" id="itemTitle">Home</span>
                             </a>
-                            <i class="menu-hamb fa-solid fa-bars d-none d-lg-block" id="btnBars"></i>
-                        </div>
+                        </li>
 
-                        <ul class="nav flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+                        <!-- * POSTS -->
+                        <li id="nav_items">
+                            <a href="#subMenuPosts" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-pen"></i>
+                                <span class="ms-1 item_size item_size" id="itemTitle">Post</span>
+                            </a>
 
-                            <!-- * HOME -->
-                            <li>
-                                <a href="/" class="nav-link align-middle px-3 nav-title" id="itemLi">
-                                    <i class="iconos fa-solid fa-house"></i>
-                                    <span class="ms-1 item_size" id="itemTitle">Home</span>
-                                </a>
-                            </li>
-
-                            <!-- * POSTS -->
-                            <li id="nav_items">
-                                <a href="#subMenuPosts" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                    <i class="iconos fa-solid fa-pen"></i>
-                                    <span class="ms-1 item_size" id="itemTitle">Post</span>
-                                </a>
-
-                                @if (formats != null)
-                                {
-                                    <ul class="collapse nav flex-column ms-1 item_subNav" id="subMenuPosts" data-bs-parent="#menu">
-                                        @foreach (var format in formats)
-                                        {
-                                            <li class="w-100">
-                                                <a asp-action="Index" asp-controller="Posts" asp-route-format="@format.name" class="nav-link item_subNav px-3">
-                                                    <span class="item_size">
-                                                        <i class="subiconos fa-regular fa-circle ms-2"></i>
-                                                        <span class="ms-2">@format.name</span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        }
-                                    </ul>
-                                }
-                            </li>
-
-                            <!-- * CATEGORIES -->
-                            <li id="nav_items">
-                                <a href="#subMenuCategories" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                    <i class="iconos fa-solid fa-list"></i>
-                                    <span class="ms-1 item_size" id="itemTitle">Categoria</span>
-                                </a>
-                                <ul class="collapse nav flex-column ms-1" id="subMenuCategories" data-bs-parent="#menu">
-                                    <li class="w-100">
-                                        <a asp-action="Index" asp-controller="Categorias" class="nav-link px-3 item_subNav">
-                                            <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
-                                                <span class="ms-2">Listado</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a asp-action="Crear" asp-controller="Categorias" class="nav-link px-3 item_subNav">
-                                            <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
-                                                <span class="ms-2">Crear</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            <!-- * FORMATS -->
-                            <li id="nav_items">
-                                <a href="#subMenuFormats" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                    <i class="iconos fa-solid fa-border-all"></i>
-                                    <span class="ms-1 item_size" id="itemTitle">Formatos</span>
-                                </a>
-                                <ul class="collapse nav flex-column ms-1" id="subMenuFormats" data-bs-parent="#menu">
-                                    <li class="w-100">
-                                        <a asp-action="Index" asp-controller="Formats" class="nav-link px-3 item_subNav">
-                                            <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
-                                                <span class="ms-2">Listado</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a asp-action="Crear" asp-controller="Formats" class="nav-link px-3 item_subNav">
-                                            <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Crear</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            <!-- * MEDIA TYPES -->
-                            <li id="nav_items">
-                                <a href="#subMenuMediaTypes" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                    <i class="iconos fa-solid fa-play"></i>
-                                    <span class="ms-1 item_size" id="itemTitle">Tipos Media</span>
-                                </a>
-                                <ul class="collapse nav flex-column ms-1" id="subMenuMediaTypes" data-bs-parent="#menu">
-                                    <li class="w-100">
-                                        <a asp-action="Index" asp-controller="Mediatype" class="nav-link px-3 item_subNav">
-                                            <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2">
-
-                                                </i><span class="ms-2">Listado</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a asp-action="Crear" asp-controller="Mediatype" class="nav-link px-3 item_subNav">
-                                            <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
-                                                <span class="ms-2">Crear</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            <!-- SOURCES -->
-                            <li id="nav_items">
-                                <a href="#subMenuSources" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                    <i class="iconos fa-solid fa-link"></i>
-                                    <span class="ms-1 item_size" id="itemTitle">Fuentes</span>
-                                </a>
-                                <ul class="collapse nav flex-column ms-1" id="subMenuSources" data-bs-parent="#menu">
-                                    <li class="w-100">
-                                        <a asp-action="Index" asp-controller="Sources" class="nav-link px-3 item_subNav">
-                                            <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2">
-
-                                                </i><span class="ms-2">Listado</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a asp-action="Crear" asp-controller="Sources" class="nav-link px-3 item_subNav">
-                                            <span class="item_size">
-                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
-                                                <span class="ms-2">Crear</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            <!-- ADMIN -->
-                            @if (MySignInManager.IsSignedIn(User) && currentUser.role == 1)
+                            @if (formats != null)
                             {
-                                <li id="nav_items">
-                                    <a href="#subMenuUsers" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
-                                        <i class="iconos fa-solid fa-user"></i>
-                                        <span class="ms-1 item_size" id="itemTitle">Usuarios</span>
-                                    </a>
-                                    <ul class="collapse nav flex-column ms-1" id="subMenuUsers" data-bs-parent="#menu">
+                                <ul class="collapse nav flex-column ms-1 item_subNav" id="subMenuPosts" data-bs-parent="#menu">
+                                    <li class="w-100 hide" id="sub-nav-title-collapse">
+                                        <span asp-action="Index" class="nav-link item_subNav px-3">
+                                            <span class="item_size">
+                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                <span class="ms-2">Post</span>
+                                            </span>
+                                        </span>
+                                    </li>
+
+                                    @foreach (var format in formats)
+                                    {
                                         <li class="w-100">
-                                        <li class="w-100">
-                                            <a asp-action="users" asp-controller="Users" class="nav-link px-3 item_subNav">
+                                            <a asp-action="Index" asp-controller="Posts" asp-route-format="@format.name" class="nav-link item_subNav px-3">
                                                 <span class="item_size">
                                                     <i class="subiconos fa-regular fa-circle ms-2"></i>
-                                                    <span class="ms-2">Lista</span>
+                                                    <span class="ms-2">@format.name</span>
                                                 </span>
                                             </a>
                                         </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+
+                        <!-- * CATEGORIES -->
+                        <li id="nav_items">
+                            <a href="#subMenuCategories" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-list"></i>
+                                <span class="ms-1 item_size" id="itemTitle">Categoria</span>
+                            </a>
+                            <ul class="collapse nav flex-column ms-1" id="subMenuCategories" data-bs-parent="#menu">
+                                <li class="w-100 hide" id="sub-nav-title-collapse">
+                                    <span asp-action="Index" class="nav-link item_subNav px-3">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                            <span class="ms-2">Categoria</span>
+                                        </span>
+                                    </span>
+                                </li>
+                                <li class="w-100">
+                                    <a asp-action="Index" asp-controller="Categorias" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                            <span class="ms-2">Listado</span>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-action="Crear" asp-controller="Categorias" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                            <span class="ms-2">Crear</span>
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- * FORMATS -->
+                        <li id="nav_items">
+                            <a href="#subMenuFormats" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-border-all"></i>
+                                <span class="ms-1 item_size" id="itemTitle">Formatos</span>
+                            </a>
+                            <ul class="collapse nav flex-column ms-1" id="subMenuFormats" data-bs-parent="#menu">
+                                <li class="w-100 hide" id="sub-nav-title-collapse">
+                                    <span asp-action="Index" class="nav-link item_subNav px-3">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                            <span class="ms-2">Formatos</span>
+                                        </span>
+                                    </span>
+                                </li>
+                                <li class="w-100">
+                                    <a asp-action="Index" asp-controller="Formats" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                            <span class="ms-2">Listado</span>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-action="Crear" asp-controller="Formats" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i><span class="ms-2">Crear</span>
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- * MEDIA TYPES -->
+                        <li id="nav_items">
+                            <a href="#subMenuMediaTypes" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-play"></i>
+                                <span class="ms-1 item_size" id="itemTitle">Tipos Media</span>
+                            </a>
+                            <ul class="collapse nav flex-column ms-1" id="subMenuMediaTypes" data-bs-parent="#menu">
+                                <li class="w-100 hide" id="sub-nav-title-collapse">
+                                    <span asp-action="Index" class="nav-link item_subNav px-3">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                            <span class="ms-2">Tipos Media</span>
+                                        </span>
+                                    </span>
+                                </li>
+                                <li class="w-100">
+                                    <a asp-action="Index" asp-controller="Mediatype" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2">
+
+                                            </i><span class="ms-2">Listado</span>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-action="Crear" asp-controller="Mediatype" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                            <span class="ms-2">Crear</span>
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- SOURCES -->
+                        <li id="nav_items">
+                            <a href="#subMenuSources" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-link"></i>
+                                <span class="ms-1 item_size" id="itemTitle">Fuentes</span>
+                            </a>
+                            <ul class="collapse nav flex-column ms-1" id="subMenuSources" data-bs-parent="#menu">
+                                <li class="w-100 hide" id="sub-nav-title-collapse">
+                                    <span asp-action="Index" class="nav-link item_subNav px-3">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                            <span class="ms-2">Fuentes</span>
+                                        </span>
+                                    </span>
+                                </li>
+                                <li class="w-100">
+                                    <a asp-action="Index" asp-controller="Sources" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2">
+
+                                            </i><span class="ms-2">Listado</span>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-action="Crear" asp-controller="Sources" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                            <span class="ms-2">Crear</span>
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- ADMIN -->
+                        @if (MySignInManager.IsSignedIn(User) && currentUser.role == 1)
+                        {
+                            <li id="nav_items">
+                                <a href="#subMenuUsers" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                    <i class="iconos fa-solid fa-user"></i>
+                                    <span class="ms-1 item_size" id="itemTitle">Usuarios</span>
+                                </a>
+                                <ul class="collapse nav flex-column ms-1" id="subMenuUsers" data-bs-parent="#menu">
+                                    <li class="w-100 hide" id="sub-nav-title-collapse">
+                                        <span asp-action="Index" class="nav-link item_subNav px-3">
+                                            <span class="item_size">
+                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                <span class="ms-2">Usuarios</span>
+                                            </span>
+                                        </span>
+                                    </li>
+                                    <li class="w-100">
+                                        <a asp-action="users" asp-controller="Users" class="nav-link px-3 item_subNav">
+                                            <span class="item_size">
+                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                <span class="ms-2">Lista</span>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="w-100">
                                         <a asp-action="Register" asp-controller="Users" class="nav-link px-3 item_subNav">
                                             <span class="item_size">
                                                 <i class="subiconos fa-regular fa-circle ms-2"></i>
                                                 <span class="ms-2">Crear</span>
                                             </span>
                                         </a>
-                                </li>
-                            </ul>
+                                    </li>
+                                </ul>
                             </li>
                             <li id="nav_items">
-                                <a href="#subMenuRole" data-bs-toggle="collapse" class="nav-link align-middle nav-title" id="itemLi">
+                                <a href="#subMenuRole" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
                                     <i class="iconos fa-solid fa-user"></i>
                                     <span class="ms-1 item_size" id="itemTitle">Rols</span>
                                 </a>
                                 <ul class="collapse nav flex-column ms-1" id="subMenuRole" data-bs-parent="#menu">
+                                    <li class="w-100 hide" id="sub-nav-title-collapse">
+                                        <span asp-action="Index" class="nav-link item_subNav px-3">
+                                            <span class="item_size">
+                                                <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                                <span class="ms-2">Rols</span>
+                                            </span>
+                                        </span>
+                                    </li>
                                     <li class="w-100">
                                         <a asp-action="Roles" asp-controller="Role" class="nav-link px-3 item_subNav">
                                             <span class="item_size">
@@ -245,54 +302,57 @@
                                     </li>
                                 </ul>
                             </li>
-                            }
+                        }
+                    </ul>
+                </div>
+
+                <div class="user-control">
+                    <!-- * PROFILE -->
+                    <div class="dropdown col">
+                        <a href="#" class="d-flex justify-content-center text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="@(currentUser.img != null ? currentUser.img : "https://picsum.photos/id/237/200/300")" alt="hugenerd" width="30" height="30" class="rounded-circle">
+                            <span class="px-4 item_subNav fs-6 profile-name-nav " id="profileName">@currentUser.name</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                            <li><a class="dropdown-item" asp-action="perfil" asp-controller="users">Perfil</a></li>
+                            <li><a class="dropdown-item" asp-action="bio" asp-controller="bio">Bio</a></li>
+                            <li><a class="dropdown-item" asp-action="redes" asp-controller="network">Redes Sociales</a></li>
+                            <li><a class="dropdown-item" asp-action="configuracion" asp-controller="users">Configuración</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form class="form-inline" asp-action="Logout" asp-controller="Users">
+                                    <button type="submit" class="dropdown-item" href="#">Salir</button>
+                                </form>
+                            </li>
                         </ul>
-                        <hr>
-                        <!-- * PROFILE -->
-                        <div class="dropdown pb-4 ms-md-4 col d-flex align-items-end justify-content-end">
-                            <a href="#" class="d-flex justify-content-center text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="@(currentUser.img != null ? currentUser.img : "https://picsum.photos/id/237/200/300")" alt="hugenerd" width="30" height="30" class="rounded-circle">
-                                <span class="px-4 item_subNav fs-6 profile-name-nav " id="profileName">@currentUser.name</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                                <li><a class="dropdown-item" asp-action="perfil" asp-controller="users">Perfil</a></li>
-                                <li><a class="dropdown-item" asp-action="bio" asp-controller="bio">Bio</a></li>
-                                <li><a class="dropdown-item" asp-action="redes" asp-controller="network">Redes Sociales</a></li>
-                                <li><a class="dropdown-item" asp-action="configuracion" asp-controller="users">Configuración</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li>
-                                    <form class="form-inline" asp-action="Logout" asp-controller="Users">
-                                        <button type="submit" class="dropdown-item" href="#">Salir</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
                 </div>
+            </div>
 
-            } <!-- FIN IF DE USUARIO-->
-            <!-- MAIN -->
-            <main role="main" class="@(MySignInManager.IsSignedIn(User) ? "col" : "login-form-content") py-3">
-                <div class="@(MySignInManager.IsSignedIn(User) ? "container" : "login-width")">
-                    @RenderBody()
 
-                    <!-- MODALS -->
-                    @if (errorModal is not null)
-                    {
-                        <partial name="_ErrorModal" model=errorModal />
-                    }
+        } <!-- FIN IF DE USUARIO-->
+        <!-- MAIN -->
+        <main role="main" class="@(MySignInManager.IsSignedIn(User) ? "col" : "login-form-content") py-3">
+            <div class="@(MySignInManager.IsSignedIn(User) ? "container" : "login-width")">
+                @RenderBody()
 
-                    @if (successModal is not null)
-                    {
-                        <partial name="_SuccessModal" model=successModal />
-                    }
-                </div>
-            </main>
+                <!-- MODALS -->
+                @if (errorModal is not null)
+                {
+                    <partial name="_ErrorModal" model=errorModal />
+                }
 
-        </div><!-- FIN DIV FLEX -->
-    </div> <!-- FIN DIV CONTAINER -->
+                @if (successModal is not null)
+                {
+                    <partial name="_SuccessModal" model=successModal />
+                }
+            </div>
+        </main>
+    </div><!-- FIN DIV FLEX -->
+
+
     <!-- SCRIPTS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -300,10 +360,15 @@
     @await RenderSectionAsync("Scripts", required: false)
 
     <script>
+
+        //Modo de barra lateral desplegado al iniciar la página
+        var mode = true;
+
         document.getElementById("btnBars").addEventListener("click", (e) =>
             {
                 e.preventDefault();
-                actionBar();
+
+               mode = actionBar(mode);
             }
         )
 

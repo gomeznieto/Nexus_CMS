@@ -470,7 +470,7 @@ async function cambiarCantidadUsers(cantidadUsers) {
     const result = await response.json();
 
     if (result) {
-       
+
         location.reload();
     }
 }
@@ -480,7 +480,7 @@ async function buscarUsuarios() {
     let SearchUsers = document.getElementById("searchUserList").value;
 
     window.location.href = `/Users/users?role=${rolerUsers}&buscar=${SearchUsers}`;
-   
+
 }
 
 /* BIOS */
@@ -500,7 +500,7 @@ async function cargarBio(id) {
 
     // Cargar ID
     let inputId = document.getElementById("formIdEditar");
-   inputId.value = result.bio.id;
+    inputId.value = result.bio.id;
 
     ////Cargar User
     let user = document.getElementById("formuserEditar");
@@ -586,61 +586,70 @@ async function cargarRoles(id) {
     name.value = result.role.name;
 }
 
+
 /* BARRAS NAVEGACION */
-function actionBar() {
+function handleMouseOver(event) {
+
+    event.currentTarget.children[1].classList.add("visible");
+    event.currentTarget.children[1].classList.remove("invisible");
+    event.currentTarget.children[1].classList.add("item_size");
+}
+
+function handleMouseOut(event) {
+    //var collapse = event.currentTarget.href.split("/").filter(x => x.includes("#"))[0];
+
+    event.currentTarget.children[1].classList.add("invisible");
+    event.currentTarget.children[1].classList.remove("visible");
+    event.currentTarget.children[1].classList.remove("item_size");
+    //new bootstrap.Collapse(collapse, { toggle: false })
+}
+
+function actionBar(mode) {
+
+
     // Tomamos la barra y aplicamos cambios en el css
-    let lateralBar = document.getElementById("lateralBar");
+    let lateralBarContent = document.getElementById("lateral-bar-content");
+    lateralBarContent.classList.toggle("content-collapse")
+    lateralBarContent.classList.toggle("content")
 
-    lateralBar.classList.toggle("menu_width")
-    lateralBar.classList.toggle("menu_width_collapse")
+    let itemTitle = document.querySelectorAll("#itemTitle");
+    itemTitle.forEach(x => x.classList.toggle("hide"));
 
-    //let itemsSize = document.querySelectorAll(".item_size");
-    //let itemsSizeCollapse = document.querySelectorAll(".item_size_collapse");
+    let itemLi = document.querySelectorAll("#itemLi");
+    let subNavTitleCollapse = document.querySelectorAll("#sub-nav-title-collapse");
 
-    //itemsSize.forEach(x => {
-    //    x.classList.toggle("item_size")
-    //    x.classList.toggle("item_size_collapse")
-    //})
+    itemLi.forEach((x, i) => {
+        x.classList.toggle("nav-title-page-collapse");
+        x.classList.toggle("nav-title");
+        x.classList.toggle("nav-link-collapse");
 
-    //itemsSizeCollapse.forEach(x => {
-    //    x.classList.toggle("item_size")
-    //    x.classList.toggle("item_size_collapse")
-    //})
+        //if (mode) {
+        //    x.addEventListener('mouseover', handleMouseOver, true);
+        //    x.addEventListener('mouseout', handleMouseOut, true);
+        //}
+    });
 
-    //let navLink = document.querySelectorAll(".nav-link");
-
-    //navLink.forEach(x => {
-    //    x.classList.toggle("nav-title")
-    //})
-
-    let itemTitle = document.querySelectorAll("#itemTitle")
-    itemTitle.forEach(x => x.classList.toggle("hide"))
-
-    let itemLi = document.querySelectorAll("#itemLi")
-    itemLi.forEach(x => {
-        x.classList.toggle("nav-title-collapse")
-        x.classList.toggle("nav-title")
-    })
+    subNavTitleCollapse.forEach( x => x.classList.toggle("hide"))
 
     let navTitle = document.getElementById("navTitle");
     navTitle.classList.toggle("nav-title-page-dimension");
     navTitle.classList.toggle("nav-title-page-collapse");
+    navTitle.classList.toggle("nav-title-page");
 
     let profileName = document.getElementById("profileName");
-    profileName.classList.toggle("profile-name-nav")
-    profileName.classList.toggle("profile-name-nav-collapse")
+    profileName.classList.toggle("profile-name-nav");
+    profileName.classList.toggle("profile-name-nav-collapse");
 
     let navItem = document.querySelectorAll("#nav_items");
     navItem.forEach(x => {
-        x.classList.toggle("d-flex");
         x.classList.toggle("collapse-relative");
     });
 
     let subIcons = document.querySelectorAll(".subiconos");
-    subIcons.forEach(x => x.classList.toggle("hide"))
+    subIcons.forEach(x => x.classList.toggle("hide"));
 
     let itemSubNav = document.querySelectorAll(".item_subNav");
-    itemSubNav.forEach(x => x.classList.toggle("item_subNav_bg"))
+    itemSubNav.forEach(x => x.classList.toggle("item_subNav_bg"));
 
     let subMenuPost = document.getElementById("subMenuPosts");
     subMenuPost.classList.toggle("collapse-absolute");
@@ -657,8 +666,21 @@ function actionBar() {
     let subMenuSources = document.getElementById("subMenuSources");
     subMenuSources.classList.toggle("collapse-absolute");
 
-    let subMenuMediaUsers = document.getElementById("subMenuMediaUsers");
+    let subMenuMediaUsers = document.getElementById("subMenuUsers");
     subMenuMediaUsers.classList.toggle("collapse-absolute");
+
+    let subMenuMediaRol = document.getElementById("subMenuRole");
+    subMenuMediaRol.classList.toggle("collapse-absolute");
+
+    //if (!mode) {
+    //    itemLi.forEach((x, i) => {
+    //        x.removeEventListener('mouseover', handleMouseOver, true);
+    //        x.removeEventListener('mouseout', handleMouseOut, true);
+    //    });
+    //}
+
+    return !mode;
+
 }
 
 /* TOAST */
@@ -667,7 +689,7 @@ function openToast() {
     var x = document.getElementById("snackbar");
     x.className = "show";
     setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
-} 
+}
 
 /* HANDLE LINKS */
 

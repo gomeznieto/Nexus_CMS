@@ -3,10 +3,10 @@
 @model UserViewModel
 
 @{
-    ViewData["Title"] = "Perfil"; 
+    ViewData["Title"] = "Perfil";
 }
 
-<h3>Mi Perfil</h3>
+<h1>@Model.username.ToUpper()</h1>
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <div class="w-100 p-1 row gap-3">
     <form method="post" asp-action="Perfil" asp-controller="Users" class="mt-2 col-6 p-2" enctype="multipart/form-data">
@@ -21,31 +21,18 @@
                 <img src="@Model.img" class="profile-picture-perfil rounded-2">
                 <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="ImageFile" class="form-control mt-2">
             </div>
-        </div> 
+        </div>
         <!-- FIN IMAGEN -->
-
-        <!-- USUARIO -->
-        <div class="d-flex  align-items-center mt-2">
-            <div class="w-25">
-                <p class="fw-bold">Usuario</p>
-            </div>
-            <div class="w-75">
-                <input asp-for="@Model.username" class="form-control" readonly />
-            </div>
-        </div> 
-        <!-- FIN USUARIO-->
-
         <!-- NOMBRE -->
         <div class="d-flex  align-items-center mt-2">
             <div class="w-25">
                 <p class="fw-bold">Nombre</p>
             </div>
             <div class="w-75">
-                <input asp-for="@Model.name" class="form-control" />
+                <input asp-for="@Model.name" title="Este es el nombre que se mostrará" class="form-control" />
             </div>
-        </div> 
+        </div>
         <!-- FIN NOMBRE-->
-
         <!-- MAIL -->
         <div class="d-flex  align-items-center mt-2">
             <div class="w-25">
@@ -54,10 +41,9 @@
             <div class="w-75">
                 <input asp-for="@Model.email" class="form-control" />
             </div>
-        </div> 
-            <span asp-validation-for="email" class="validate-error"></span>
+        </div>
+        <span asp-validation-for="email" class="validate-error"></span>
         <!-- FIN MAIL-->
-
         <!-- ABOUT-->
         <div class="d-flex align-items-center mt-2">
             <div class="w-25">
@@ -66,9 +52,8 @@
             <div class="w-75">
                 <textarea asp-for="@Model.about" class="form-control textarea-style" rows="5" placeholder="Agregar un resumen al perfil"></textarea>
             </div>
-        </div> 
+        </div>
         <!-- FIN ABOUT -->
-
         <!-- HOBBIES-->
         <div class="d-flex align-items-center mt-2">
             <div class="w-25">
@@ -84,11 +69,10 @@
                 <p class="fw-bold">Curriculum Vitae</p>
             </div>
             <div class="w-75">
-                <input asp-for="@Model.cv" class="form-control" />
+                <input asp-for="@Model.cv" class="form-control" title="Ingrese la url en el que se encuentra subido el curriculum" placeholder="Ingreso url del archivo pdf" />
             </div>
         </div>
         <!-- FIN CV -->
-
         <!-- REDES -->
         <!-- Todas las redes sociales -->
         <div class="mt-4 row col-12">
@@ -99,7 +83,7 @@
             </div>
         </div>
     </form>
-    
+
 </div>
 
 @section Scripts {
