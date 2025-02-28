@@ -50,7 +50,6 @@
     <div class="@(MySignInManager.IsSignedIn(User) ? "content" : "")" id="lateral-bar-content">
         @if (MySignInManager.IsSignedIn(User))
         {
-
             <!-- MENU -->
             <div class="sub-menu-grid menu-color ">
 
@@ -65,7 +64,7 @@
                     <ul class="nav flex-column" id="menu">
 
                         <!-- * HOME -->
-                        <li>
+                        <li id="nav_items" path="">
                             <a href="/" class="nav-link nav-title" id="itemLi">
                                 <i class="iconos fa-solid fa-house"></i>
                                 <span class="ms-1 item_size" id="itemTitle">Home</span>
@@ -73,9 +72,9 @@
                         </li>
 
                         <!-- * POSTS -->
-                        <li id="nav_items">
+                        <li id="nav_items" path="Posts">
                             <a href="#subMenuPosts" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
-                                <i class="iconos fa-solid fa-pen"></i>
+                                <i class="iconos fa-solid fa-pen" id="icon_post"></i>
                                 <span class="ms-1 item_size item_size" id="itemTitle">Post</span>
                             </a>
 
@@ -107,7 +106,7 @@
                         </li>
 
                         <!-- * CATEGORIES -->
-                        <li id="nav_items">
+                        <li id="nav_items" path="Categorias">
                             <a href="#subMenuCategories" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
                                 <i class="iconos fa-solid fa-list"></i>
                                 <span class="ms-1 item_size" id="itemTitle">Categoria</span>
@@ -141,7 +140,7 @@
                         </li>
 
                         <!-- * FORMATS -->
-                        <li id="nav_items">
+                        <li id="nav_items" path="Formats">
                             <a href="#subMenuFormats" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
                                 <i class="iconos fa-solid fa-border-all"></i>
                                 <span class="ms-1 item_size" id="itemTitle">Formatos</span>
@@ -174,7 +173,7 @@
                         </li>
 
                         <!-- * MEDIA TYPES -->
-                        <li id="nav_items">
+                        <li id="nav_items" path="Mediatype">
                             <a href="#subMenuMediaTypes" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
                                 <i class="iconos fa-solid fa-play"></i>
                                 <span class="ms-1 item_size" id="itemTitle">Tipos Media</span>
@@ -209,7 +208,7 @@
                         </li>
 
                         <!-- SOURCES -->
-                        <li id="nav_items">
+                        <li id="nav_items" path="Sources">
                             <a href="#subMenuSources" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
                                 <i class="iconos fa-solid fa-link"></i>
                                 <span class="ms-1 item_size" id="itemTitle">Fuentes</span>
@@ -246,7 +245,7 @@
                         <!-- ADMIN -->
                         @if (MySignInManager.IsSignedIn(User) && currentUser.role == 1)
                         {
-                            <li id="nav_items">
+                            <li id="nav_items" path="Users">
                                 <a href="#subMenuUsers" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
                                     <i class="iconos fa-solid fa-user"></i>
                                     <span class="ms-1 item_size" id="itemTitle">Usuarios</span>
@@ -278,7 +277,7 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li id="nav_items">
+                            <li id="nav_items" path="Role">
                                 <a href="#subMenuRole" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
                                     <i class="iconos fa-solid fa-user"></i>
                                     <span class="ms-1 item_size" id="itemTitle">Rols</span>
@@ -358,7 +357,7 @@
     @await RenderSectionAsync("Scripts", required: false)
 
     <script>
-        
+
         // Obtenemos el local storage. Caso contrario, lo seteamos en false
         let currentMode = localStorage.getItem("barModeCollapse") == "true";
         if(localStorage.getItem("barModeCollapse") == null)
@@ -382,10 +381,8 @@
             }
         )
 
-        console.log("Medida: " + window.visualViewport.width)
-
         /* Colpasamos la barra cuando la ventana se reduce a 570 px */
-        window.addEventListener("resize", () => 
+        window.addEventListener("resize", () =>
         {
             if(window.visualViewport.width < 990)
             {
@@ -396,6 +393,24 @@
                 {
                     actionBarExpand();
                 }
+            }
+        })
+
+        // Selección menú
+        let paths = []
+        let items = document.querySelectorAll("#nav_items")
+
+        // Listamos todas las páginas
+        items.forEach( el => {
+            paths.push("/" + el.getAttribute("path"))
+        })
+
+        //Buscamos si la página en la que nos encontramos coincide con alguno del listado
+        paths.forEach((i, index) => {
+            
+            if(window.location.pathname == i)
+            {
+                items[index].classList.add("item_subNav_bg")
             }
         })
     </script>
