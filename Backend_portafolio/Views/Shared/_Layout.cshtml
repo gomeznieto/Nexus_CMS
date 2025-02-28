@@ -351,8 +351,6 @@
             </div>
         </main>
     </div><!-- FIN DIV FLEX -->
-
-
     <!-- SCRIPTS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -360,18 +358,46 @@
     @await RenderSectionAsync("Scripts", required: false)
 
     <script>
+        
+        // Obtenemos el local storage. Caso contrario, lo seteamos en false
+        let currentMode = localStorage.getItem("barModeCollapse") == "true";
+        if(localStorage.getItem("barModeCollapse") == null)
+             localStorage.setItem("barModeCollapse", currentMode);
 
-        //Modo de barra lateral desplegado al iniciar la página
-        var mode = true;
+        // Verificamos la selección guardada por el usuario
+        if(currentMode)
+            actionBarCollapse();
+        else
+            actionBarExpand();
 
+        // Al accionar el botón para reducir barra
         document.getElementById("btnBars").addEventListener("click", (e) =>
             {
                 e.preventDefault();
 
-               mode = actionBar(mode);
+               currentMode = !currentMode;
+               localStorage.setItem("barModeCollapse", currentMode);
+
+               actionBar(currentMode);
             }
         )
 
+        console.log("Medida: " + window.visualViewport.width)
+
+        /* Colpasamos la barra cuando la ventana se reduce a 570 px */
+        window.addEventListener("resize", () => 
+        {
+            if(window.visualViewport.width < 990)
+            {
+                actionBarCollapse();
+            }
+            else{
+                if(!currentMode)
+                {
+                    actionBarExpand();
+                }
+            }
+        })
     </script>
 
 </body>

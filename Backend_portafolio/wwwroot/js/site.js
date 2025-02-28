@@ -604,83 +604,152 @@ function handleMouseOut(event) {
     //new bootstrap.Collapse(collapse, { toggle: false })
 }
 
-function actionBar(mode) {
-
-
-    // Tomamos la barra y aplicamos cambios en el css
-    let lateralBarContent = document.getElementById("lateral-bar-content");
-    lateralBarContent.classList.toggle("content-collapse")
-    lateralBarContent.classList.toggle("content")
-
-    let itemTitle = document.querySelectorAll("#itemTitle");
-    itemTitle.forEach(x => x.classList.toggle("hide"));
-
-    let itemLi = document.querySelectorAll("#itemLi");
-    let subNavTitleCollapse = document.querySelectorAll("#sub-nav-title-collapse");
-
-    itemLi.forEach((x, i) => {
-        x.classList.toggle("nav-title-page-collapse");
-        x.classList.toggle("nav-title");
-        x.classList.toggle("nav-link-collapse");
-
-        //if (mode) {
-        //    x.addEventListener('mouseover', handleMouseOver, true);
-        //    x.addEventListener('mouseout', handleMouseOut, true);
-        //}
-    });
-
-    subNavTitleCollapse.forEach( x => x.classList.toggle("hide"))
-
+function actionBarCollapse() {
+    /** TITULOS PRINCIPAL DE BARRA LATERAL**/
     let navTitle = document.getElementById("navTitle");
-    navTitle.classList.toggle("nav-title-page-dimension");
-    navTitle.classList.toggle("nav-title-page-collapse");
-    navTitle.classList.toggle("nav-title-page");
+    navTitle.classList.add("nav-title-page-dimension");
+    navTitle.classList.add("nav-title-page-collapse");
+    navTitle.classList.remove("nav-title-page");
 
+    /** PROFILE **/
     let profileName = document.getElementById("profileName");
-    profileName.classList.toggle("profile-name-nav");
-    profileName.classList.toggle("profile-name-nav-collapse");
+    profileName.classList.remove("profile-name-nav");
+    profileName.classList.add("profile-name-nav-collapse");
 
+    /** ITEMS MAIN **/
     let navItem = document.querySelectorAll("#nav_items");
     navItem.forEach(x => {
-        x.classList.toggle("collapse-relative");
+        x.classList.add("collapse-relative");
     });
 
+    /** ITEMS LI **/
+    let itemLi = document.querySelectorAll("#itemLi");
+    itemLi.forEach((x, i) => {
+        x.classList.add("nav-title-page-collapse");
+        x.classList.remove("nav-title");
+        x.classList.add("nav-link-collapse");
+    });
+
+    /** ITEMS TITULOS COLLAPSE **/
+    let subNavTitleCollapse = document.querySelectorAll("#sub-nav-title-collapse");
+    subNavTitleCollapse.forEach(x => x.classList.remove("hide"))
+
+    /** CONTENIDO LATERAL **/
+    let lateralBarContent = document.getElementById("lateral-bar-content");
+    lateralBarContent.classList.add("content-collapse")
+    lateralBarContent.classList.remove("content")
+
+    /** ITEMS TITULOS EXPANDIDOS **/
+    let itemTitle = document.querySelectorAll("#itemTitle");
+    itemTitle.forEach(x => x.classList.add("hide"));
+
+    /** ICONOS CIRCULOS **/
     let subIcons = document.querySelectorAll(".subiconos");
-    subIcons.forEach(x => x.classList.toggle("hide"));
+    subIcons.forEach(x => x.classList.add("hide"));
 
+    /** FONDO DE NAVEGACION COLLAPSE**/
     let itemSubNav = document.querySelectorAll(".item_subNav");
-    itemSubNav.forEach(x => x.classList.toggle("item_subNav_bg"));
+    itemSubNav.forEach(x => x.classList.add("item_subNav_bg"));
 
+    /** POSICION ABSOLUTA DE ITEMS**/
     let subMenuPost = document.getElementById("subMenuPosts");
-    subMenuPost.classList.toggle("collapse-absolute");
+    subMenuPost.classList.add("collapse-absolute");
 
     let subMenuCategories = document.getElementById("subMenuCategories");
-    subMenuCategories.classList.toggle("collapse-absolute");
+    subMenuCategories.classList.add("collapse-absolute");
 
     let subMenuFormats = document.getElementById("subMenuFormats");
-    subMenuFormats.classList.toggle("collapse-absolute");
+    subMenuFormats.classList.add("collapse-absolute");
 
     let subMenuMediaTypes = document.getElementById("subMenuMediaTypes");
-    subMenuMediaTypes.classList.toggle("collapse-absolute");
+    subMenuMediaTypes.classList.add("collapse-absolute");
 
     let subMenuSources = document.getElementById("subMenuSources");
-    subMenuSources.classList.toggle("collapse-absolute");
+    subMenuSources.classList.add("collapse-absolute");
 
     let subMenuMediaUsers = document.getElementById("subMenuUsers");
-    subMenuMediaUsers.classList.toggle("collapse-absolute");
+    subMenuMediaUsers.classList.add("collapse-absolute");
 
     let subMenuMediaRol = document.getElementById("subMenuRole");
-    subMenuMediaRol.classList.toggle("collapse-absolute");
+    subMenuMediaRol.classList.add("collapse-absolute");
+}
 
-    //if (!mode) {
-    //    itemLi.forEach((x, i) => {
-    //        x.removeEventListener('mouseover', handleMouseOver, true);
-    //        x.removeEventListener('mouseout', handleMouseOut, true);
-    //    });
-    //}
+function actionBarExpand() {
+    /** TITULOS PRINCIPAL DE BARRA LATERAL**/
+    let navTitle = document.getElementById("navTitle");
+    navTitle.classList.remove("nav-title-page-dimension");
+    navTitle.classList.remove("nav-title-page-collapse");
+    navTitle.classList.add("nav-title-page");
 
-    return !mode;
+    /** PROFILE **/
+    let profileName = document.getElementById("profileName");
+    profileName.classList.add("profile-name-nav");
+    profileName.classList.remove("profile-name-nav-collapse");
 
+    /** ITEMS MAIN **/
+    let navItem = document.querySelectorAll("#nav_items");
+    navItem.forEach(x => {
+        x.classList.remove("collapse-relative");
+    });
+
+    /** ITEMS LI **/
+    let itemLi = document.querySelectorAll("#itemLi");
+    itemLi.forEach((x, i) => {
+        x.classList.remove("nav-title-page-collapse");
+        x.classList.add("nav-title");
+        x.classList.remove("nav-link-collapse");
+    });
+
+    /** ITEMS TITULOS COLLAPSE **/
+    let subNavTitleCollapse = document.querySelectorAll("#sub-nav-title-collapse");
+    subNavTitleCollapse.forEach(x => x.classList.add("hide"))
+
+    /** ITEMS TITULOS EXPANDIDOS **/
+    let itemTitle = document.querySelectorAll("#itemTitle");
+    itemTitle.forEach(x => x.classList.remove("hide"));
+
+    /** CONTENIDO LATERAL **/
+    let lateralBarContent = document.getElementById("lateral-bar-content");
+    lateralBarContent.classList.remove("content-collapse")
+    lateralBarContent.classList.add("content")
+
+    /** ICONOS CIRCULOS **/
+    let subIcons = document.querySelectorAll(".subiconos");
+    subIcons.forEach(x => x.classList.remove("hide"));
+
+    /** FONDO DE NAVEGACION COLLAPSE**/
+    let itemSubNav = document.querySelectorAll(".item_subNav");
+    itemSubNav.forEach(x => x.classList.remove("item_subNav_bg"));
+
+    /** POSICION ABSOLUTA DE ITEMS**/
+    let subMenuPost = document.getElementById("subMenuPosts");
+    subMenuPost.classList.remove("collapse-absolute");
+
+    let subMenuCategories = document.getElementById("subMenuCategories");
+    subMenuCategories.classList.remove("collapse-absolute");
+
+    let subMenuFormats = document.getElementById("subMenuFormats");
+    subMenuFormats.classList.remove("collapse-absolute");
+
+    let subMenuMediaTypes = document.getElementById("subMenuMediaTypes");
+    subMenuMediaTypes.classList.remove("collapse-absolute");
+
+    let subMenuSources = document.getElementById("subMenuSources");
+    subMenuSources.classList.remove("collapse-absolute");
+
+    let subMenuMediaUsers = document.getElementById("subMenuUsers");
+    subMenuMediaUsers.classList.remove("collapse-absolute");
+
+    let subMenuMediaRol = document.getElementById("subMenuRole");
+    subMenuMediaRol.classList.remove("collapse-absolute");
+}
+
+function actionBar(mode) {
+    if (mode) {
+        actionBarCollapse();
+    } else {
+        actionBarExpand();
+    }
 }
 
 /* TOAST */
