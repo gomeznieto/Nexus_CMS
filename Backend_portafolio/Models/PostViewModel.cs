@@ -6,6 +6,7 @@ namespace Backend_portafolio.Models
 {
     public class PostViewModel
 	{
+        // ENTIDAD
         public int id { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [StringLength(maximumLength: 40, MinimumLength = 2, ErrorMessage = "El titulo debe tener entre {2} y {1} letras")]
@@ -17,17 +18,16 @@ namespace Backend_portafolio.Models
         [Display(Name = "Imagen principal")]
         public string cover { get; set; }
         [Display(Name = "Formato")]
-        public int format_id { get; set; }
-
-        public string userName { get; set; }
         public int user_id { get; set; }
-
-        public bool draft { get; set; }
-        public string format { get; set; }
-
-        [Display(Name = "Fecha de creación")]
+        public int format_id { get; set; }
         public DateTime created_at { get; set; }
         public DateTime modify_at { get; set; }
+        public bool draft { get; set; }
+        [Display(Name = "Fecha de creación")]
+
+        // STRINGS
+        public string userName { get; set; }
+        public string format { get; set; }
 
         // LISTAS DE LA ENTRADA
         public IEnumerable<Media> mediaList { get; set; }

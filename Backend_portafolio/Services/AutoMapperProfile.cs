@@ -67,11 +67,11 @@ namespace Backend_portafolio.Sevices
             //************************ API ***********************
             //****************************************************
 
-            CreateMap<User, ApiUserViewModel>();
-            CreateMap<Post, ApiPostViewModel>();
+            CreateMap<UserViewModel, ApiUserViewModel>();
+            CreateMap<PostViewModel, ApiPostViewModel>();
             CreateMap<Media, ApiMediaViewModel>();
             CreateMap<Link, ApiLinkViewModel>();
-            CreateMap<Categoria, ApiCategoryViewModel>();
+            CreateMap<CategoryViewModel, ApiCategoryViewModel>();
         }
     }
 }

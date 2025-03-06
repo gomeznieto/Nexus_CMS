@@ -170,9 +170,26 @@ namespace Backend_portafolio.Services
             {
                 await _tokenService.ValidateApiKey(apiKey);
                 var user = await _usersService.GetUserByApiKey(apiKey);
-                var posts = await _postService.GetAllPosts(user.id);
+                List<PostViewModel> posts = await _postService.GetAllPosts(user.id);
 
-                var postsApiModels = _mapper.Map<List<ApiPostViewModel>>(posts);
+                List<ApiPostViewModel> postsApiModels = _mapper.Map<List<ApiPostViewModel>>(posts);
+                //List<ApiPostViewModel> postsApiModels = new List<ApiPostViewModel>();
+
+                //foreach (var post in posts)
+                //{
+                //    var addPost = new ApiPostViewModel()
+                //    {
+                //        id = post.id,
+                //        title = post.description,
+                //        description = post.description,
+                //        cover = post.cover,
+                //        format = post.format,
+                //        created_at = post.created_at
+
+                //    };
+
+                //    postsApiModels.Add(addPost);
+                //}
 
                 foreach (var post in postsApiModels)
                 {
@@ -185,7 +202,7 @@ namespace Backend_portafolio.Services
                     post.categories = _mapper.Map<List<ApiCategoryViewModel>>
                         ((await _categoriaService.GetCategoriasByPost(post.id))
                         .ToList()
-                        .Select(c => c.Categoria));
+                        .Select(c => c.Categoria)).ToList();
                 }
 
                 var data = new ApiResponsePosts<List<ApiPostViewModel>>()

@@ -352,7 +352,7 @@ namespace Backend_portafolio.Services
                 // generamos ApiKey para que poder acceder a la API
                 newUSer.apiKey = _tokenService.GenerateApiKey();
 
-                var result = await _userManager.CreateAsync(newUSer, password: viewModel.Username + ".pass");
+                var result = await _userManager.CreateAsync(newUSer, password: viewModel.Username + ".pass"); //Variable de entorno
 
                 // SI no se pudo crear el usuario
                 if (!result.Succeeded)
@@ -367,7 +367,7 @@ namespace Backend_portafolio.Services
 
         public async Task CreateAdminUser()
         {
-            var provisoryPassword = "123456";
+            var provisoryPassword = "123456"; //Variable de entorno
 
             try
             {

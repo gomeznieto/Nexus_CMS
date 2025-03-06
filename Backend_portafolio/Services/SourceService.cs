@@ -92,7 +92,7 @@ namespace Backend_portafolio.Sevices
 
                 var existe = await _repositorySource.Existe(viewModel.name, userID);
 
-                if(!existe)
+                if(existe)
                     throw new ApplicationException("El recurso ya existe");
 
                 await _repositorySource.Crear(_mapper.Map<Source>(viewModel));
