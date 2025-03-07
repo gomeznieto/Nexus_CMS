@@ -11,18 +11,21 @@
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 @* FORMULARIO *@
-<form asp-controller="Sources" asp-action="Editar">
+<form asp-controller="Sources" asp-action="Editar" class="w-75" enctype="multipart/form-data">
 	<input type="hidden" asp-for="id" />
 	<input type="hidden" asp-for="user_id" />
+	<input type="hidden" asp-for="icon" />
 
 	<div class="mb-3">
-		<div class="flex-column mb-3">
-			<input type="text" asp-for="name" class="form-control" placeholder="Indique el nombre del tipo de la fuente"/>
-				<span asp-validation-for="name" class="text-borrador fs-6 mt-1"></span>
+		<div class="w-75 mb-3">
+			<input type="text" asp-for="name" class="form-control" placeholder="Indique el nombre del tipo de la fuente" />
+			<span asp-validation-for="name" class="text-borrador fs-6 mt-1"></span>
 		</div>
-		<div class="flex-column mb-3">
-			<input type="text" asp-for="icon" class="form-control" placeholder="Indique el icono de la fuente. Por ejemplo: 'fa-brands fa-vimeo'"/>
-			<span asp-validation-for="icon" class="text-borrador fs-6 mt-1"></span>
+			<div class="flex-column mb-3">
+			<img src="@Model.icon" class="source-picture-edit">
+		</div> 
+		<div class="w-75">
+			<input type="file" id="image" name="ImageFile" accept="image/*" asp-for="ImageFile" class="form-control mt-2">
 		</div>
 		<button type="submit" class="btn btn-action mt-3">Crear</button>
 		<a asp-action="Index" class="btn btn-delete mt-3">cancelar</a>

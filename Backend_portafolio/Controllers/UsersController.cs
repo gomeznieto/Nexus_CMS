@@ -175,17 +175,13 @@ namespace Backend_portafolio.Controllers
             }
         }
 
-        //****************************************************
-        //************* EDIT REGISTER BY USER  ***************
-        //****************************************************
-
         [HttpPost]
         public async Task<IActionResult> Perfil(UserViewModel ViewModel)
         {
 
             if (!ModelState.IsValid)
             {
-                var viewModel = await _usersService.GetUserViewModel(ViewModel);
+                ViewModel = await _usersService.GetUserViewModel();
                 return View(ViewModel);
             }
 

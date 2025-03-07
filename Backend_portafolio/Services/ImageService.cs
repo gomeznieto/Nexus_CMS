@@ -1,35 +1,50 @@
 ﻿using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backend_portafolio.Services
 {
     public interface IImageService
     {
-        Task<string> UploadImageAsync(IFormFile imageFile, UserViewModel user, string subfolder = "images");
+        Task<string> UploadImageAsync(IFormFile imageFile, UserViewModel user, string subfolder, string source = "");
     }
     public class ImageService : IImageService
     {
         //Guarda un archivo que le pasemos en la carpeta del Usuario
-        public async Task<string> UploadImageAsync(IFormFile imageFile, UserViewModel user, string subfolder)
+        public async Task<string> UploadImageAsync(IFormFile imageFile, UserViewModel user, string subfolder, string source)
         {
             // Carpeta raíz
             string root = "img";
 
-            // Verifica que el archivo no sea nulo o vacío
+            // Verifica que el archivo no sea nulo o esté vacío
             if (imageFile == null || imageFile.Length == 0)
             {
                 throw new ArgumentException("El archivo no es válido.");
             }
 
-            // Define la carpeta de subcarpetas y crea si no existe
-            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", root, subfolder, user.username);
+            // Define la ruta de la carpeta
+            string uploadsFolder;
+            string savedPath;
+
+            if (source.IsNullOrEmpty())
+            {
+                uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", root, subfolder, user.username);
+                savedPath = Path.Combine(root, subfolder, user.username);
+            }
+            else
+            {
+                uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", root, subfolder, user.username, source);
+                savedPath = Path.Combine(root, subfolder, user.username, source);
+            }
+
+            // Creamos el directorio
             Directory.CreateDirectory(uploadsFolder);
 
             // Verifica la extensión del archivo
             string fileNameWithExtension = imageFile.FileName;
             string extension = Path.GetExtension(fileNameWithExtension).ToLower();
 
-            if (extension != ".jpg" && extension != ".png")
+            if (extension != ".jpg" && extension != ".png" && extension != ".svg")
             {
                 throw new ArgumentException("El tipo de archivo no es válido. Solo se permiten .jpg y .png.");
             }
@@ -47,28 +62,27 @@ namespace Backend_portafolio.Services
             }
 
             // Borrar anterior
-            string img_anterior = user.img;
+            BorrarArchivo(uploadsFolder);
 
             // Guardamos imagen
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await imageFile.CopyToAsync(stream);
-
-                BorrarArchivo(user.img);
             }
 
-            return $"/{root}/{subfolder}/{user.username}/{uniqueFileName}";
+            return $"/{savedPath}/{uniqueFileName}";
         }
+
 
         // Borra el archivo de la ruta que le indicamos
         void BorrarArchivo(string path)
         {
-            if (path != null)
+            if (Directory.Exists(path))
             {
-                string path_anterior = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", path.TrimStart('/'));
-                if (File.Exists(path_anterior))
+                string[] files = Directory.GetFiles(path);
+                foreach (string file in files)
                 {
-                    File.Delete(path_anterior);
+                    File.Delete(file);
                 }
             }
 

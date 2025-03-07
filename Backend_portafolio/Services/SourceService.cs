@@ -13,7 +13,7 @@ namespace Backend_portafolio.Sevices
         Task EditSource(SourceViewModel viewModel);
         Task<bool> Existe(string source);
         Task<IEnumerable<SourceViewModel>> GetAllSource();
-        Task<Source> GetSourceById(int id);
+        Task<SourceViewModel> GetSourceById(int id);
         SourceViewModel GetSourceViewModel();
     }
 
@@ -21,16 +21,19 @@ namespace Backend_portafolio.Sevices
     {
         private readonly IRepositorySource _repositorySource;
         private readonly IMapper _mapper;
+        private readonly IImageService _imageService;
         private readonly IUsersService _usersService;
 
         public SourceService(
             IRepositorySource repositorySource,
             IMapper mapper,
+            IImageService imageService,
             IUsersService usersService
             )
         {
             _repositorySource = repositorySource;
             _mapper = mapper;
+            this._imageService = imageService;
             _usersService = usersService;
         }
 
@@ -52,11 +55,11 @@ namespace Backend_portafolio.Sevices
             }
         }
 
-        public async Task<Source> GetSourceById(int id)
+        public async Task<SourceViewModel> GetSourceById(int id)
         {
             try
             {
-                var viewModel = await _repositorySource.ObtenerPorId(id);
+                var viewModel = _mapper.Map<SourceViewModel>(await _repositorySource.ObtenerPorId(id));
 
                 if (viewModel is null)
                     throw new ApplicationException("El recurso solicitado no existe");
@@ -86,14 +89,18 @@ namespace Backend_portafolio.Sevices
             try
             {
                 var userID = _usersService.ObtenerUsuario();
+                UserViewModel currentUser = await _usersService.GetDataUser();
 
-                if(userID != viewModel.user_id)
+                if (userID != viewModel.user_id)
                     throw new ApplicationException("El usuario no tiene permisos para realizar esta acción");
 
                 var existe = await _repositorySource.Existe(viewModel.name, userID);
 
                 if(existe)
                     throw new ApplicationException("El recurso ya existe");
+
+                //Subir imagen
+                viewModel.icon = await _imageService.UploadImageAsync(viewModel.ImageFile, currentUser, $"source-images", viewModel.name);
 
                 await _repositorySource.Crear(_mapper.Map<Source>(viewModel));
 
@@ -113,15 +120,20 @@ namespace Backend_portafolio.Sevices
         {
            try
             {
+                UserViewModel currentUser = await _usersService.GetDataUser();
+
                 var existe = await _repositorySource.ObtenerPorId(viewModel.id);
 
-                if (existe != null)
+                if (existe is null)
                     throw new ApplicationException("El recurso no existe");
 
                 var userID = _usersService.ObtenerUsuario();
 
                 if (userID != viewModel.user_id)
                     throw new ApplicationException("El usuario no tiene permisos para realizar esta acción");
+
+                //Subir imagen
+                viewModel.icon = await _imageService.UploadImageAsync(viewModel.ImageFile, currentUser, $"source-images", viewModel.name);
 
                 await _repositorySource.Editar(_mapper.Map<Source>(viewModel));
             }

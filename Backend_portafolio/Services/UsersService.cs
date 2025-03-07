@@ -409,6 +409,7 @@ namespace Backend_portafolio.Services
                 userEdit.img = viewModel.ImageFile != null
                     ? await _imageService.UploadImageAsync(viewModel.ImageFile, currentUser, "profile-images")
                     : currentUser.img;
+
                 userEdit.passwordHash = userEdit.passwordHash == null ? currentUser.passwordHash : userEdit.passwordHash;
 
 

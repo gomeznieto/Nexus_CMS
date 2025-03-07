@@ -10,7 +10,6 @@ namespace Backend_portafolio.Models
         [Display(Name = "Nombre")]
         public string name { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
-
         public string username { get; set; }
         public string usernameNormalizado { get; set; }
         public int role { get; set; }
@@ -30,6 +29,8 @@ namespace Backend_portafolio.Models
         public string passwordHash { get; set; }
         [Display(Name = "ApiKey")]
         public string apiKey { get; set; }
+
+        // FORMULARIO
         [Display(Name = "Imagen")]
         public IFormFile ImageFile { get; set; }
         [Display(Name = "Rol")]

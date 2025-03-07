@@ -12,13 +12,14 @@
     <form method="post" asp-action="Perfil" asp-controller="Users" class="mt-2 col-6 p-2" enctype="multipart/form-data">
         <input type="hidden" asp-for="@Model.id" />
         <input type="hidden" asp-for="@Model.role" />
+        <input type="hidden" asp-for="@Model.username" />
         <!-- IMAGEN -->
         <div class="d-flex align-items-center mt-2 ">
             <div class="w-25">
                 <p class="fw-bold">Imagen Perfil</p>
             </div>
             <div class="w-75">
-                <img src="@Model.img" class="profile-picture-perfil rounded-2">
+                <img src="@(Model.img != null ? Model.img : "https://picsum.photos/id/237/200/300")" class="profile-picture-perfil rounded-2">
                 <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="ImageFile" class="form-control mt-2">
             </div>
         </div>

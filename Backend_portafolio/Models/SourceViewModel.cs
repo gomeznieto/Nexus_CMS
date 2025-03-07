@@ -9,10 +9,15 @@ namespace Backend_portafolio.Models
         [Required(ErrorMessage = "El campo {0} es requerido")]
         //[Remote(action: "VerificarExisteCategoria", controller: "Sources")]
         public string name { get; set; }
+        //[Required(ErrorMessage = "El campo {0} es requerido")]
         [Display(Name = "Icono")]
-        [Required(ErrorMessage = "El campo {0} es requerido")]
         public string icon { get; set; }
 
         public int user_id { get; set; }
+
+        //FORMULARIO
+        [Display(Name = "Imagen")]
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+        public IFormFile ImageFile { get; set; }
     }
 }
