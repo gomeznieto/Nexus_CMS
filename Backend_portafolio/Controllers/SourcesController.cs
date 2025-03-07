@@ -94,6 +94,7 @@ namespace Backend_portafolio.Controllers
 			try
 			{
 				await _sourceService.EditSource(viewModel);
+				Session.CrearModalSuccess("Se ha editado exitosamente", "Sources", HttpContext);
                 return RedirectToAction("Index");
 			}
 			catch (Exception ex)

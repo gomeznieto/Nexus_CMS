@@ -1,4 +1,5 @@
-﻿using Backend_portafolio.Entities;
+﻿using Backend_portafolio.Datos;
+using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
 using Microsoft.IdentityModel.Tokens;
 
@@ -7,9 +8,43 @@ namespace Backend_portafolio.Services
     public interface IImageService
     {
         Task<string> UploadImageAsync(IFormFile imageFile, UserViewModel user, string subfolder, string source = "");
+        Task<bool> DeleteImageAsync(string path);
     }
     public class ImageService : IImageService
     {
+        public async Task<bool> DeleteImageAsync(string directoryFile)
+        {
+            try
+            {
+                // Combina la ruta del archivo o 
+                var file = Path.GetFileName(directoryFile);
+                var path = Path.GetDirectoryName(directoryFile);
+                var currentFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", path.TrimStart('\\'));
+
+                // Verifica si es un archivo o un directorio
+                // Borrar archivos dentro del directorio
+                if (Directory.Exists(currentFolder))
+                {
+                    // Si es un directorio, elimínalo recursivamente
+                    deleteFilesDirectory(currentFolder);
+                    Directory.Delete(currentFolder);
+                }
+                else
+                {
+                    // Si no existe, retorna false
+                    return false;
+                }
+
+                // Verifica si el archivo o directorio fue eliminado correctamente
+                return !File.Exists(currentFolder + "\\" + file) && !Directory.Exists(currentFolder);
+            }
+            catch (Exception ex)
+            {
+                // Maneja la excepción (puedes loguearla o relanzarla)
+                throw new Exception(ex.Message);
+            }
+        }
+
         //Guarda un archivo que le pasemos en la carpeta del Usuario
         public async Task<string> UploadImageAsync(IFormFile imageFile, UserViewModel user, string subfolder, string source)
         {
@@ -62,7 +97,7 @@ namespace Backend_portafolio.Services
             }
 
             // Borrar anterior
-            BorrarArchivo(uploadsFolder);
+            deleteFilesDirectory(uploadsFolder);
 
             // Guardamos imagen
             using (var stream = new FileStream(filePath, FileMode.Create))
@@ -70,12 +105,12 @@ namespace Backend_portafolio.Services
                 await imageFile.CopyToAsync(stream);
             }
 
-            return $"/{savedPath}/{uniqueFileName}";
+            return $"\\{savedPath}\\{uniqueFileName}";
         }
 
 
         // Borra el archivo de la ruta que le indicamos
-        void BorrarArchivo(string path)
+        void deleteFilesDirectory(string path)
         {
             if (Directory.Exists(path))
             {
