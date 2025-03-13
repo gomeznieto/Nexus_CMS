@@ -72,15 +72,20 @@
                         </li>
 
                         <!-- * POSTS -->
-                        <li id="nav_items" path="Posts">
-                            <a href="#subMenuPosts" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                        <li id="nav_items" path="Posts" class="cursor_pointer" collapse="true" onclick="actionBarHide(this)">
+                            @* <a href="#subMenuPosts" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-pen" id="icon_post"></i>
+                                <span class="ms-1 item_size item_size" id="itemTitle">Post</span>
+                            </a> *@
+                            <a  class="nav-link nav-title" id="itemLi">
                                 <i class="iconos fa-solid fa-pen" id="icon_post"></i>
                                 <span class="ms-1 item_size item_size" id="itemTitle">Post</span>
                             </a>
 
                             @if (formats != null)
                             {
-                                <ul class="collapse nav flex-column ms-1 item_subNav" id="subMenuPosts" data-bs-parent="#menu">
+                                <ul class="collapse nav flex-column ms-1 item_subNav" id="subMenuPosts" @* data-bs-parent="#menu" *@>
+                                    
                                     <li class="w-100 hide" id="sub-nav-title-collapse">
                                         <span asp-action="Index" class="nav-link item_subNav px-3">
                                             <span class="item_size">
@@ -106,12 +111,16 @@
                         </li>
 
                         <!-- * CATEGORIES -->
-                        <li id="nav_items" path="Categorias">
-                            <a href="#subMenuCategories" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                        <li id="nav_items" path="Categorias" class="cursor_pointer" collapse="true" onclick="actionBarHide(this)">
+                           @*  <a href="#subMenuCategories" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-list"></i>
+                                <span class="ms-1 item_size" id="itemTitle">Categoria</span>
+                            </a> *@
+                            <a class="nav-link nav-title" id="itemLi">
                                 <i class="iconos fa-solid fa-list"></i>
                                 <span class="ms-1 item_size" id="itemTitle">Categoria</span>
                             </a>
-                            <ul class="collapse nav flex-column ms-1" id="subMenuCategories" data-bs-parent="#menu">
+                            <ul class="collapse nav flex-column ms-1" id="subMenuCategories" @* data-bs-parent="#menu" *@>
                                 <li class="w-100 hide" id="sub-nav-title-collapse">
                                     <span asp-action="Index" class="nav-link item_subNav px-3">
                                         <span class="item_size">
@@ -140,12 +149,16 @@
                         </li>
 
                         <!-- * FORMATS -->
-                        <li id="nav_items" path="Formats">
-                            <a href="#subMenuFormats" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                        <li id="nav_items" path="Formats" class="cursor_pointer" collapse="true" onclick="actionBarHide(this)">
+                            @* <a href="#subMenuFormats" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-border-all"></i>
+                                <span class="ms-1 item_size" id="itemTitle">Formatos</span>
+                            </a> *@
+                            <a class="nav-link nav-title" id="itemLi">
                                 <i class="iconos fa-solid fa-border-all"></i>
                                 <span class="ms-1 item_size" id="itemTitle">Formatos</span>
                             </a>
-                            <ul class="collapse nav flex-column ms-1" id="subMenuFormats" data-bs-parent="#menu">
+                            <ul class="collapse nav flex-column ms-1" id="subMenuFormats" @* data-bs-parent="#menu" *@>
                                 <li class="w-100 hide" id="sub-nav-title-collapse">
                                     <span asp-action="Index" class="nav-link item_subNav px-3">
                                         <span class="item_size">
@@ -173,12 +186,16 @@
                         </li>
 
                         <!-- * MEDIA TYPES -->
-                        <li id="nav_items" path="Mediatype">
-                            <a href="#subMenuMediaTypes" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                        <li id="nav_items" path="Mediatype" class="cursor_pointer" collapse="true" onclick="actionBarHide(this)">
+                            @* <a href="#subMenuMediaTypes" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-play"></i>
+                                <span class="ms-1 item_size" id="itemTitle">Tipos Media</span>
+                            </a> *@
+                            <a class="nav-link nav-title" id="itemLi">
                                 <i class="iconos fa-solid fa-play"></i>
                                 <span class="ms-1 item_size" id="itemTitle">Tipos Media</span>
                             </a>
-                            <ul class="collapse nav flex-column ms-1" id="subMenuMediaTypes" data-bs-parent="#menu">
+                            <ul class="collapse nav flex-column ms-1" id="subMenuMediaTypes" @* data-bs-parent="#menu" *@>
                                 <li class="w-100 hide" id="sub-nav-title-collapse">
                                     <span asp-action="Index" class="nav-link item_subNav px-3">
                                         <span class="item_size">
@@ -208,12 +225,16 @@
                         </li>
 
                         <!-- SOURCES -->
-                        <li id="nav_items" path="Sources">
-                            <a href="#subMenuSources" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                        <li id="nav_items" path="Sources" class="cursor_pointer" collapse="true" onclick="actionBarHide(this)">
+                            @* <a href="#subMenuSources" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-link"></i>
+                                <span class="ms-1 item_size" id="itemTitle">Fuentes</span>
+                            </a> *@
+                            <a  class="nav-link nav-title" id="itemLi">
                                 <i class="iconos fa-solid fa-link"></i>
                                 <span class="ms-1 item_size" id="itemTitle">Fuentes</span>
                             </a>
-                            <ul class="collapse nav flex-column ms-1" id="subMenuSources" data-bs-parent="#menu">
+                            <ul class="collapse nav flex-column ms-1" id="subMenuSources" @* data-bs-parent="#menu" *@>
                                 <li class="w-100 hide" id="sub-nav-title-collapse">
                                     <span asp-action="Index" class="nav-link item_subNav px-3">
                                         <span class="item_size">
@@ -245,12 +266,16 @@
                         <!-- ADMIN -->
                         @if (MySignInManager.IsSignedIn(User) && currentUser.role == 1)
                         {
-                            <li id="nav_items" path="Users">
-                                <a href="#subMenuUsers" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                            <li id="nav_items" path="Users" class="cursor_pointer" collapse="true" onclick="actionBarHide(this)">
+                                @* <a href="#subMenuUsers" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                    <i class="iconos fa-solid fa-user"></i>
+                                    <span class="ms-1 item_size" id="itemTitle">Usuarios</span>
+                                </a> *@
+                                <a class="nav-link nav-title" id="itemLi">
                                     <i class="iconos fa-solid fa-user"></i>
                                     <span class="ms-1 item_size" id="itemTitle">Usuarios</span>
                                 </a>
-                                <ul class="collapse nav flex-column ms-1" id="subMenuUsers" data-bs-parent="#menu">
+                                <ul class="collapse nav flex-column ms-1" id="subMenuUsers" @* data-bs-parent="#menu" *@>
                                     <li class="w-100 hide" id="sub-nav-title-collapse">
                                         <span asp-action="Index" class="nav-link item_subNav px-3">
                                             <span class="item_size">
@@ -277,12 +302,16 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li id="nav_items" path="Role">
-                                <a href="#subMenuRole" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                            <li id="nav_items" path="Role" class="cursor_pointer" collapse="true" onclick="actionBarHide(this)">
+                                @* <a href="#subMenuRole" data-bs-toggle="collapse" class="nav-link nav-title" id="itemLi">
+                                    <i class="iconos fa-solid fa-user"></i>
+                                    <span class="ms-1 item_size" id="itemTitle">Rols</span>
+                                </a> *@
+                                <a class="nav-link nav-title" id="itemLi">
                                     <i class="iconos fa-solid fa-user"></i>
                                     <span class="ms-1 item_size" id="itemTitle">Rols</span>
                                 </a>
-                                <ul class="collapse nav flex-column ms-1" id="subMenuRole" data-bs-parent="#menu">
+                                <ul class="collapse nav flex-column ms-1" id="subMenuRole" @* data-bs-parent="#menu" *@>
                                     <li class="w-100 hide" id="sub-nav-title-collapse">
                                         <span asp-action="Index" class="nav-link item_subNav px-3">
                                             <span class="item_size">
@@ -408,7 +437,7 @@
         //Buscamos si la página en la que nos encontramos coincide con alguno del listado
         paths.forEach((i, index) => {
             
-            if(window.location.pathname == i)
+            if(window.location.pathname.startsWith(i))
             {
                 items[index].classList.add("item_subNav_bg")
             }

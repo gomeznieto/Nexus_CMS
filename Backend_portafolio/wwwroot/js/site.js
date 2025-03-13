@@ -149,7 +149,6 @@ function addList(element, type) {
  */
 function editInput(element, type) {
     let nodeElementsClean = cleanNodes(element)
-    console.log("----------\nENTRAMOS\n--------------")
     let select = nodeElementsClean[0];
     let input = nodeElementsClean[1];
     let btnCancelar = nodeElementsClean[3];
@@ -550,7 +549,6 @@ async function cargarRedes(id) {
     //Cargar URL
     let url = document.getElementById("formUrlEditar");
     url.value = result.bio.url;
-    console.log(user);
 
     // Cargar username
     let username = document.getElementById("formUsernameEditar");
@@ -567,8 +565,6 @@ async function cargarRoles(id) {
     const urlPost = `/role/ObtenerRol/${id}`;
     const response = await fetch(urlPost);
     const result = await response.json();
-
-    console.log(result)
 
     // Verificar error
     if (result.error) {
@@ -768,4 +764,28 @@ function handleLinkClickCloseModal(event, url) {
     closeModalError();
 
     window.location.href = url;
+}
+
+/* MENU */
+
+function actionBarHide(obj)
+{
+    let childs = Array.from(obj.childNodes);
+    let mode = obj.getAttribute("collapse") == "true";
+    let ulElement = childs.find(el => el.localName == "ul")
+
+    if (mode) {
+        ulElement.classList.remove("collapse")
+        ulElement.classList.remove("hide")
+        ulElement.classList.remove("transitionSmooth")
+
+    }
+    else {
+        ulElement.classList.add("collapse")
+        ulElement.classList.add("hide")
+        ulElement.classList.add("transitionSmooth")
+    }
+
+    obj.setAttribute("collapse", !mode)
+
 }

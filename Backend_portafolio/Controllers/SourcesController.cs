@@ -55,6 +55,7 @@ namespace Backend_portafolio.Controllers
             try
             {
 				await _sourceService.CreateSource(viewModel);
+                Session.CrearModalSuccess("Se ha creado exitosamente", "Sources", HttpContext);
                 return RedirectToAction("Index");
 			}
             catch (Exception ex)

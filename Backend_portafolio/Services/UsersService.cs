@@ -347,12 +347,12 @@ namespace Backend_portafolio.Services
                     throw new ApplicationException("No tienes permisos para registrar un nuevo usuario");
 
                 // Creamos el nuevo usuario
-                var newUSer = new UserViewModel() { username = viewModel.Username, email = viewModel.Email, name = viewModel.Name, role = viewModel.role };
+                var newUser = new UserViewModel() { username = viewModel.Username, email = viewModel.Email, name = viewModel.Name, role = viewModel.role };
 
                 // generamos ApiKey para que poder acceder a la API
-                newUSer.apiKey = _tokenService.GenerateApiKey();
+                newUser.apiKey = _tokenService.GenerateApiKey();
 
-                var result = await _userManager.CreateAsync(newUSer, password: viewModel.Username + ".pass"); //Variable de entorno
+                var result = await _userManager.CreateAsync(newUser, password: viewModel.Username + ".pass"); //Variable de entorno
 
                 // SI no se pudo crear el usuario
                 if (!result.Succeeded)

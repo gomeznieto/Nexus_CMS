@@ -83,6 +83,13 @@ h1 {
     visibility: visible;
 }
 
+.transitionSmooth {
+    transition: all ease-in-out 0.3s;
+}
+
+.cursor_pointer {
+    cursor: pointer;
+}
 
 /* MENU */
 .nav-link-collapse {
@@ -190,8 +197,7 @@ h1 {
     background-color: var(--bg-menu-focus)
 }
 
-.content-collapse
-{
+.content-collapse {
     display: grid;
     grid-template-columns: 70px 1fr;
     transition: all ease-in-out 0.3s;
@@ -203,76 +209,76 @@ h1 {
     transition: all ease-in-out 0.3s;
 }
 
-    .nav-title-page-dimension {
-        display: flex;
-        justify-content: center !important;
-        margin-top: 1rem;
-    }
+.nav-title-page-dimension {
+    display: flex;
+    justify-content: center !important;
+    margin-top: 1rem;
+}
 
 
-    .iconos {
-        min-width: 25px;
-        text-align: center;
-        font-size: 12px;
-        border: 1px solid var(--color-border-icons);
-        padding: 4px;
-        border-radius: 5px;
+.iconos {
+    min-width: 25px;
+    text-align: center;
+    font-size: 12px;
+    border: 1px solid var(--color-border-icons);
+    padding: 4px;
+    border-radius: 5px;
+    transition: all ease-in-out 0.3s;
+}
+
+.subiconos {
+    font-size: 10px;
+}
+
+.nav-title {
+    color: var(--text-color-menu) !important;
+    font-weight: 500;
+    font-size: 16px;
+    transition: all ease-in-out 0.3s;
+}
+
+    .nav-title:hover {
+        color: var(--text-colot-menu-hover);
         transition: all ease-in-out 0.3s;
     }
 
-    .subiconos {
-        font-size: 10px;
+.menu-color-font {
+    color: var(--text-color-menu);
+}
+
+.item_size {
+    visibility: visible;
+    transition: all ease-in-out 0.3s;
+}
+
+.item_subNav {
+    min-height: 38px;
+    font-size: 14px;
+    text-decoration: none;
+    background-color: none;
+    color: var(--text-color-menu) !important;
+    font-weight: 500;
+}
+
+    .item_subNav:hover {
+        color: var(--text-colot-menu-hover) !important;
     }
 
-    .nav-title {
-        color: var(--text-color-menu) !important;
-        font-weight: 500;
-        font-size: 16px;
-        transition: all ease-in-out 0.3s;
+.menu-hamb {
+    display: block;
+    color: var(--text-color-menu) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .menu-hamb:hover {
+        cursor: pointer;
     }
 
-        .nav-title:hover {
-            color: var(--text-colot-menu-hover);
-            transition: all ease-in-out 0.3s;
-        }
-
-    .menu-color-font {
-        color: var(--text-color-menu);
-    }
-
-    .item_size {
-        visibility: visible;
-        transition: all ease-in-out 0.3s;
-    }
-
-    .item_subNav {
-        min-height: 38px;
-        font-size: 14px;
-        text-decoration: none;
-        background-color: none;
-        color: var(--text-color-menu) !important;
-        font-weight: 500;
-    }
-
-        .item_subNav:hover {
-            color: var(--text-colot-menu-hover) !important;
-        }
-
-    .menu-hamb {
-        display: block;
-        color: var(--text-color-menu) !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-        .menu-hamb:hover {
-            cursor: pointer;
-        }
-
-    .nav-link:hover {
-        background-color: var(--bg-menu-focus)
-    }
+.nav-link:hover {
+    background-color: var(--bg-menu-focus)
+}
 
 table tbody,
 table thead {
@@ -310,10 +316,10 @@ form input[type="file"]::file-selector-button {
     color: var(--text-color-primary);
 }
 
-form input[type="file"]::file-selector-button:hover {
-    background-color: var(--bg-btn-action-hover) !important;
-    color: var(--text-color-primary) !important;
-}
+    form input[type="file"]::file-selector-button:hover {
+        background-color: var(--bg-btn-action-hover) !important;
+        color: var(--text-color-primary) !important;
+    }
 
 .input-style,
 .select-style,
