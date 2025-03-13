@@ -18,16 +18,19 @@ namespace Backend_portafolio.Services
     public class NetworkService : INetworkService
     {
         private readonly IRepositorySocialNetwork _repositorySocialNetwork;
+        private readonly IImageService _imageService;
         private readonly IMapper _mapper;
         private readonly IUsersService _usersService;
 
         public NetworkService(
             IRepositorySocialNetwork repositorySocialNetwork,
+            IImageService imageService,
             IMapper mapper,
             IUsersService usersService
         )
         {
             _repositorySocialNetwork = repositorySocialNetwork;
+            _imageService = imageService;
             _mapper = mapper;
             _usersService = usersService;
         }
@@ -110,9 +113,16 @@ namespace Backend_portafolio.Services
             try
             {
                 var userId = _usersService.ObtenerUsuario();
+                var user = await _usersService.GetDataUser();
 
-                if(viewmodel.user_id != userId)
+                if (viewmodel.user_id != userId)
                     throw new Exception("No puedes crear una red social para otro usuario");
+
+                //Guardar imagen del íconos y ponerla en icon
+                if (viewmodel.ImageFile != null)
+                {
+                    viewmodel.icon = await _imageService.UploadImageAsync(viewmodel.ImageFile, user, "social_networks", viewmodel.name);
+                }
 
                 var result = await _repositorySocialNetwork.Agregar(_mapper.Map<SocialNetwork>(viewmodel));
 
@@ -130,24 +140,31 @@ namespace Backend_portafolio.Services
         //********************** EDIT ************************
         //****************************************************
 
-        public async Task EditSocialNetwork(SocialNetworkViewModel viewModel)
+        public async Task EditSocialNetwork(SocialNetworkViewModel viewmodel)
         {
             try
             {
                 // Verificar si el usuario autenticado es el dueño de la red social
                 var userId = _usersService.ObtenerUsuario();
+                var user = await _usersService.GetDataUser();
 
-                if (viewModel.user_id != userId)
+                if (viewmodel.user_id != userId)
                     throw new Exception("No puedes editar una red social de otro usuario");
 
                 // Verificar si la red social existe
-                var socialNetworkToEdit = await GetSocialNetworkById(viewModel.id);
+                var socialNetworkToEdit = await GetSocialNetworkById(viewmodel.id);
 
                 if (socialNetworkToEdit is null)
                     throw new Exception("La red social no existe");
 
+                //Modificar la imagen
+                if(viewmodel.ImageFile != null)
+                {
+                    viewmodel.icon = await _imageService.UploadImageAsync(viewmodel.ImageFile, user, "social_networks", viewmodel.name);
+                }
+
                 //Mapear el modelo de vista a la entidad
-                SocialNetwork socialNetwork = _mapper.Map(viewModel, new SocialNetwork());
+                SocialNetwork socialNetwork = _mapper.Map(viewmodel, new SocialNetwork());
 
                 var editado = await _repositorySocialNetwork.Editar(socialNetwork);
 

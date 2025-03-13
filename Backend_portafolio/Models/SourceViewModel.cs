@@ -17,7 +17,6 @@ namespace Backend_portafolio.Models
 
         //FORMULARIO
         [Display(Name = "Imagen")]
-        [Required(ErrorMessage = "El campo {0} es requerido")]
         public IFormFile ImageFile { get; set; }
     }
 }

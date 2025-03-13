@@ -21,7 +21,7 @@
 			<span asp-validation-for="icon" class="text-borrador fs-6 mt-1"></span>
 		</div> *@
 		<div class="w-75">
-			<input type="file" id="image" name="ImageFile" accept="image/*" asp-for="ImageFile" class="form-control mt-2">
+			<input type="file" id="image" name="ImageFile" accept="image/*" asp-for="ImageFile" class="form-control mt-2" required>
 		</div>
 		<button type="submit" class="btn btn-action mt-3">Crear</button>
 		<a asp-action="Index" class="btn btn-delete mt-3">cancelar</a>

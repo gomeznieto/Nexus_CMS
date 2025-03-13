@@ -15,6 +15,10 @@ namespace Backend_portafolio.Models
         [Display(Name = "Icóno de la Red Social")]
         public string icon { get; set; }
         public int user_id { get; set; }
+
+        // CREACION Y FORMULARIOS
         public List<SocialNetwork> Networks { get; set; }
+        [Display(Name = "Imagen")]
+        public IFormFile ImageFile { get; set; }
     }
 }

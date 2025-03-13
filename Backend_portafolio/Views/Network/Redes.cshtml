@@ -27,7 +27,8 @@
                             <td class="fw-bold">@social.name</td>
                             <td><a href="@social.url" target="_blank" class="link-info">LINK</a></td>
                             <td>@social.username</td>
-                            <td><i class="fa-brands @social.icon fs-4 text-center"></i></td>
+                            @* <td><i class="fa-brands @social.icon fs-4 text-center"></i></td> *@
+                            <td><img src="@social.icon" class="source-picture-perfil fs-4 text-center"></td>
                             <td class="d-flex gap-2 justify-content-center">
                                 <a class="btn btn-edit" onclick="showFormEditar(@social.id)">Editar</a>
                                 <a class="btn btn-delete" onclick="openModal({id: '@social.id', name: '@social.name'})" )>Borrar</a>
@@ -49,7 +50,7 @@
     <!-- AGREGAR RED SOCIAL -->
     <div class="hide col-6" id="formAddRedes">
         <h2>Crear</h2>
-        <form class="mt-2" asp-action="Redes" asp-controller="network">
+        <form class="mt-2" asp-action="Redes" asp-controller="network" enctype="multipart/form-data">
             <input type="hidden" asp-for="@Model.user_id" />
             <!-- VALIDATION -->
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
@@ -63,8 +64,11 @@
                 <div class="mb-2">
                     <input type="text" class="form-control" asp-for="@Model.username" placeholder="Ingrese el usuario de la Red Social" />
                 </div>
-                <div class="mb-2">
+@*                 <div class="mb-2">
                     <input type="text" class="form-control" asp-for="@Model.icon" placeholder="Ingrese el ícono de la Red Social" />
+                </div> *@
+                <div class="mb-2">
+                    <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="ImageFile" class="form-control mt-2" placeholder="Imagen del ícono de la Red Social">
                 </div>
 
                 <button type="submit" class="btn btn-action">Guardar</button>
@@ -81,11 +85,12 @@
     <!-- EDITAR RED SOCIAL -->
     <div class="mt-2 col-6 p-2 hide" id="formEditar">
         <h2>Editar</h2>
-        <form asp-action="EditarRedes" asp-controller="network">
+        <form asp-action="EditarRedes" asp-controller="network" enctype="multipart/form-data">
             <!-- VALIDATION -->
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <input type="hidden" id="formIdEditar" asp-for="@Model.id" />
             <input type="hidden" id="formUserEditar" asp-for="@Model.user_id" />
+            <input type="hidden" id="formIconEditar" asp-for="@Model.icon" />
             <div class="mt-2">
 
                 <div class="mb-2">
@@ -97,8 +102,11 @@
                 <div class="mb-2">
                     <input type="text" class="form-control" id="formUsernameEditar" asp-for="@Model.username" />
                 </div>
-                <div class="mb-2">
+@*                 <div class="mb-2">
                     <input type="text" class="form-control" id="formIconEditar" asp-for="@Model.icon" />
+                </div> *@
+                <div class="mb-2">
+                    <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="ImageFile" class="form-control mt-2" placeholder="Imagen del ícono de la Red Social">
                 </div>
 
                 <button type="submit" class="btn btn-edit">Editar</button>
