@@ -175,12 +175,12 @@ static async Task CreateAdminUserAsync(IUsersService userService, IRoleService r
         RoleViewModel roleViewModel = await roleService.GetRoleByName("admin");
         UserViewModel user = await userService.GetUserByUser("admin");
 
-        if (roleViewModel == null)
+        if (roleViewModel is null)
         {
             await roleService.CreateAdminRole();
         }
 
-        if (user == null)
+        if (user is null)
         {
             await userService.CreateAdminUser();
         }

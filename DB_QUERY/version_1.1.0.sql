@@ -25,6 +25,7 @@ CREATE TABLE [dbo].[users](
     [id] [int] IDENTITY(1,1) NOT NULL,
 	[name] [varchar](100) NOT NULL,
 	[username] [varchar](100) NOT NULL,
+	[usernameNormalizado] [varchar](100) NOT NULL,
 	[role] [int] NOT NULL,
 	[img] [varchar](255) NULL,
 	[cv] [varchar](255) NULL,

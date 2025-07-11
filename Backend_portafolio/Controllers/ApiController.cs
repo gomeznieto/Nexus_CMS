@@ -1,9 +1,7 @@
 ﻿using Backend_portafolio.Services;
-using Backend_portafolio.Datos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Backend_portafolio.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backend_portafolio.Controllers
 {
@@ -24,7 +22,7 @@ namespace Backend_portafolio.Controllers
         //****************************************************
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Categoria([FromHeader(Name = "X-Api-Key")] string apiKey)
         {
             try
@@ -48,7 +46,7 @@ namespace Backend_portafolio.Controllers
         //******************** FORMATOS **********************
         //****************************************************
         [AllowAnonymous]
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Formato([FromHeader(Name = "X-Api-Key")] string apiKey)
         {
             try
@@ -73,7 +71,7 @@ namespace Backend_portafolio.Controllers
         //****************************************************
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Usuario([FromHeader(Name = "X-Api-Key")] string apiKey)
         {
             try
@@ -97,7 +95,7 @@ namespace Backend_portafolio.Controllers
         //****************************************************
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Entrada([FromHeader(Name = "X-Api-Key")] string apiKey)
         {
             try
@@ -118,7 +116,7 @@ namespace Backend_portafolio.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("{controller}/{action}/{id}")]
+        [HttpGet("{controller}/{action}/{id}")]
         public async Task<IActionResult> Entrada([FromHeader(Name = "X-Api-Key")] string apiKey, int id)
         {
             try
@@ -138,7 +136,7 @@ namespace Backend_portafolio.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("{controller}/{action}/{pageNumber}/{pageSize}")]
+        [HttpGet("{controller}/{action}/{pageNumber}/{pageSize}")]
         public async Task<IActionResult> Entrada([FromHeader(Name = "X-Api-Key")] string apiKey, int pageNumber = 1, int pageSize = 10)
         {
             try

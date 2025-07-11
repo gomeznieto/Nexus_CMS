@@ -102,9 +102,11 @@ namespace Backend_portafolio.Datos
         public async Task<Role> BuscarPorNombre(string name)
         {
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QueryFirstOrDefaultAsync<Role>(@"
+            var result =  await connection.QueryFirstOrDefaultAsync<Role>(@"
             SELECT * FROM role WHERE name = @name
             ", new { name });
+
+            return result;
         }
 
         //*****************************************************

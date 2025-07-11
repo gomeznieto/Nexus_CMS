@@ -1,0 +1,18 @@
+services:
+  backend_portafolio:
+    image: ${DOCKER_REGISTRY-}backendportafolio
+    build:
+      context: .
+      dockerfile: Backend_portafolio/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - sqlserver_db
+      
+  sqlserver_db:
+    image: mcr.microsoft.com/mssql/server:2019-latest 
+    environment:
+      SA_PASSWORD: "//7611&Pago//" 
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
