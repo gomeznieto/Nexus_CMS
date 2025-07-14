@@ -20,7 +20,7 @@
             </div>
             <div class="w-75">
                 <img src="@(Model.img != null ? Model.img : "https://picsum.photos/id/237/200/300")" class="profile-picture-perfil rounded-2">
-                <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="ImageFile" class="form-control mt-2">
+                <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="@Model.ImageFile" class="form-control mt-2">
             </div>
         </div>
         <!-- FIN IMAGEN -->
@@ -46,26 +46,38 @@
         <span asp-validation-for="email" class="validate-error"></span>
         <!-- FIN MAIL-->
         <!-- ABOUT-->
-        <div class="d-flex align-items-center mt-2">
+        <div class="d-flex align-items-center mt-4">
             <div class="w-25">
                 <p class="fw-bold">Acerca de</p>
             </div>
             <div class="w-75">
-                <textarea asp-for="@Model.about" class="form-control textarea-style" rows="5" placeholder="Agregar un resumen al perfil"></textarea>
+
+                <!-- STYLES -->
+                <partial name="_TextControl" />
+
+                <!-- TEXT -->
+                <textarea asp-for="@Model.about" class="form-control textarea-style about" rows="10" placeholder="Agregar contenido de Acerca de..." onclick="addId(this)"></textarea>
+                <span asp-validation-for="@Model.about" class="form-error"></span>
             </div>
         </div>
         <!-- FIN ABOUT -->
         <!-- HOBBIES-->
-        <div class="d-flex align-items-center mt-2">
+        <div class="d-flex align-items-center mt-4">
             <div class="w-25">
                 <p class="fw-bold">Hobbies</p>
             </div>
             <div class="w-75">
-                <textarea asp-for="@Model.hobbies" class="form-control textarea-style" rows="10" placeholder="Agregar hobbies al perfil"></textarea>
+
+                <!-- STYLES -->
+                <partial name="_TextControl" />
+
+                <!-- TEXT -->
+                <textarea asp-for="@Model.hobbies" class="form-control textarea-style hobbies" rows="10" placeholder="Agregar contenido del Hobbie" onclick="addId(this)"></textarea>
+                <span asp-validation-for="@Model.hobbies" class="form-error"></span>
             </div>
         </div> <!-- FIN BIOS -->
         <!-- CV -->
-        <div class="d-flex  align-items-center mt-2">
+        <div class="d-flex align-items-center mt-2">
             <div class="w-25">
                 <p class="fw-bold">Curriculum Vitae</p>
             </div>
@@ -90,3 +102,29 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+<script>
+
+    function addId(element) {
+
+        let name = element.getAttribute("name")
+
+        if(name == "about")
+        {
+            element.setAttribute('id', "post_text")
+
+            let hobbies = document.getElementsByClassName("hobbies")[0];
+            hobbies.removeAttribute('id');
+        }
+
+        if(name == "hobbies")
+        {
+            element.setAttribute('id', "post_text")
+
+            let about = document.getElementsByClassName("about")[0];
+            about.removeAttribute('id');
+        }
+
+    }
+
+</script>

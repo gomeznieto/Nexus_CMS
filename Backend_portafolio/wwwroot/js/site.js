@@ -512,7 +512,7 @@ async function cargarBio(id) {
     options.forEach(x => x[1].value == result.bio.year ? x[1].selected = true : x[1].selected = false)
 
     // Cargar trabajo
-    let work = document.getElementById("inputFormBioEditar");
+    let work = document.getElementsByClassName("inputFormBioEditar")[0];
     work.value = result.bio.work;
 }
 
