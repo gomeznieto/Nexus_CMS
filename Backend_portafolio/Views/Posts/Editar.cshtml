@@ -7,7 +7,7 @@
 <div class="mt-5">
     <h1>Editar @Model.title <span class="@(Model.draft ? "text-borrador": "text-publicado") date_post">@(Model.draft ? "Borrador" : "Publicado")</span></h1>
     <span class="date_post mb-3"> @Model.created_at.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES")) - @Model.created_at.ToShortTimeString()</span>
-    <form asp-action="Editar" method="post" class="mt-5">
+    <form asp-action="Editar" method="post" class="mt-5" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
         <input type="hidden" asp-for="user_id" />
         <input type="hidden" asp-for="id" id="post_id" />
@@ -33,9 +33,11 @@
             <span asp-validation-for="description" class="form-error"></span>
         </div>
 
+        <!-- IAMGE -->
         <div class="mb-3">
-            <input asp-for="cover" class="form-control" placeholder="Agregar la imagen principal para ilustracion" />
-            <span asp-validation-for="cover" class="form-error"></span>
+            <h3 class="fs-5">Cover</h3>
+                <img src="@(Model.cover != null ? Model.cover : "https://picsum.photos/id/237/200/300")" class="cover-picture rounded-2">
+                <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="@Model.ImageFile" class="form-control mt-2">
         </div>
 
 

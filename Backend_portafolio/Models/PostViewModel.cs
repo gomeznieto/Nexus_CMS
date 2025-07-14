@@ -23,7 +23,8 @@ namespace Backend_portafolio.Models
         public DateTime created_at { get; set; }
         public DateTime modify_at { get; set; }
         public bool draft { get; set; }
-        [Display(Name = "Fecha de creación")]
+        [Display(Name = "Imagen")]
+        public IFormFile ImageFile { get; set; }
 
         // STRINGS
         public string userName { get; set; }

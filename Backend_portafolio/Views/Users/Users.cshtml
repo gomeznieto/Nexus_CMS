@@ -30,10 +30,11 @@
 }
 
 <h1 class="mb-3">Listado de Usuarios</h1>
-<p class="fs-6 mb-3">Nulla varius ex ut posuere consectetur. In tincidunt, nisi vitae. </p>
+<p class="fs-6 mb-3">Es una lista de todos los usuarios registrados en el sitio </p>
 <P>Cantidad de Entradas Totales: @ViewBag.Cantidad</P>
+<a asp-action="Register" class="btn btn-action mb-2"><i class="fa-solid fa-plus me-2"></i>Crear nuevo Usuario </a>
 <div class="d-flex flex-column flex-lg-row justify-content-lg-between lign-items-lg-center col-6 col-lg-12 gap-2">
-
+    <!-- CREAR NUEVO -->
     <!-- CANITDAD DE USUARIOS -->
     <select id="cantidadUserList" class="form-select select-style w-25" onchange="cambiarCantidadUsers(this.value)">
         <option selected>Cantidad de Usuarios</option>
@@ -49,7 +50,8 @@
         @foreach (var role in Model.roles)
         {
             <option value="@role.id">@role.name</option>
-        })
+        }
+)
     </select>
 
     <input id="searchUserList" type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
@@ -61,7 +63,7 @@
 </div>
 
 <div class="w-100 p-1 row gap-3">
-    <!-- TABLA CON REDES SOCIALES-->
+    <!-- TABLA DE USUARIOS -->
     <div class=" mt-2 col-12 p-2">
 
         @if (Model.usersList.Count() is not 0)
@@ -89,19 +91,19 @@
                             <td>@user.name</td>
                             <td>@user.email</td>
                             <td>
-                                    @* <i class="fs-4 text-center"></i>@Model.roles.Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault() *@
+                                @* <i class="fs-4 text-center"></i>@Model.roles.Where(x => x.id == user.role).Select(x => x.name).FirstOrDefault() *@
                                 <select asp-for="@Model.role">
-                                        @foreach (var rol in Model.roles)
+                                    @foreach (var rol in Model.roles)
+                                    {
+                                        if (rol.id == user.role)
                                         {
-                                            if (rol.id == user.role)
-                                            {
                                             <option value="@rol.id" selected>@rol.name</option>
-                                            }
-                                            else
-                                            {
-                                            <option value="@rol.id">@rol.name</option>
-                                            }
                                         }
+                                        else
+                                        {
+                                            <option value="@rol.id">@rol.name</option>
+                                        }
+                                    }
                                 </select>
                             </td>
                             <td>
@@ -152,13 +154,13 @@
                     {
                         <li class="page-item">
                             <a class="page-link @(pageValue == i
-                                                ? "bg-pagination-active"
-                                                : "bg-pagination")"
-                               href="/Users/Users/?buscar=@(buscarValue)&role=@(roleValue)&page=@(i.ToString())">
-                                @(i)
-                            </a>
-                        </li>
-                    }
+                                                                               ? "bg-pagination-active"
+                                                                               : "bg-pagination")"
+                       href="/Users/Users/?buscar=@(buscarValue)&role=@(roleValue)&page=@(i.ToString())">
+                        @(i)
+                    </a>
+                </li>
+                                }
 
                     <!-- RIGHT ARROW -->
                     @if (pageValue < @paginas)

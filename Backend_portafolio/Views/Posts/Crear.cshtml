@@ -9,7 +9,7 @@
     <h1>Crear @Model.format</h1>
     <fs-4>El texto debe ser escrito con markdown para poder colocar estilos.</fs-4>
 
-    <form asp-action="Crear" method="post" class="mt-5">
+    <form asp-action="Crear" method="post" class="mt-5" enctype="multipart/form-data">
 
         <!-- VALIDATION -->
         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
@@ -39,9 +39,10 @@
             <span asp-validation-for="description" class="form-error"></span>
         </div>
 
+        <!-- IMAGEN -->
         <div class="mb-3">
-            <input asp-for="cover" class="form-control" placeholder="Agregar la imagen principal para ilustracion" />
-            <span asp-validation-for="cover" class="form-error"></span>
+            <h3 class="fs-5">Cover</h3>
+            <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="@Model.ImageFile" class="form-control mt-2">
         </div>
 
         <!-- AGREGAR CATEGORIAS -->
@@ -92,16 +93,16 @@
 
             @if (Model?.categoryList != null)
             {
-                @foreach (var item in Model.categoryList)
-                {
-                    <text>
-                                    objs.push({
-                                        id: @item.Categoria.id,
-                                        postId: @Model.id,
-                                        name: "@item.Categoria.name"
-                                    });
-                    </text>
-                }
+                    @foreach (var item in Model.categoryList)
+                    {
+                            <text>
+                                            objs.push({
+                                                id: @item.Categoria.id,
+                                                postId: @Model.id,
+                                                name: "@item.Categoria.name"
+                                            });
+                            </text>
+                    }
             }
 
             objs.forEach(x => addCategoryRefresh(x));
@@ -124,12 +125,12 @@
             // Agregamos opciones al select utilizando los SelectListItem del modelo
             @foreach (var item in Model?.mediaTypes)
             {
-                <text>
-                        var option = document.createElement("option");
-                        option.text = "@item.Text";
-                        option.value = "@item.Value";
-                        select.add(option);
-                </text>
+                    <text>
+                            var option = document.createElement("option");
+                            option.text = "@item.Text";
+                            option.value = "@item.Value";
+                            select.add(option);
+                    </text>
             }
 
             // Agregamos el select al div
@@ -177,13 +178,13 @@
             // Agregamos opciones al select utilizando los SelectListItem del modelo
             @foreach (var item in Model?.sources)
             {
-                <text>
+                    <text>
 
-                        var option = document.createElement("option");
-                        option.text = "@item.Text";
-                        option.value = "@item.Value";
-                        select.add(option);
-                </text>
+                            var option = document.createElement("option");
+                            option.text = "@item.Text";
+                            option.value = "@item.Value";
+                            select.add(option);
+                    </text>
             }
                 // Agregamos el select al div
                 div.appendChild(select);

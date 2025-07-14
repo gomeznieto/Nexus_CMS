@@ -200,6 +200,27 @@ namespace Backend_portafolio.Controllers
 
 
         //****************************************************
+        //********************* APIKEY ***********************
+        //****************************************************
+
+        [HttpGet]
+        public async Task<IActionResult>Apikey()
+        {
+            try
+            {
+                var viewModel = await _usersService.GetUserViewModel();
+                return View(viewModel);
+
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+
+        //****************************************************
         //************* EDIT REGISTER BY ADMIN  **************
         //****************************************************
 

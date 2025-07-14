@@ -40,6 +40,7 @@ namespace Backend_portafolio.Sevices
         private readonly IMediaService _mediaService;
         private readonly ILinkService _linkService;
         private readonly IEncryptionService _encryptionService;
+        private readonly IImageService _imageService;
         private readonly ISourceService _sourceService;
         private readonly HttpContext _httpContext;
         private readonly IMapper _mapper;
@@ -58,6 +59,7 @@ namespace Backend_portafolio.Sevices
             ILinkService linkService,
             IHttpContextAccessor httpContextAccessor,
             IEncryptionService encryptionService,
+            IImageService imageService,
             IMapper mapper)
         {
             _repositoryCategorias = repositoryCategorias;
@@ -70,6 +72,7 @@ namespace Backend_portafolio.Sevices
             _mediaService = mediaService;
             _linkService = linkService;
             _encryptionService = encryptionService;
+            _imageService = imageService;
             _sourceService = sourceService;
             _usersService = usersService;
             _httpContext = httpContextAccessor.HttpContext;
@@ -174,7 +177,7 @@ namespace Backend_portafolio.Sevices
             }
             else
             {
-               posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page, usuarioID);
+                posts = await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, page, usuarioID);
             }
 
             if (!buscar.IsNullOrEmpty())
@@ -322,6 +325,7 @@ namespace Backend_portafolio.Sevices
             {
                 // Usuario registrado
                 var userID = _usersService.ObtenerUsuario();
+                var currentUser = await _usersService.GetDataUser();
 
                 if (userID != viewModel.user_id)
                 {
@@ -340,7 +344,17 @@ namespace Backend_portafolio.Sevices
                 viewModel.created_at = DateTime.Now;
 
                 // Creamos el post
-                await _repositoryPosts.Crear(_mapper.Map<Post>(viewModel));
+                var createPost = _mapper.Map<Post>(viewModel);
+                await _repositoryPosts.Crear(createPost);
+                viewModel.id = createPost.id;
+
+                //GUARDAR IMAGEN
+                if (viewModel.ImageFile != null)
+                {
+                    viewModel.cover = await _imageService.UploadImageAsync(viewModel.ImageFile, currentUser, "posts", viewModel.id.ToString());
+                    await _repositoryPosts.GuardarImagen(viewModel.id, viewModel.cover);
+
+                }
 
                 // SUBIR MEDIA
                 if (!viewModel.mediaListString.IsNullOrEmpty())
@@ -406,6 +420,7 @@ namespace Backend_portafolio.Sevices
             {
                 // Usuario registrado
                 var userID = _usersService.ObtenerUsuario();
+                var currentUser = await _usersService.GetDataUser();
 
                 if (userID != viewModel.user_id)
                 {
@@ -418,6 +433,23 @@ namespace Backend_portafolio.Sevices
                 if (format is null)
                 {
                     throw new Exception("¡El formato no existe!");
+                }
+
+                var postExist = await GetPostById(viewModel.id);
+
+                if (postExist == null)
+                {
+                    throw new Exception("¡El post que intenta modificar no existe!");
+                }
+
+                // Iamgen
+                if (viewModel.ImageFile != null)
+                {
+                    viewModel.cover = await _imageService.UploadImageAsync(viewModel.ImageFile, currentUser, "posts", viewModel.id.ToString());
+                }
+                else
+                {
+                    viewModel.cover = postExist.cover;
                 }
 
                 // Cargamos la fecha de creación
@@ -497,7 +529,7 @@ namespace Backend_portafolio.Sevices
 
                 // CATEGOIRIAS
                 //SUBIR CATEGORIAS
-                if (!viewModel.sourceListString.IsNullOrEmpty())
+                if (!viewModel.categoryListString.IsNullOrEmpty())
                 {
                     //Deserializamos string de media
                     List<CategoryForm> categoriesForms = _categoriaService.SerealizarJsonCategoryForm(viewModel.categoryListString);

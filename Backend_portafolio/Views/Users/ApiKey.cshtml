@@ -1,0 +1,74 @@
+﻿@model UserViewModel
+
+@{
+    ViewData["Title"] = "Apikey";
+}
+
+<h3>Apikeys</h3>
+<div class="d-flex p-1 row gap-3">
+    <div class="mt-3 col-8">
+        <div class="input-group input-group-sm flex-nowrap">
+            <input type="password" id="apikey" asp-for=@Model.apiKey class="form-control input-style" value="@Model.apiKey" />
+            <i class="fa-regular fa-eye input-group-text d-flex align-items-center" id="toggleApikey"></i>
+            <i class="fa-solid fa-pen input-group-text d-flex align-items-center" id="copyApikey"></i>
+        </div>
+    </div>
+</div>
+<div id="snackbar">¡Se ha copiado la ApiKey en el portapapeles!</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+
+<script>
+    function toogleIconEye(element, type)
+    {
+
+         if(type == "password")
+        {
+            element.classList.add("fa-eye");
+            element.classList.remove("fa-eye-slash")
+        }
+        else
+        {
+            element.classList.add("fa-eye-slash")
+            element.classList.remove("fa-eye")
+        }
+    }
+
+    function toogleIconPen()
+    {
+        let icon = document.getElementById('copyApikey');
+        icon.classList.add("fa-check")
+        icon.classList.add("icon-check")
+        icon.classList.remove("fa-pen")
+
+        setTimeout(() => {
+         icon.classList.remove("fa-check")
+        icon.classList.remove("icon-check")
+        icon.classList.add("fa-pen")
+        }, 3000)
+
+    }
+
+    document.getElementById('toggleApikey').addEventListener('click', function () {
+        const apiInput = document.getElementById('apikey');
+        const type = apiInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        apiInput.setAttribute('type', type);
+
+        toogleIconEye(this, type)
+    });
+
+    document.getElementById('copyApikey').addEventListener('click', () => {
+        const apiInput = document.getElementById('apikey');
+        apiInput.select();
+        apiInput.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(apiInput.value);
+
+        toogleIconPen()
+        openToast()
+
+    })
+
+</script>

@@ -814,3 +814,17 @@ form label {
     overflow: hidden;
     filter: invert(100%);
 }
+
+/* ICONS */
+.icon-check {
+    background-color: var(--text-color-action);
+    transition: all ease-in-out 0.3s;
+}
+
+/* COVER */
+.cover-picture {
+    max-width: 20%;
+    object-fit: scale-down;
+    object-position: center;
+    overflow: hidden;
+}

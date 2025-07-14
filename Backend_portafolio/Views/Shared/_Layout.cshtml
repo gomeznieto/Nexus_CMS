@@ -345,6 +345,10 @@
                             <li><a class="dropdown-item" asp-action="perfil" asp-controller="users">Perfil</a></li>
                             <li><a class="dropdown-item" asp-action="bio" asp-controller="bio">Bio</a></li>
                             <li><a class="dropdown-item" asp-action="redes" asp-controller="network">Redes Sociales</a></li>
+                            @if (MySignInManager.IsSignedIn(User) && currentUser.role != 1)
+                            {
+                                <li><a class="dropdown-item" asp-action="apikey" asp-controller="users">Apikey</a></li>
+                            }
                             <li><a class="dropdown-item" asp-action="configuracion" asp-controller="users">Configuración</a></li>
                             <li>
                                 <hr class="dropdown-divider">

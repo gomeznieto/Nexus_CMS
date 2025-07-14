@@ -12,14 +12,17 @@ namespace Backend_portafolio.Controllers
     {
         private readonly IHomeService _homeService;
         private readonly IFormatService _formatService;
+        private readonly IUsersService _usersService;
 
         public HomeController(
             IHomeService homeService,
-            IFormatService formatService
+            IFormatService formatService,
+            IUsersService usersService
         )
         {
             _homeService = homeService;
             _formatService = formatService;
+            _usersService = usersService;
         }
 
         //****************************************************
@@ -31,8 +34,9 @@ namespace Backend_portafolio.Controllers
             try
             {
                 var formatos = (await _formatService.GetAllFormat()).Count();
+                var user = await _usersService.GetDataUser();
 
-                if(formatos < 1)
+                if (formatos < 1 && user.role != 1)
                     throw new Exception(
                         "Antes de comenzar a crear \"Entradas\" es necesario crear un \"Formato\"" +
                         "</br><a class=\"btn btn-action mt-5\" href='/formats' onclick='handleLinkClickCloseModal(event, \"/formats\")'>Formatos</a>" +

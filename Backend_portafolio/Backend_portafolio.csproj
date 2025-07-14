@@ -21,6 +21,7 @@
   <ItemGroup>
     <Folder Include="Business\" />
     <Folder Include="wwwroot\img\" />
+    <Folder Include="wwwroot\img\posts\agomeznieto\" />
   </ItemGroup>
 
 </Project>

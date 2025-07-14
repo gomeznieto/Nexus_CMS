@@ -1,6 +1,7 @@
 ﻿using Backend_portafolio.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Hosting;
 
 namespace Backend_portafolio.Datos
 {
@@ -35,6 +36,7 @@ namespace Backend_portafolio.Datos
         Task<int> ObtenerCantidadPorUsuario(int user_id);
         Task<IEnumerable<Post>> ObtenerPorFormato(string name, int cant, int page, int user_id);
         Task<Post> ObtenerPorId(int id, int id_user);
+        Task GuardarImagen(int id, string cover);
     }
 
     public class RepositoryPosts : IRepositoryPosts
@@ -56,6 +58,15 @@ namespace Backend_portafolio.Datos
                 post);
 
             post.id = id;
+        }
+
+        public async Task GuardarImagen(int id, string cover)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            await connection.ExecuteAsync($@"UPDATE {POST.TABLA} 
+											SET  {POST.COVER} = @{POST.COVER}
+											WHERE {POST.ID} = @{POST.ID}", new { id, cover});
         }
 
         public async Task<IEnumerable<Post>> Obtener(int user_id)
