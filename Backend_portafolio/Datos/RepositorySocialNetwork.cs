@@ -10,6 +10,7 @@ namespace Backend_portafolio.Datos
         Task<bool> Borrar(int id, int user_id);
         Task<bool> Editar(SocialNetwork socialNetwork);
         Task<SocialNetwork> ObtenerPorId(int id, int user_id);
+        Task<SocialNetwork> ObtenerPorNombre(string name, int user_id);
         Task<IEnumerable<SocialNetwork>> ObtenerPorUsuario(int user_id);
     }
     public class RepositorySocialNetwork : IRepositorySocialNetwork
@@ -45,6 +46,13 @@ namespace Backend_portafolio.Datos
         {
             using var connection = new SqlConnection(_connectionString);
             return await connection.QueryFirstOrDefaultAsync<Entities.SocialNetwork>($@"SELECT * FROM {SocialNetwork.TABLE} WHERE {SocialNetwork.ID} = @{SocialNetwork.ID} AND {SocialNetwork.USERID} = @{SocialNetwork.USERID}", new { id, user_id });
+        }
+
+        // OBTENER POR NOMBRE
+        public async Task<Entities.SocialNetwork> ObtenerPorNombre(string name, int user_id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QueryFirstOrDefaultAsync<Entities.SocialNetwork>($@"SELECT * FROM {SocialNetwork.TABLE} WHERE {SocialNetwork.NAME} = @{SocialNetwork.NAME} AND {SocialNetwork.USERID} = @{SocialNetwork.USERID}", new { name, user_id });
         }
 
         // CREAR

@@ -2,6 +2,7 @@
 using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
+using static Backend_portafolio.Datos.RepositorySocialNetwork;
 
 namespace Backend_portafolio.Services
 {
@@ -11,6 +12,7 @@ namespace Backend_portafolio.Services
         Task DeleteSocialNetwork(int id);
         Task EditSocialNetwork(SocialNetworkViewModel viewModel);
         Task<SocialNetworkViewModel> GetSocialNetworkById(int id);
+        List<SocialNetworkDefault> GetSocialNetworkDefaults();
         Task<List<SocialNetworkViewModel>> GetSocialNetworksByUserId(int userId);
         Task<SocialNetworkViewModel> GetSocialNetworkViewModel(SocialNetworkViewModel viewModel = null);
     }
@@ -52,7 +54,7 @@ namespace Backend_portafolio.Services
                     viewModel = new SocialNetworkViewModel();
 
                 var userId = _usersService.ObtenerUsuario();
-                viewModel.Networks = _mapper.Map<List<SocialNetwork>>(await GetSocialNetworksByUserId(userId));
+                viewModel.Networks = _mapper.Map<List<Entities.SocialNetwork>>(await GetSocialNetworksByUserId(userId));
                 viewModel.user_id = userId;
 
                 return viewModel;
@@ -93,7 +95,7 @@ namespace Backend_portafolio.Services
                 var userId = _usersService.ObtenerUsuario();
                 var socialNetwork = await _repositorySocialNetwork.ObtenerPorId(id, userId);
 
-                if(socialNetwork is null)
+                if (socialNetwork is null)
                     throw new Exception("La red social no existe");
 
                 return _mapper.Map<SocialNetworkViewModel>(socialNetwork);
@@ -114,9 +116,13 @@ namespace Backend_portafolio.Services
             {
                 var userId = _usersService.ObtenerUsuario();
                 var user = await _usersService.GetDataUser();
+                var socialExist = await GetSocialNetworkByName(userId, viewmodel);
 
                 if (viewmodel.user_id != userId)
                     throw new Exception("No puedes crear una red social para otro usuario");
+
+                if (socialExist is not null)
+                    throw new Exception($"La Red Social {socialExist.name} ya se encuentra creada");
 
                 //Guardar imagen del íconos y ponerla en icon
                 if (viewmodel.ImageFile != null)
@@ -124,10 +130,12 @@ namespace Backend_portafolio.Services
                     viewmodel.icon = await _imageService.UploadImageAsync(viewmodel.ImageFile, user, "social_networks", viewmodel.name);
                 }
 
-                var result = await _repositorySocialNetwork.Agregar(_mapper.Map<SocialNetwork>(viewmodel));
+                var result = await _repositorySocialNetwork.Agregar(_mapper.Map<Entities.SocialNetwork>(viewmodel));
 
                 if (result == 0)
                     throw new Exception("No se pudo crear la red social");
+
+                // TODO: Si no se pudo agregar, borramos la imagen de la carpeta y de la base de datos
             }
             catch (Exception ex)
             {
@@ -158,13 +166,13 @@ namespace Backend_portafolio.Services
                     throw new Exception("La red social no existe");
 
                 //Modificar la imagen
-                if(viewmodel.ImageFile != null)
+                if (viewmodel.ImageFile != null)
                 {
                     viewmodel.icon = await _imageService.UploadImageAsync(viewmodel.ImageFile, user, "social_networks", viewmodel.name);
                 }
 
                 //Mapear el modelo de vista a la entidad
-                SocialNetwork socialNetwork = _mapper.Map(viewmodel, new SocialNetwork());
+                Entities.SocialNetwork socialNetwork = _mapper.Map(viewmodel, new Entities.SocialNetwork());
 
                 var editado = await _repositorySocialNetwork.Editar(socialNetwork);
 
@@ -217,5 +225,31 @@ namespace Backend_portafolio.Services
         //****************************************************
         //********************* FUNCTIONS ********************
         //****************************************************
+
+        public async Task<SocialNetworkViewModel> GetSocialNetworkByName(int id, SocialNetworkViewModel socialNetworkViewModel)
+        {
+            try
+            {
+                return _mapper.Map<SocialNetworkViewModel>(await _repositorySocialNetwork.ObtenerPorNombre(socialNetworkViewModel.name, id));
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public List<SocialNetworkDefault> GetSocialNetworkDefaults()
+        {
+            return new List<SocialNetworkDefault>()
+            {
+                new SocialNetworkDefault() { Name = "YouTube", IconUrl = "/img/social_networks/Defaults/YouTube/icon.svg", BaseUrl = "https://www.youtube.com/" },
+                new SocialNetworkDefault() { Name = "Facebook", IconUrl = "/img/social_networks/Defaults/Facebook/icon.svg", BaseUrl = "https://www.facebook.com/" },
+                new SocialNetworkDefault() { Name = "Twitter", IconUrl = "/img/social_networks/Defaults/Twitter/icon.svg", BaseUrl = "https://twitter.com/" },
+                new SocialNetworkDefault() { Name = "Instagram", IconUrl = "/img/social_networks/Defaults/Instagram/icon.svg", BaseUrl = "https://www.instagram.com/" },
+                new SocialNetworkDefault() { Name = "LinkedIn", IconUrl = "/img/social_networks/Defaults/LinkedIn/icon.svg", BaseUrl = "https://www.linkedin.com/in/" },
+                new SocialNetworkDefault() { Name = "Github", IconUrl = "/img/social_networks/Defaults/Github/icon.svg", BaseUrl = "https://www.github.com/" },
+            };
+        }
     }
 }

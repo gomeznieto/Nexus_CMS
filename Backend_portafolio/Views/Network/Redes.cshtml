@@ -5,7 +5,7 @@
 
 <h3>Redes</h3>
 <div class="w-100 p-1 row gap-3">
-        <!-- TABLA CON REDES SOCIALES-->
+    <!-- TABLA CON REDES SOCIALES-->
     <div class=" mt-2 col-6 p-2">
 
         @if (Model.Networks.Count() is not 0)
@@ -46,17 +46,29 @@
         <button class="btn btn-action" id="btnAddRedes" onclick="showForm()"><i class="fa-solid fa-plus me-2"></i>Agregar Red Social</button>
     </div>
     <!-- FIN TABLA CON REDES SOCIALES-->
-
     <!-- AGREGAR RED SOCIAL -->
     <div class="hide col-6" id="formAddRedes">
         <h2>Crear</h2>
         <form class="mt-2" asp-action="Redes" asp-controller="network" enctype="multipart/form-data">
             <input type="hidden" asp-for="@Model.user_id" />
+            <input type="hidden" asp-for="@Model.icon" id="socialIcon" />
             <!-- VALIDATION -->
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <div class="mt-2">
                 <div class="mb-2">
-                    <input type="text" class="form-control" asp-for="@Model.name" placeholder="Ingrese el nombre de la Red Social"/>
+                    <select class="form-select select-style" onchange="addSocial(this)">
+                        <option disabled selected>Seleccione Red Social</option>
+                        @foreach(var social in Model.Defaults)
+                        {
+                            <option value="@social.Name" icon="@social.IconUrl">@social.Name</option>
+                        }
+                        <option value="otra">Otra</option>
+                    </select>
+                </div>
+                
+                <!-- OCULTAR HASTA QUE QUIERAN CREAR UNA NUEVA-->
+                <div class="mb-2 hide" id="SocialNameEl">
+                    <input type="text" id="SocialName" class="form-control" asp-for="@Model.name" placeholder="Ingrese el nombre de la Red Social" />
                 </div>
                 <div class="mb-2">
                     <input type="text" class="form-control" asp-for="@Model.url" placeholder="Ingrese la dirección de la Red Social" />
@@ -64,10 +76,9 @@
                 <div class="mb-2">
                     <input type="text" class="form-control" asp-for="@Model.username" placeholder="Ingrese el usuario de la Red Social" />
                 </div>
-@*                 <div class="mb-2">
-                    <input type="text" class="form-control" asp-for="@Model.icon" placeholder="Ingrese el ícono de la Red Social" />
-                </div> *@
-                <div class="mb-2">
+
+                <!-- OCULTAR HASTA QUE QUIERAN CREAR UNA NUEVA-->
+                <div class="mb-2 hide" id="SocialImageEl">
                     <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="ImageFile" class="form-control mt-2" placeholder="Imagen del ícono de la Red Social">
                 </div>
 
@@ -81,7 +92,6 @@
         </form>
     </div>
     <!-- FIN AGREGAR REDES SOCIALES-->
-
     <!-- EDITAR RED SOCIAL -->
     <div class="mt-2 col-6 p-2 hide" id="formEditar">
         <h2>Editar</h2>
@@ -102,7 +112,7 @@
                 <div class="mb-2">
                     <input type="text" class="form-control" id="formUsernameEditar" asp-for="@Model.username" />
                 </div>
-@*                 <div class="mb-2">
+                @*                 <div class="mb-2">
                     <input type="text" class="form-control" id="formIconEditar" asp-for="@Model.icon" />
                 </div> *@
                 <div class="mb-2">
@@ -121,7 +131,7 @@
 </div>
 
 <!-- MODAL -->
-<partial name="_Modal" model='new { url = "/Network", action="BorrarRedes" }' />
+<partial name="_Modal" model='new { url = "/Network", action = "BorrarRedes" }' />
 
 @section Scripts
 {
@@ -185,6 +195,32 @@
         let formIconEditar = document.getElementById("formIconEditar");
         formIconEditar.ariaValueMax = "";
 
+    }
+
+    function addSocial(element)
+    {
+        let selected = element.options[element.selectedIndex];
+        let socialNameEl = document.getElementById("SocialNameEl");
+        let socialName = document.getElementById("SocialName");
+        let socialImageEl = document.getElementById("SocialImageEl");
+        let socialIcon = document.getElementById("socialIcon");
+
+        if(selected.value == 'otra')
+        {
+            console.log("Entramos")
+            // MOSTRAR OPCIONES
+            socialNameEl.classList.remove("hide");
+            socialImageEl.classList.remove("hide");
+        }
+        else
+        {
+            // OCULTAR OPCIONES DE CREACION
+            socialNameEl.classList.add("hide");
+            socialImageEl.classList.add("hide");
+
+            socialIcon.value = selected.getAttribute("icon");
+            socialName.value = selected.value;
+        }
     }
 
 </script>

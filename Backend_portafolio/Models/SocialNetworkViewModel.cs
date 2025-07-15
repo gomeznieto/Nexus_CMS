@@ -20,5 +20,8 @@ namespace Backend_portafolio.Models
         public List<SocialNetwork> Networks { get; set; }
         [Display(Name = "Imagen")]
         public IFormFile ImageFile { get; set; }
+
+        // FORMULARIO PRE DEFINIDO
+        public List<SocialNetworkDefault> Defaults { get; set; } = new List<SocialNetworkDefault>();
     }
 }

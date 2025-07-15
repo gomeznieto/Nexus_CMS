@@ -26,6 +26,7 @@ namespace Backend_portafolio.Controllers
             try
             {
                 var viewModel = await _networkService.GetSocialNetworkViewModel();
+                viewModel.Defaults = _networkService.GetSocialNetworkDefaults();
                 return View(viewModel);
             }
             catch (Exception ex)
