@@ -73,7 +73,7 @@ namespace Backend_portafolio.Controllers
 
             try
             {
-                await _usersService.LoginUser(viewModel);
+                await _usersService.LoginUser(viewModel);               
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)

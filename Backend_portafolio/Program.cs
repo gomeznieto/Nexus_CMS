@@ -150,8 +150,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 
-/// ***** FIN TEST ****///
-
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseStaticFiles();

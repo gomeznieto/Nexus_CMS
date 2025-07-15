@@ -34,9 +34,11 @@ namespace Backend_portafolio.Controllers
             try
             {
                 var formatos = (await _formatService.GetAllFormat()).Count();
-                var user = await _usersService.GetDataUser();
+                var user = await _usersService.GetUserViewModel();
 
-                if (formatos < 1 && user.role != 1)
+                _usersService.SessionRole(user);
+
+                if (formatos < 1 && user.RoleName != "admin")
                     throw new Exception(
                         "Antes de comenzar a crear \"Entradas\" es necesario crear un \"Formato\"" +
                         "</br><a class=\"btn btn-action mt-5\" href='/formats' onclick='handleLinkClickCloseModal(event, \"/formats\")'>Formatos</a>" +

@@ -169,7 +169,7 @@ namespace Backend_portafolio.Sevices
                     throw new ApplicationException("El recurso se encuentra en uso");
 
                 //Borrar imagen y directorio
-                await _imageService.DeleteImageAsync(existe.icon);
+                _imageService.DeleteImageAsync(existe.icon);
 
                 await _repositorySource.Borrar(id, userID);
             }

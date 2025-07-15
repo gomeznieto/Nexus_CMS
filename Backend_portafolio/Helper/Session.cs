@@ -133,5 +133,23 @@ namespace Backend_portafolio.Helper
             var formatsJson = JsonSerializer.Serialize(userList);
             httpContext.Session.SetString("searchedUserList", formatsJson);
         }
+
+        public static void SetRoleSession(HttpContext httpContext, string role)
+        {
+            var formatsJson = JsonSerializer.Serialize(role);
+            httpContext.Session.SetString("RoleName", formatsJson);
+        }
+
+        public static string GetRoleSession(HttpContext httpContext)
+        {
+            var roleName = httpContext.Session.GetString("RoleName");
+
+            if (roleName != null)
+            {
+                return JsonSerializer.Deserialize<string>(roleName);
+            }
+
+            return String.Empty;
+        }
     }
 }

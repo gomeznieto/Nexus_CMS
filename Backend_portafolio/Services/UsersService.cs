@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Data;
 using Backend_portafolio.Helper;
 using Backend_portafolio.Entities;
+using System.Threading.Tasks;
 
 
 namespace Backend_portafolio.Services
@@ -35,6 +36,7 @@ namespace Backend_portafolio.Services
         Task EditUserByAdmin(UserDataListViewModel viewModel);
         Task CreateAdminUser();
         Task<PasswordViewModel> GetPasswordViewModel();
+        void SessionRole(UserViewModel user);
     }
 
     public class UsersService : IUsersService
@@ -476,7 +478,7 @@ namespace Backend_portafolio.Services
             try
             {
                 var result = await _signInManager.PasswordSignInAsync(viewModel.Username, viewModel.Password, viewModel.RememberMe, lockoutOnFailure: false);
-
+                
                 if (!result.Succeeded)
                 {
                     throw new ApplicationException("Nombre del usuario o password incorrectos");
@@ -577,6 +579,14 @@ namespace Backend_portafolio.Services
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        //****************************************************
+        //********************* SESIONES *********************
+        //****************************************************
+        public void SessionRole(UserViewModel user)
+        {
+            Session.SetRoleSession(_httpContext, user.RoleName);
         }
 
 

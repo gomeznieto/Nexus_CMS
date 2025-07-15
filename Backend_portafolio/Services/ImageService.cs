@@ -8,11 +8,11 @@ namespace Backend_portafolio.Services
     public interface IImageService
     {
         Task<string> UploadImageAsync(IFormFile imageFile, UserViewModel user, string subfolder, string source = "");
-        Task<bool> DeleteImageAsync(string path);
+        bool DeleteImageAsync(string path);
     }
     public class ImageService : IImageService
     {
-        public async Task<bool> DeleteImageAsync(string directoryFile)
+        public bool DeleteImageAsync(string directoryFile)
         {
             try
             {
@@ -81,15 +81,15 @@ namespace Backend_portafolio.Services
 
             if (extension != ".jpg" && extension != ".png" && extension != ".svg")
             {
-                throw new ArgumentException("El tipo de archivo no es válido. Solo se permiten .jpg y .png.");
+                throw new ArgumentException("El tipo de archivo no es válido. Solo se permiten 'jpg', 'svg' y 'png'");
             }
 
             // Define el nombre único del archivo
             string uniqueFileName = $"{Path.GetRandomFileName()}{extension}";
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            // Verifica el tamaño del archivo (por ejemplo, 2MB)
-            const int maxFileSizeInBytes = 1 * 1024 * 1024; // 2 MB
+            // Tamaño de la imagen
+            const int maxFileSizeInBytes = 512 * 1024;
 
             if (imageFile.Length > maxFileSizeInBytes)
             {
