@@ -45,6 +45,7 @@ namespace Backend_portafolio.Controllers
         public IActionResult Crear()
         {
             var viewModel = _mediaTypeService.GetMediaTypeViewModel();
+            viewModel.MediaTypeDefaults = _mediaTypeService.GetMediaTypeDefault().ToList();
             return View(viewModel);
         }
 

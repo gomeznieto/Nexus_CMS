@@ -11,5 +11,7 @@ namespace Backend_portafolio.Models
         [Remote(action: "VerificarExisteMediaType", controller: "Mediatype")]
         public string name { get; set; }
         public int user_id { get; set; }
+        public List<MediaTypeDefaults> MediaTypeDefaults { get; set; } = new List<MediaTypeDefaults>();
+
     }
 }

@@ -13,6 +13,7 @@ namespace Backend_portafolio.Sevices
         Task EditMediaType(MediaTypeViewModel viewModel);
         Task<bool> ExisteMediaType(string mediaType);
         Task<IEnumerable<MediaTypeViewModel>> GetAllMediaType(int userID = 0);
+        IEnumerable<MediaTypeDefaults> GetMediaTypeDefault(int userID = 0);
         Task<MediaTypeViewModel> GetMediaTypeById(int id);
         MediaTypeViewModel GetMediaTypeViewModel();
     }
@@ -205,5 +206,33 @@ namespace Backend_portafolio.Sevices
             }
         }
 
+        public IEnumerable<MediaTypeDefaults> GetMediaTypeDefault(int userID = 0)
+        {
+            try
+            {
+                if (userID == 0)
+                    userID = _usersService.ObtenerUsuario();
+
+                return new List<MediaTypeDefaults>()
+                {
+                    new MediaTypeDefaults() {
+                        Name = "Image"
+                    },
+                    new MediaTypeDefaults() {
+                        Name = "Video"
+                    },
+                    new MediaTypeDefaults() {
+                        Name = "Sound"
+                    },
+                    new MediaTypeDefaults() {
+                        Name = "Archive"
+                    },
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
+        }
     }
 }

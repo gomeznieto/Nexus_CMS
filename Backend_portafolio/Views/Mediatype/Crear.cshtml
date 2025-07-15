@@ -2,7 +2,7 @@
 @model MediaTypeViewModel
 
 @{
-	ViewData["Title"] = "Crear categoria";
+    ViewData["Title"] = "Crear categoria";
 }
 
 <h1 class="mb-3">Crear Tipo de Media</h1>
@@ -10,18 +10,50 @@
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 @* FORMULARIO *@
 <form asp-controller="Mediatype" asp-action="Crear">
-	<input type="hidden" asp-for="user_id" />
-	<div class="mb-3">
-		<div class="flex-column">
-			<input type="text" asp-for="name" class="form-control" placeholder="Indique el nombre del tipo de media" />
-			<span asp-validation-for="name" class="text-danger"></span>
-		</div>
-		<button type="submit" class="btn btn-action mt-3">Crear</button>
-		<a asp-action="Index" class="btn btn-delete mt-3">cancelar</a>
-	</div>
+    <input type="hidden" asp-for="user_id" />
+    <div class="mb-2">
+    <select class="form-select select-style" onchange="addSource(this)">
+        <option disabled selected>Seleccione un tipo de Media</option>
+        @foreach (var source in Model.MediaTypeDefaults)
+        {
+            <option value="@source.Name">@source.Name</option>
+        }
+        <option value="otra">Otra</option>
+    </select>
+    </div>
+    <div class="mb-3">
+        <div class="flex-column hide" id="mediaNameEl">
+            <input type="text" id="madiaName" asp-for="name" class="form-control" placeholder="Indique el nombre del tipo de media" />
+            <span asp-validation-for="name" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-action mt-3">Crear</button>
+        <a asp-action="Index" class="btn btn-delete mt-3">cancelar</a>
+    </div>
 </form>
 
 @section Scripts
 {
-	<partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial" />
 }
+
+<script>
+    function addSource(element)
+    {
+        let selected = element.options[element.selectedIndex];
+        let mediaNameEl = document.getElementById("mediaNameEl");
+        let madiaName = document.getElementById("madiaName");
+
+        if(selected.value == 'otra')
+        {
+            // MOSTRAR OPCIONES
+            mediaNameEl.classList.remove("hide");
+        }
+        else
+        {
+            // OCULTAR OPCIONES DE CREACION
+            mediaNameEl.classList.add("hide");
+
+            madiaName.value = selected.value;
+        }
+    }
+</script>
