@@ -24,8 +24,9 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-				var mediTypes = await _sourceService.GetAllSource();
-				return View(mediTypes);
+				var mediaTypes = await _sourceService.GetAllSource();
+
+				return View(mediaTypes);
 			}
             catch (Exception ex)
             {
@@ -43,6 +44,7 @@ namespace Backend_portafolio.Controllers
         public  IActionResult Crear()
         {
 			var viewModel = _sourceService.GetSourceViewModel();
+			viewModel.Default = _sourceService.GetSorurceDefault();
             return View(viewModel);
         }
 

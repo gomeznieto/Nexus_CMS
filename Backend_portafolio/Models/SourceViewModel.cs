@@ -18,5 +18,8 @@ namespace Backend_portafolio.Models
         //FORMULARIO
         [Display(Name = "Imagen")]
         public IFormFile ImageFile { get; set; }
+
+        public List<SourceDefault> Default { get; set; } = new List<SourceDefault>();
+
     }
 }

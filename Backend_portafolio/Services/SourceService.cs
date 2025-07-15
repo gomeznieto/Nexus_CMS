@@ -13,6 +13,7 @@ namespace Backend_portafolio.Sevices
         Task EditSource(SourceViewModel viewModel);
         Task<bool> Existe(string source);
         Task<IEnumerable<SourceViewModel>> GetAllSource();
+        List<SourceDefault> GetSorurceDefault();
         Task<SourceViewModel> GetSourceById(int id);
         SourceViewModel GetSourceViewModel();
     }
@@ -91,16 +92,20 @@ namespace Backend_portafolio.Sevices
                 var userID = _usersService.ObtenerUsuario();
                 UserViewModel currentUser = await _usersService.GetDataUser();
 
+                if (viewModel.ImageFile is null && viewModel.icon is null)
+                    throw new ApplicationException("Debe subirse una imagen o ícono");
+
                 if (userID != viewModel.user_id)
                     throw new ApplicationException("El usuario no tiene permisos para realizar esta acción");
 
                 var existe = await _repositorySource.Existe(viewModel.name, userID);
 
-                if(existe)
+                if (existe)
                     throw new ApplicationException("El recurso ya existe");
 
                 //Subir imagen
-                viewModel.icon = await _imageService.UploadImageAsync(viewModel.ImageFile, currentUser, $"source-images", viewModel.name);
+                if(viewModel.ImageFile is not null)
+                    viewModel.icon = await _imageService.UploadImageAsync(viewModel.ImageFile, currentUser, $"source-images", viewModel.name);
 
                 await _repositorySource.Crear(_mapper.Map<Source>(viewModel));
 
@@ -118,7 +123,7 @@ namespace Backend_portafolio.Sevices
 
         public async Task EditSource(SourceViewModel viewModel)
         {
-           try
+            try
             {
                 UserViewModel currentUser = await _usersService.GetDataUser();
 
@@ -201,5 +206,18 @@ namespace Backend_portafolio.Sevices
             }
         }
 
+        public List<SourceDefault> GetSorurceDefault()
+        {
+            return new List<SourceDefault>()
+            {
+                 new SourceDefault() { Name = "YouTube", IconUrl = "/img/Source/Defaults/YouTube/icon.svg" },
+                new SourceDefault() { Name = "Facebook", IconUrl = "/img/Source/Defaults/Facebook/icon.svg" },
+                new SourceDefault() { Name = "Twitter", IconUrl = "/img/Source/Defaults/Twitter/icon.svg"  },
+                new SourceDefault() { Name = "Instagram", IconUrl = "/img/Source/Defaults/Instagram/icon.svg" },
+                new SourceDefault() { Name = "LinkedIn", IconUrl = "/img/Source/Defaults/LinkedIn/icon.svg" },
+                new SourceDefault() { Name = "Github", IconUrl = "/img/Source/Defaults/Github/icon.svg" },
+                new SourceDefault() { Name = "WebPage", IconUrl = "/img/Source/Defaults/WebPage/icon.svg" },
+            };
+        }
     }
 }
