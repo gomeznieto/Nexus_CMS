@@ -243,12 +243,12 @@ namespace Backend_portafolio.Services
         {
             return new List<SocialNetworkDefault>()
             {
-                new SocialNetworkDefault() { Name = "YouTube", IconUrl = "/img/social_networks/Defaults/YouTube/icon.svg", BaseUrl = "https://www.youtube.com/" },
-                new SocialNetworkDefault() { Name = "Facebook", IconUrl = "/img/social_networks/Defaults/Facebook/icon.svg", BaseUrl = "https://www.facebook.com/" },
-                new SocialNetworkDefault() { Name = "Twitter", IconUrl = "/img/social_networks/Defaults/Twitter/icon.svg", BaseUrl = "https://twitter.com/" },
-                new SocialNetworkDefault() { Name = "Instagram", IconUrl = "/img/social_networks/Defaults/Instagram/icon.svg", BaseUrl = "https://www.instagram.com/" },
-                new SocialNetworkDefault() { Name = "LinkedIn", IconUrl = "/img/social_networks/Defaults/LinkedIn/icon.svg", BaseUrl = "https://www.linkedin.com/in/" },
-                new SocialNetworkDefault() { Name = "Github", IconUrl = "/img/social_networks/Defaults/Github/icon.svg", BaseUrl = "https://www.github.com/" },
+                new SocialNetworkDefault() { Name = "YouTube", IconUrl = "/img/Social/Defaults/YouTube/icon.svg", BaseUrl = "https://www.youtube.com/" },
+                new SocialNetworkDefault() { Name = "Facebook", IconUrl = "/img/Social/Defaults/Facebook/icon.svg", BaseUrl = "https://www.facebook.com/" },
+                new SocialNetworkDefault() { Name = "Twitter", IconUrl = "/img/Social/Defaults/Twitter/icon.svg", BaseUrl = "https://twitter.com/" },
+                new SocialNetworkDefault() { Name = "Instagram", IconUrl = "/img/Social/Defaults/Instagram/icon.svg", BaseUrl = "https://www.instagram.com/" },
+                new SocialNetworkDefault() { Name = "LinkedIn", IconUrl = "/img/Social/Defaults/LinkedIn/icon.svg", BaseUrl = "https://www.linkedin.com/in/" },
+                new SocialNetworkDefault() { Name = "Github", IconUrl = "/img/Social/Defaults/Github/icon.svg", BaseUrl = "https://www.github.com/" },
             };
         }
     }
