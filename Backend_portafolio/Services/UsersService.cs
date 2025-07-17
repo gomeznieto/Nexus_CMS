@@ -37,6 +37,7 @@ namespace Backend_portafolio.Services
         Task CreateAdminUser();
         Task<PasswordViewModel> GetPasswordViewModel();
         void SessionRole(UserViewModel user);
+        Task RecoveryApiKey(UserViewModel user);
     }
 
     public class UsersService : IUsersService
@@ -414,7 +415,6 @@ namespace Backend_portafolio.Services
 
                 userEdit.passwordHash = userEdit.passwordHash == null ? currentUser.passwordHash : userEdit.passwordHash;
 
-
                 var result = await _userManager.UpdateAsync(userEdit);
 
                 if (!result.Succeeded)
@@ -464,6 +464,26 @@ namespace Backend_portafolio.Services
             }
         }
 
+        public async Task RecoveryApiKey(UserViewModel currentUser)
+        {
+            try
+            {
+                if (currentUser is null)
+                    throw new ApplicationException("Error al editar el usuario");
+
+                //Reestablecer la ApiKey
+                currentUser.apiKey = _tokenService.GenerateApiKey();
+
+                var user = _mapper.Map<User>(currentUser);
+
+                await _repositoryUsers.EditarUsuario(user);
+                
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         //****************************************************
         //********************** LOGIN ***********************

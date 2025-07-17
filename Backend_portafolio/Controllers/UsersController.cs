@@ -4,6 +4,7 @@ using Backend_portafolio.Models;
 using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.Intrinsics.Arm;
 
 namespace Backend_portafolio.Controllers
 {
@@ -219,6 +220,24 @@ namespace Backend_portafolio.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Apikey(bool recoveryApiKey)
+        {
+            try
+            {
+                // RESTABLECER LA API DEL USUARIO
+                var viewModel = await _usersService.GetUserViewModel();
+                await _usersService.RecoveryApiKey(viewModel);
+                Session.CrearModalSuccess("La Apikey se ha reestablecido exitosamente", "Users", HttpContext);
+                return RedirectToAction("apikey", viewModel);
+
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Users", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+        }
 
         //****************************************************
         //************* EDIT REGISTER BY ADMIN  **************

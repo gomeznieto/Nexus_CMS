@@ -417,6 +417,17 @@ form label {
     left: 0;
 }
 
+.bgModalConfirm {
+    background-color: var(--bg-modal);
+    color: #fff;
+    border: 1px solid #000;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    width: 400px;
+    max-width: 90%;
+    padding: 2rem;
+}
+
 .btn-close-modal {
     font-size: 20px;
     color: var(--bg-red) !important;

@@ -12,9 +12,29 @@
             <i class="fa-regular fa-eye input-group-text d-flex align-items-center" id="toggleApikey"></i>
             <i class="fa-solid fa-pen input-group-text d-flex align-items-center" id="copyApikey"></i>
         </div>
+        <form asp-action="Apikey" asp-controller="Users" method="post" id="resetApiKeyForm">
+            <button type="button" class="btn btn-action mt-3" id="btnResetApikey">Restablecer ApiKey</button>
+        </form>
     </div>
 </div>
 <div id="snackbar">¡Se ha copiado la ApiKey en el portapapeles!</div>
+
+<div class="modal fade" id="confirmResetModal" tabindex="-1" aria-labelledby="confirmResetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bgModalConfirm">
+            <div class="d-flex justify-content-center align-content-center">
+                <h5 class="modal-title" id="confirmResetModalLabel">Reestablecer ApiKey</h5>
+            </div>
+            <div class="mt-4 text-center fw-normal">
+                ¿Estás seguro de que deseas restablecer la ApiKey?
+            </div>
+            <div class="d-flex justify-content-between align-content-center mt-4">
+                <button type="button" class="btn btn-delete" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-edit" id="confirmResetBtn">Restablecer</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -70,5 +90,23 @@
         openToast()
 
     })
+
+        document.addEventListener('DOMContentLoaded', function () {
+        const btnResetApikey = document.getElementById('btnResetApikey');
+        const confirmResetModal = new bootstrap.Modal(document.getElementById('confirmResetModal'));
+        const confirmResetBtn = document.getElementById('confirmResetBtn');
+        const resetApiKeyForm = document.getElementById('resetApiKeyForm');
+
+        // Cuando se hace clic en el botón "Restablecer ApiKey"
+        btnResetApikey.addEventListener('click', function () {
+            confirmResetModal.show(); // Muestra el modal de confirmación
+        });
+
+        // Cuando se hace clic en el botón "Restablecer" dentro del modal
+        confirmResetBtn.addEventListener('click', function () {
+            confirmResetModal.hide(); // Oculta el modal
+            resetApiKeyForm.submit(); // Envía el formulario programáticamente
+        });
+    });
 
 </script>

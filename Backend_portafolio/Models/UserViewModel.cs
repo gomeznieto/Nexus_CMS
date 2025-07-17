@@ -31,6 +31,7 @@ namespace Backend_portafolio.Models
         public string apiKey { get; set; }
 
         // FORMULARIO
+        public bool RecoveryApikey { get; set; } = false;
         [Display(Name = "Imagen")]
         public IFormFile ImageFile { get; set; }
         [Display(Name = "Rol")]
