@@ -2,6 +2,8 @@
 using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Backend_portafolio.Services
 {
@@ -26,6 +28,7 @@ namespace Backend_portafolio.Services
         private readonly IMediaService _mediaService;
         private readonly ILinkService _linkService;
         private readonly IUsersService _usersService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public ApiService(
             IBioService bioService,
@@ -37,7 +40,8 @@ namespace Backend_portafolio.Services
             INetworkService networkService,
             IPostService postService,
             ITokenService tokenService,
-            IUsersService usersService
+            IUsersService usersService,
+            IWebHostEnvironment webHostEnvironment
         )
         {
             _bioService = bioService;
@@ -50,6 +54,7 @@ namespace Backend_portafolio.Services
             _postService = postService;
             _tokenService = tokenService;
             _usersService = usersService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         //****************************************************
@@ -72,7 +77,36 @@ namespace Backend_portafolio.Services
                 userApiViewModel.Bios = await _bioService.GetAllBio(user.id);
 
                 //Obtener Redes
-                userApiViewModel.Networks = await _networkService.GetSocialNetworksByUserId(user.id);
+                var networks = await _networkService.GetSocialNetworksByUserId(user.id);
+
+                foreach (var network in networks) {
+                    string svgContent = null;
+                    // Construir la ruta física del archivo SVG
+                    string filePath = Path.Combine(_webHostEnvironment.WebRootPath, network.icon.TrimStart('/'));
+
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        svgContent = await System.IO.File.ReadAllTextAsync(filePath);
+                        svgContent = svgContent.Replace("fill=\"#0F0F0F\"", "fill=\"currentColor\"");
+                        svgContent = svgContent.Replace("fill=\"#000000\"", "fill=\"currentColor\"");
+                        svgContent = svgContent.Replace("fill=\"#000\"", "fill=\"currentColor\"");
+                        svgContent = svgContent.Replace("fill=\"#fff\"", "fill=\"currentColor\"");
+                        svgContent = svgContent.Replace("width=\"800px\"", "");
+                        svgContent = svgContent.Replace("height=\"800px\"", "");
+
+                        if (!svgContent.Contains("fill=\"currentColor\"") && svgContent.Contains("<svg"))
+                        {
+                            svgContent = svgContent.Replace("<svg", "<svg fill=\"currentColor\"");
+                        }
+                    }
+
+                    network.icon = svgContent;
+
+                }
+
+                userApiViewModel.Networks = networks;
+
+                // Pasar iconos a SVG
 
                 var result = new ApiResponse<ApiUserViewModel>()
                 {
@@ -157,7 +191,7 @@ namespace Backend_portafolio.Services
 
 
         //****************************************************
-        //*********************** PSOTS **********************
+        //*********************** POSTS **********************
         //****************************************************
 
         /**
@@ -173,23 +207,6 @@ namespace Backend_portafolio.Services
                 List<PostViewModel> posts = await _postService.GetAllPosts(user.id);
 
                 List<ApiPostViewModel> postsApiModels = _mapper.Map<List<ApiPostViewModel>>(posts);
-                //List<ApiPostViewModel> postsApiModels = new List<ApiPostViewModel>();
-
-                //foreach (var post in posts)
-                //{
-                //    var addPost = new ApiPostViewModel()
-                //    {
-                //        id = post.id,
-                //        title = post.description,
-                //        description = post.description,
-                //        cover = post.cover,
-                //        format = post.format,
-                //        created_at = post.created_at
-
-                //    };
-
-                //    postsApiModels.Add(addPost);
-                //}
 
                 foreach (var post in postsApiModels)
                 {
@@ -210,6 +227,37 @@ namespace Backend_portafolio.Services
                     Items = postsApiModels,
                     TotalRecords = posts.Count()
                 };
+
+                //Pasar SVG a HTML
+                foreach (var el in postsApiModels)
+                {
+                    foreach(var link in el.links)
+                    {
+                        string svgContent = null;
+                        // Construir la ruta física del archivo SVG
+                        string filePath = Path.Combine(_webHostEnvironment.WebRootPath, link.icon.TrimStart('/'));
+
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            svgContent = await System.IO.File.ReadAllTextAsync(filePath);
+                            svgContent = svgContent.Replace("fill=\"#0F0F0F\"", "fill=\"currentColor\"");
+                            svgContent = svgContent.Replace("fill=\"none\"", "fill=\"currentColor\"");
+                            svgContent = svgContent.Replace("fill=\"#000000\"", "fill=\"currentColor\"");
+                            svgContent = svgContent.Replace("fill=\"#000\"", "fill=\"currentColor\"");
+                            svgContent = svgContent.Replace("fill=\"#fff\"", "fill=\"currentColor\"");
+                            svgContent = svgContent.Replace("width=\"800px\"", "");
+                            svgContent = svgContent.Replace("height=\"800px\"", "");
+
+                            if (!svgContent.Contains("fill=\"currentColor\"") && svgContent.Contains("<svg"))
+                            {
+                                svgContent = svgContent.Replace("<svg", "<svg fill=\"currentColor\"");
+                            }
+                        }
+
+                        link.icon = svgContent;
+                    }
+
+                }
 
                 return new ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>()
                 {

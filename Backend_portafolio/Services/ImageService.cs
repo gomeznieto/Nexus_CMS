@@ -105,7 +105,7 @@ namespace Backend_portafolio.Services
                 await imageFile.CopyToAsync(stream);
             }
 
-            return $"\\{savedPath}\\{uniqueFileName}";
+            return $"/{savedPath}/{uniqueFileName}";
         }
 
 

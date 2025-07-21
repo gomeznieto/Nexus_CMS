@@ -22,6 +22,17 @@ builder.Services.AddControllersWithViews(options =>
 builder.Services.AddSession();
 
 //****************************************************
+//*********************** CORS ***********************
+//****************************************************
+builder.Services.AddCors(opc =>
+{
+    opc.AddDefaultPolicy(opcCors =>
+    {
+        opcCors.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
+
+//****************************************************
 //***************** USER SERVICES ********************
 //****************************************************
 builder.Services.AddScoped<IUserStore<UserViewModel>, UsersStore>();
@@ -149,7 +160,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
+app.UseCors();
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseStaticFiles();

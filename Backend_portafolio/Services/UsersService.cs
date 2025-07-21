@@ -406,7 +406,7 @@ namespace Backend_portafolio.Services
         {
             try
             {
-                UserViewModel currentUser = await GetDataUser();
+                UserViewModel currentUser = await GetUserViewModel();
                 UserViewModel userEdit = _mapper.Map<UserViewModel>(viewModel);
 
                 userEdit.img = viewModel.ImageFile != null
@@ -414,6 +414,7 @@ namespace Backend_portafolio.Services
                     : currentUser.img;
 
                 userEdit.passwordHash = userEdit.passwordHash == null ? currentUser.passwordHash : userEdit.passwordHash;
+                userEdit.apiKey = userEdit.apiKey == null ? currentUser.apiKey : userEdit.apiKey;
 
                 var result = await _userManager.UpdateAsync(userEdit);
 
