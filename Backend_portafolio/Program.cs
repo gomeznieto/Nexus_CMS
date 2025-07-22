@@ -52,6 +52,8 @@ builder.Services.AddTransient<IRepositoryRole, RepositoryRole>();
 builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
 builder.Services.AddTransient<IRepositoryBio, RepositoryBio>();
 builder.Services.AddTransient<IRepositorySocialNetwork, RepositorySocialNetwork>();
+builder.Services.AddTransient<IRepositoryHomeSection, RepositoryHomeSection>();
+builder.Services.AddTransient<IRepositoryHomeSectionPost, RepositoryHomeSectionPost>();
 
 
 //****************************************************
@@ -72,6 +74,7 @@ builder.Services.AddTransient<INetworkService, NetworkService>();
 builder.Services.AddTransient<IApiService, ApiService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
+builder.Services.AddTransient<IHomeSectionService, HomeSectionService>();
 
 
 //****************************************************

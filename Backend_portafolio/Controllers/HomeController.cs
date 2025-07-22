@@ -13,16 +13,19 @@ namespace Backend_portafolio.Controllers
         private readonly IHomeService _homeService;
         private readonly IFormatService _formatService;
         private readonly IUsersService _usersService;
+        private readonly IHomeSectionService _homeSectionService;
 
         public HomeController(
             IHomeService homeService,
             IFormatService formatService,
-            IUsersService usersService
+            IUsersService usersService,
+            IHomeSectionService homeSectionService
         )
         {
             _homeService = homeService;
             _formatService = formatService;
             _usersService = usersService;
+            _homeSectionService = homeSectionService;
         }
 
         //****************************************************
@@ -78,6 +81,23 @@ namespace Backend_portafolio.Controllers
             }
         }
 
+        //****************************************************
+        //******************* HOME SECTION *******************
+        //****************************************************
+        [HttpPost]
+        public async Task<IActionResult> CreateHomeSection(HomeViewModel viewModel)
+        {
+            try
+            {
+                await _homeSectionService.CreateAsync(viewModel.SectionForm);
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Home", HttpContext);
+                return RedirectToAction("Index", "Posts");
+            }
+        }
 
         //****************************************************
         //************************ 404 ***********************

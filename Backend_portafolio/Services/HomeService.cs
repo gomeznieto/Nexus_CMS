@@ -15,18 +15,21 @@ namespace Backend_portafolio.Services
         private readonly IUsersService _usersService;
         private readonly IPostService _postService;
         private readonly IFormatService _formatService;
+        private readonly IHomeSectionService _homeSectionService;
         private readonly HttpContext _httpContext;
 
         public HomeService(
             IUsersService usersService,
             IHttpContextAccessor httpContextAccessor,
             IPostService postService,
-            IFormatService formatService
+            IFormatService formatService,
+            IHomeSectionService homeSectionService
         )
         {
             _usersService = usersService;
             _postService = postService;
             _formatService = formatService;
+            _homeSectionService = homeSectionService;
             _httpContext = httpContextAccessor.HttpContext;
         }
 
@@ -40,13 +43,14 @@ namespace Backend_portafolio.Services
             {
                 var userID = _usersService.ObtenerUsuario();
                 await Session.UpdateSession(_httpContext, _formatService, userID);
-
+                
                 if(viewModel == null)
                     viewModel = new HomeViewModel();
 
                 viewModel.formatList = await _formatService.GetAllFormat();
                 viewModel.ultimosPosts = await _postService.GetAllPosts();
                 viewModel.user_id = userID;
+                viewModel.homeSectionList = await _homeSectionService.GetByUserAsync(userID);
 
                 return viewModel;
             }

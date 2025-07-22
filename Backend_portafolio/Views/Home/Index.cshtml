@@ -132,12 +132,75 @@
                     <p>Antes de comenzar a publicar entradas, primero debe crear un Formato</p>
                 }
             </div>
-            <!-- FIN ENTRADA RAPIDA -->
+            <div class="border-section">
+                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Secciones</p>
+                <div class="mb-3">
+                    @if (Model.homeSectionList.Count > 0)
+                    {
+                        <select class="form-select select-style">
+                            <option disabled selected>Seleccione Formato</option>
+                            @foreach (var sectionHome in Model.homeSectionList)
+                            {
+                                <option value="@sectionHome.Id">@sectionHome.Name</option>
+                            }
+                        </select>
+                        <a class="btn btn-edit" onclick="editHomeSection">Editar</a>
+                }
+                <button class="btn btn-action" id="btnAddSection" onclick="showHomeSectionForm()" mode="edit"><i class="fa-solid fa-plus me-2 mb-2"></i>Agregar Sección</button>
+            </div>
+            <form method="post" asp-controller="Home" asp-action="CreateHomeSection" class="d-flex flex-row flex-lg-row justify-content-center align-items-center gap-2 hide" id="formHomeSection">
+                <input asp-for="@Model.SectionForm.Name" type="text" class="form-control input-style" placeholder="Nombre" />
+                <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25">
+                    <option selected>Orden</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="4">5</option>
+                    <option value="4">6</option>
+                </select>
+                <select asp-for="@Model.SectionForm.MaxItems" class="form-select select-style w-25">
+                    <option selected>Entradas</option>
+                    <option value="6">2</option>
+                    <option value="4">4</option>
+                    <option value="6">6</option>
+                </select>
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-action">Crear</button>
+                </div>
+            </form>
         </div>
-        <!-- FIN COLUMNA 2 -->
     </div>
+    <!-- FIN ENTRADA RAPIDA -->
+</div>
+<!-- FIN COLUMNA 2 -->
+</div>
 
 
 </div>
 
+<script>
+    function showHomeSectionForm()
+    {
+        let form =document.getElementById("formHomeSection");
+        let btnAddSection = document.getElementById("btnAddSection");
 
+        if(btnAddSection.getAttribute("mode") == "edit")
+        {
+            btnAddSection.classList.remove("btn-action");
+            btnAddSection.classList.add("btn-delete");
+            btnAddSection.setAttribute("mode", "cancel")
+            form.classList.remove("hide");
+            btnAddSection.innerHTML = "Cancelar";
+        }
+        else
+        {
+             btnAddSection.classList.add("btn-action");
+            btnAddSection.classList.remove("btn-delete");
+            btnAddSection.setAttribute("mode", "edit")
+            form.classList.add("hide");
+            btnAddSection.innerHTML = "Agregar Sección";
+        }
+    }
+
+</script>

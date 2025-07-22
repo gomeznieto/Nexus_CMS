@@ -39,6 +39,8 @@ namespace Backend_portafolio.Sevices
 
             CreateMap<SourceViewModel, Source>();
 
+            CreateMap<HomeSectionModel, HomeSection>();
+
 
             //****************************************************
             //**************** ENTITY TO VIEWMODEL ***************
@@ -61,6 +63,8 @@ namespace Backend_portafolio.Sevices
             CreateMap<Bio, BioViewModel>();
 
             CreateMap<Source, SourceViewModel>();
+
+            CreateMap<HomeSection, HomeSectionModel>();
 
 
             //****************************************************

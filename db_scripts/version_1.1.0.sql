@@ -176,4 +176,33 @@ CREATE TABLE [dbo].[user_role](
 ) ON [PRIMARY];
 GO
 
+-- Tabla de secciones del home
+CREATE TABLE HomeSection (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    [Order] INT NOT NULL,
+    MaxItems INT NULL,
+    UserId INT NOT NULL,
+
+    CONSTRAINT FK_HomeSection_Users FOREIGN KEY (UserId)
+        REFERENCES users(Id) ON DELETE CASCADE
+
+);
+
+-- Tabla de relación entre sección y post
+CREATE TABLE HomeSectionPost (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    HomeSectionId INT NOT NULL,
+    PostId INT NOT NULL,
+    [Order] INT NOT NULL,
+
+    CONSTRAINT FK_HomeSectionPost_HomeSection FOREIGN KEY (HomeSectionId)
+        REFERENCES HomeSection(Id) ON DELETE CASCADE,
+
+    CONSTRAINT FK_HomeSectionPost_Post FOREIGN KEY (PostId)
+        REFERENCES Post(Id) ON DELETE CASCADE,
+
+    CONSTRAINT UQ_HomeSectionPost UNIQUE (HomeSectionId, [Order]),
+    CONSTRAINT UQ_HomeSectionPostPost UNIQUE (HomeSectionId, PostId)
+);
 
