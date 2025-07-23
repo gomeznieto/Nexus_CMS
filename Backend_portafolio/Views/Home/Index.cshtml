@@ -1,6 +1,7 @@
 ﻿@using Backend_portafolio.Helper
 @using Microsoft.AspNetCore.Http;
 @using System.Text.Json;
+
 @model HomeViewModel;
 
 @inject IHttpContextAccessor HttpContextAccessor
@@ -9,6 +10,7 @@
     ViewData["Title"] = "Home Page";
 }
 
+<!-- INICIO HTML -->
 <div>
     <h1>Panel de Control</h1>
     <!-- COLUMNA 1 -->
@@ -132,75 +134,217 @@
                     <p>Antes de comenzar a publicar entradas, primero debe crear un Formato</p>
                 }
             </div>
+            <!-- FIN DE ENTRADA RAPIDA -->
+            <!-- SECCION RAPIDA -->
             <div class="border-section">
                 <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Secciones</p>
-                <div class="mb-3">
+                <!-- LISTADO -->
+                <div class="mb-3 d-flex flex-row gap-2">
                     @if (Model.homeSectionList.Count > 0)
                     {
-                        <select class="form-select select-style">
+                        <select class="form-select select-style" id="homeSectionSelect" name="selectListSection" onchange="disableBtnEdit()">
                             <option disabled selected>Seleccione Formato</option>
                             @foreach (var sectionHome in Model.homeSectionList)
                             {
-                                <option value="@sectionHome.Id">@sectionHome.Name</option>
+                                <option value="@sectionHome.Id" data-order="@sectionHome.Order" data-items="@sectionHome.MaxItems" data-name="@sectionHome.Name">@sectionHome.Name [Orden: @sectionHome.Order]</option>
                             }
                         </select>
-                        <a class="btn btn-edit" onclick="editHomeSection">Editar</a>
-                }
-                <button class="btn btn-action" id="btnAddSection" onclick="showHomeSectionForm()" mode="edit"><i class="fa-solid fa-plus me-2 mb-2"></i>Agregar Sección</button>
-            </div>
-            <form method="post" asp-controller="Home" asp-action="CreateHomeSection" class="d-flex flex-row flex-lg-row justify-content-center align-items-center gap-2 hide" id="formHomeSection">
-                <input asp-for="@Model.SectionForm.Name" type="text" class="form-control input-style" placeholder="Nombre" />
-                <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25">
-                    <option selected>Orden</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="4">5</option>
-                    <option value="4">6</option>
-                </select>
-                <select asp-for="@Model.SectionForm.MaxItems" class="form-select select-style w-25">
-                    <option selected>Entradas</option>
-                    <option value="6">2</option>
-                    <option value="4">4</option>
-                    <option value="6">6</option>
-                </select>
-                <div class="input-group-append">
-                    <button type="submit" class="btn btn-action">Crear</button>
+                        <a class="btn btn-edit" id="btnEditSection" onclick="editHomeSection()" data-mode="edit" data-disable="true">Editar</a>
+                    }
                 </div>
-            </form>
+                <button class="btn btn-action mb-2" id="btnAddSection" onclick="showHomeSectionForm()" data-mode="create"><i class="fa-solid fa-plus me-2 mb-2"></i>Agregar Sección</button>
+                <!-- FIN LISTADO -->
+                <!-- CREACION -->
+                <form method="post" asp-controller="Home" asp-action="CreateHomeSection" class="d-flex flex-row flex-lg-row justify-content-center align-items-center gap-2 hide" id="formHomeSection">
+                    <input asp-for="@Model.SectionForm.Name" type="text" class="form-control input-style" placeholder="Nombre" />
+                    <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25">
+                        <option selected>Orden</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="4">5</option>
+                        <option value="4">6</option>
+                    </select>
+                    <select asp-for="@Model.SectionForm.MaxItems" class="form-select select-style w-25">
+                        <option selected>Entradas</option>
+                        <option value="6">2</option>
+                        <option value="4">4</option>
+                        <option value="6">6</option>
+                    </select>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-action">Crear</button>
+                    </div>
+                </form>
+                <!-- FIN CREACION -->
+                <!-- EDICION -->
+                <form method="post" asp-controller="Home" asp-action="EditHomeSection" class="d-flex flex-row flex-lg-row justify-content-center align-items-center gap-2 hide" id="formHomeEditSection">
+                    <input asp-for="@Model.SectionForm.Id" type="hidden" class="form-control input-style" placeholder="Nombre" id="idEditFormSection" />
+                    <input asp-for="@Model.SectionForm.Name" type="text" class="form-control input-style" placeholder="Nombre" id="nameEditFormSection" />
+                    <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25" id="orderEditFormSection">
+                        <option selected>Orden</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="4">5</option>
+                        <option value="4">6</option>
+                    </select>
+                    <select asp-for="@Model.SectionForm.MaxItems" class="form-select select-style w-25" id="itemsEditFormSection">
+                        <option selected>Entradas</option>
+                        <option value="6">2</option>
+                        <option value="4">4</option>
+                        <option value="6">6</option>
+                    </select>
+                    <div class="input-group-append d-flex gap-2 justify-content-center">
+                        <button type="submit" name="action" value="edit" class="btn btn-action">Editar</button>
+                        <button type="button" class="btn btn-delete" id="btnDeleteHomeSection" data-bs-toggle="modal" data-bs-target="#modalDeleteSection">
+                            Borrar
+                        </button>
+                    </div>
+                </form>
+                <!-- FIN CREACION -->
+            </div>
         </div>
+        <!-- FIN DE SECCION RAPIDA -->
     </div>
-    <!-- FIN ENTRADA RAPIDA -->
+    <!-- FIN COLUMNA 2 -->
 </div>
-<!-- FIN COLUMNA 2 -->
+<!-- MODAL -->
+<!-- Modal con form de borrado -->
+<div class="modal fade" id="modalDeleteSection" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="post" asp-controller="Home" asp-action="DeleteHomeSection">
+            <input type="hidden" id="idDeleteHomeSection" asp-for="@Model.SectionForm.Id" />
+            <div class="modal-content bgModalConfirm">
+                <div class="d-flex justify-content-center align-content-center"><h5 class="modal-title">Confirmar borrado</h5></div>
+                <div class="mt-4 text-center fw-normal">¿Estás seguro de eliminar esta sección?</div>
+                <div class="d-flex justify-content-between align-content-center mt-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
-
-
-</div>
-
+<!-- FIN DE HTML -->
+<!-- FUNCIONES DE JS -->
 <script>
+    document.getElementById("btnDeleteHomeSection").addEventListener("click", () => {
+        document.getElementById("idDeleteHomeSection").value = document.getElementById("idEditFormSection").value;
+
+    })
+
     function showHomeSectionForm()
     {
         let form =document.getElementById("formHomeSection");
         let btnAddSection = document.getElementById("btnAddSection");
+        let action = btnAddSection.getAttribute("data-mode");
 
-        if(btnAddSection.getAttribute("mode") == "edit")
+        if( action == "create")
         {
             btnAddSection.classList.remove("btn-action");
             btnAddSection.classList.add("btn-delete");
-            btnAddSection.setAttribute("mode", "cancel")
+            btnAddSection.setAttribute("data-mode", "cancel")
             form.classList.remove("hide");
             btnAddSection.innerHTML = "Cancelar";
+
+            candelEditHomeSection();
         }
         else
         {
-             btnAddSection.classList.add("btn-action");
-            btnAddSection.classList.remove("btn-delete");
-            btnAddSection.setAttribute("mode", "edit")
-            form.classList.add("hide");
-            btnAddSection.innerHTML = "Agregar Sección";
+            cancelCrateHomeSection();
         }
     }
+
+    function cancelCrateHomeSection()
+    {
+        let form =document.getElementById("formHomeSection");
+        let btnAddSection = document.getElementById("btnAddSection");
+        let action = btnAddSection.getAttribute("data-mode");
+
+        if(action == "create")
+            return;
+
+        form.classList.add("hide");
+        btnAddSection.classList.add("btn-action");
+        btnAddSection.classList.remove("btn-delete");
+        btnAddSection.setAttribute("data-mode", "create")
+        btnAddSection.innerHTML = "Agregar Sección";
+    }
+
+    function disableBtnEdit()
+    {
+        let btnEdit = document.getElementById("btnEditSection");
+
+        if(btnEdit.getAttribute("data-disable") == "true")
+            btnEdit.setAttribute("data-disable", "false")
+
+        console.log(btnEdit.getAttribute("data-disable"))
+    }
+
+    function editHomeSection()
+    {
+        let formCreate =document.getElementById("formHomeSection");
+        let btnEdit = document.getElementById("btnEditSection");
+        let action = btnEdit.getAttribute("data-mode");
+        let editForm = document.getElementById("formHomeEditSection");
+
+        if(btnEdit.getAttribute("data-disable") == "true")
+            return;
+
+        // Valores
+        let optSelect = document.getElementById("homeSectionSelect");
+        const optSelected = optSelect.options[optSelect.selectedIndex];
+        let idOptSelected = optSelected.value;
+        let nameOptSelected = optSelected.getAttribute("data-name");
+        let orderOptSelected = optSelected.getAttribute("data-order");
+        let maxItemsOptSelected = optSelected.getAttribute("data-items");
+
+        //Formulario
+        document.getElementById("idEditFormSection").value = idOptSelected;
+        document.getElementById("nameEditFormSection").value = nameOptSelected;
+        document.getElementById("orderEditFormSection").value = orderOptSelected;
+        document.getElementById("itemsEditFormSection").value = maxItemsOptSelected;
+
+        if(action == "edit")
+        {
+            formCreate.classList.add("hide")
+            optSelect.disabled = true;
+            editForm.classList.remove("hide");
+            btnEdit.classList.remove("btn-action")
+            btnEdit.classList.add("btn-delete")
+            btnEdit.setAttribute("data-mode", "Cancel");
+            btnEdit.innerHTML = "Cancel";
+
+            cancelCrateHomeSection();
+        }
+        else
+        {
+            candelEditHomeSection();
+        }
+    }
+
+    function candelEditHomeSection()
+    {
+
+        let optSelect = document.getElementById("homeSectionSelect");
+        let editForm = document.getElementById("formHomeEditSection");
+        let btnEdit = document.getElementById("btnEditSection");
+        let action = btnEdit.getAttribute("data-mode");
+
+        if(action == "edit")
+            return;
+
+        optSelect.disabled = false;
+        editForm.classList.add("hide");
+        btnEdit.setAttribute("data-mode", "edit");
+        btnEdit.innerHTML = "Editar";
+        btnEdit.classList.remove("btn-delete")
+        btnEdit.classList.add("btn-edit")
+    }
+
 
 </script>

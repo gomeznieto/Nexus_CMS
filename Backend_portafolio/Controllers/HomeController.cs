@@ -71,6 +71,7 @@ namespace Backend_portafolio.Controllers
             try
             {
                 await _homeService.CreatePostFromHomeView(viewModel);
+
                 Session.CrearModalSuccess("Post creado correctamente", "Home", HttpContext);
                 return RedirectToAction("Index", "Home");
             }
@@ -90,6 +91,42 @@ namespace Backend_portafolio.Controllers
             try
             {
                 await _homeSectionService.CreateAsync(viewModel.SectionForm);
+
+                Session.CrearModalSuccess("Sección creado correctamente", "Home", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Home", HttpContext);
+                return RedirectToAction("Index", "Posts");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditHomeSection(HomeViewModel viewModel)
+        {
+            try
+            {
+                await _homeSectionService.UpdateAsync(viewModel.SectionForm);
+
+                Session.CrearModalSuccess("Sección editada correctamente", "Home", HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                Session.CrearModalError(ex.Message, "Home", HttpContext);
+                return RedirectToAction("Index", "Posts");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteHomeSection(HomeViewModel viewModel)
+        {
+            try
+            {
+                await _homeSectionService.DeleteAsync(viewModel.SectionForm);
+
+                Session.CrearModalSuccess("Sección editada correctamente", "Home", HttpContext);
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)

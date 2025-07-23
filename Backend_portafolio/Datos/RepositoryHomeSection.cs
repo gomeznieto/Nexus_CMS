@@ -19,6 +19,8 @@ namespace Backend_portafolio.Datos
         Task Crear(HomeSection homeSection);
         Task Editar(HomeSection homeSection);
         Task<IEnumerable<HomeSection>> Obtener(int userId);
+        Task<HomeSection> Obtener(int id, int userId);
+        Task<bool> GetOrderAsync(int order, int userId);
     }
 
     public class RepositoryHomeSection : IRepositoryHomeSection
@@ -66,6 +68,21 @@ namespace Backend_portafolio.Datos
         {
             using var connection = new SqlConnection(_connectionString);
             await connection.ExecuteAsync($@"DELETE FROM {HOMESECTION.TABLA} WHERE {HOMESECTION.ID} = @{HOMESECTION.ID}", new { id });
+        }
+
+        public async Task<bool> GetOrderAsync(int Order, int userId)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            var section = await connection.QueryFirstAsync<int>($@"SELECT 1 FROM {HOMESECTION.TABLA} WHERE {HOMESECTION.USER_ID} = @{HOMESECTION.USER_ID} AND [{HOMESECTION.ORDER}] = @{HOMESECTION.ORDER}", new { userId, Order });
+
+            return section == 1;
+        }
+
+        public async Task<HomeSection> Obtener(int id, int userId)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            return await connection.QueryFirstAsync<HomeSection>($@"SELECT {HOMESECTION.ID}, {HOMESECTION.NOMBRE}, {HOMESECTION.USER_ID}, [{HOMESECTION.ORDER}], {HOMESECTION.MAX_ITEMS} FROM {HOMESECTION.TABLA} WHERE {HOMESECTION.USER_ID} = @{HOMESECTION.USER_ID} AND {HOMESECTION.ID} = @{HOMESECTION.ID}", new { id, userId });
         }
     }
 }

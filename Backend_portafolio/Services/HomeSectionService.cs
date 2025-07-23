@@ -2,6 +2,7 @@
 using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backend_portafolio.Services
 {
@@ -17,10 +18,10 @@ namespace Backend_portafolio.Services
         Task<int> CreateAsync(HomeSectionModel section);
 
         // Editar una sección existente
-        Task<bool> UpdateAsync(HomeSectionModel section);
+        Task UpdateAsync(HomeSectionModel section);
 
         // Eliminar una sección
-        Task<bool> DeleteAsync(int id, int userId);
+        Task DeleteAsync(HomeSectionModel viewModel);
     }
 
     public class HomeSectionService : IHomeSectionService
@@ -47,7 +48,12 @@ namespace Backend_portafolio.Services
                 var currenUser = await _usersService.GetUserViewModel();
                 if (currenUser is null)
                     throw new Exception("No se ha encontrado el usuario");
+
                 //Verificar que no exista con el mismo nombre otro
+                var existOrder = await _repositoryHomeSection.GetOrderAsync((int)sectionModel.Order, currenUser.id);
+
+                if (existOrder)
+                    sectionModel.Order = 0;
 
                 sectionModel.UserId = currenUser.id;
                 var section = _mapper.Map<HomeSection>(sectionModel);
@@ -62,9 +68,29 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public Task<bool> DeleteAsync(int id, int userId)
+        public async Task DeleteAsync(HomeSectionModel sectionModel)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var currenUser = await _usersService.GetUserViewModel();
+                if (currenUser is null)
+                    throw new Exception("No se ha encontrado el usuario");
+
+                //Verificar que no exista con el mismo nombre otro
+
+                if(sectionModel?.Id is null)
+                    throw new Exception("No se ha encontrado la sección");
+
+                var section = _mapper.Map<HomeSection>(sectionModel);
+
+                await _repositoryHomeSection.Borrar((int)sectionModel.Id);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
         }
 
         public Task<HomeSectionModel> GetByIdAsync(int id, int userId)
@@ -96,9 +122,39 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public Task<bool> UpdateAsync(HomeSectionModel section)
+        public async Task UpdateAsync(HomeSectionModel sectionModel)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var currentUser = await _usersService.GetUserViewModel();
+
+                if (currentUser is null)
+                    throw new Exception("No se ha encontrado el usuario");
+
+                sectionModel.UserId = currentUser.id;
+
+                //Verificar si existe la sección
+                var existSection = await _repositoryHomeSection.Obtener((int)sectionModel.Id, currentUser.id);
+
+                if(existSection is null)
+                    throw new Exception("No se ha encontrado la sección");
+
+
+                //Verificar si el orden existe
+                var existOrder = await _repositoryHomeSection.GetOrderAsync((int)sectionModel.Order, currentUser.id);
+
+                if (existOrder)
+                    sectionModel.Order = existSection.Order;
+
+                var section = _mapper.Map<HomeSection>(sectionModel);
+                await _repositoryHomeSection.Editar(section);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
