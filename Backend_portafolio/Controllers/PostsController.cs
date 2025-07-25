@@ -124,6 +124,7 @@ namespace Backend_portafolio.Controllers
             if (!ModelState.IsValid)
             {
                 viewModel = await _postService.PrepareViewModel(viewModel);
+                Session.CrearModalSuccess("Sección creado correctamente", "Home", HttpContext);
                 return View(viewModel);
             }
 
@@ -171,6 +172,18 @@ namespace Backend_portafolio.Controllers
         {
             if (!ModelState.IsValid)
             {
+                // TODO: Eliminar antes de subir a producción
+                foreach (var entry in ModelState)
+                {
+                    var key = entry.Key;
+                    var errors = entry.Value.Errors;
+
+                    foreach (var error in errors)
+                    {
+                        Console.WriteLine($"Error en '{key}': {error.ErrorMessage}");
+                    }
+                }
+
                 viewModel = await _postService.PrepareViewModel(viewModel);
                 return View(viewModel);
             }
@@ -178,6 +191,7 @@ namespace Backend_portafolio.Controllers
             try
             {
                 await _postService.EditPost(viewModel);
+                Session.CrearModalSuccess("Sección editado correctamente", "Home", HttpContext);
                 return RedirectToAction("Index", "Posts", new { format = viewModel.format });
             }
             catch (Exception ex)

@@ -9,76 +9,93 @@
     <h1>Crear @Model.format</h1>
     <fs-4>El texto debe ser escrito con markdown para poder colocar estilos.</fs-4>
 
-    <form asp-action="Crear" method="post" class="mt-5" enctype="multipart/form-data">
-
-        <!-- VALIDATION -->
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
-        <!-- HIDDEN -->
-        <input type="hidden" asp-for="user_id" />
-        <input type="hidden" asp-for="format_id" />
-        <input type="hidden" asp-for="format" />
-        <input type="hidden" asp-for="draft" id="inputDraft" />
-        <input type="hidden" asp-for="mediaListString" id="imageLinksField" />
-        <input type="hidden" asp-for="sourceListString" id="sourceLinksField" />
-        <input type="hidden" asp-for="categoryListString" id="categoryListField" />
+    <form asp-action="Crear" method="post" class="mt-5 col-md-10 col-12 d-flex flex-row gap-2 me-4" enctype="multipart/form-data">
 
         <!-- CREACION DE ENTRADA -->
-        <div class="mb-3">
-            <input asp-for="title" class="form-control fs-2 fw-bolder" placeholder="Agregar titulo" />
-            <span asp-validation-for="title" class="form-error"></span>
+        <div class="border-section col-9">
+            <!-- VALIDATION -->
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <!-- HIDDEN -->
+            <input type="hidden" asp-for="user_id" />
+            <input type="hidden" asp-for="format_id" />
+            <input type="hidden" asp-for="format" />
+            <input type="hidden" asp-for="draft" id="inputDraft" />
+            <input type="hidden" asp-for="mediaListString" id="imageLinksField" />
+            <input type="hidden" asp-for="sourceListString" id="sourceLinksField" />
+            <input type="hidden" asp-for="categoryListString" id="categoryListField" />
+
+            <div class="mb-3">
+                <input asp-for="title" class="form-control fs-2 fw-bolder" placeholder="Agregar titulo" />
+                <span asp-validation-for="title" class="form-error"></span>
+            </div>
+
+            <!-- POST -->
+            <div class="mb-3">
+                <!-- STYLES -->
+                <partial name="_TextControl" />
+
+                <!-- TEXT -->
+                <textarea asp-for="description" class="form-control textarea-style" rows="10" placeholder="Agregar contenido de la entrada" id="post_text"></textarea>
+                <span asp-validation-for="description" class="form-error"></span>
+            </div>
+
+            <!-- IMAGEN -->
+            <div class="mb-3">
+                <h3 class="fs-5">Cover</h3>
+                <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="@Model.ImageFile" class="form-control mt-2">
+            </div>
+
+            <!-- AGREGAR CATEGORIAS -->
+            <div class="mb-3">
+                <h3 class="fs-5">Categorias</h3>
+                <select class="form-select select-style" id="selectCategory" postId="@Model.id" onchange="addCategory(this)">
+                    <option disabled selected>Seleccione categorías</option>
+                    @foreach (var category in Model.categories)
+                    {
+                        <option value="@category.Value">@category.Text</option>
+                    }
+                </select>
+
+                <div class="mb-3 d-flex" id="categoryContainer"></div>
+            </div>
+
+            <!-- AGREGAR MULTIMEDIA -->
+            <div class="mb-3">
+                <h3 class="fs-5">Multi Media</h3>
+                <button type="button" class="btn btn-add mb-3" onclick="addInputMedia()">Agregar Multimedia</button>
+                <div id="inputContainerMedia">
+                </div>
+            </div>
+
+            <!--LINKS-->
+            <div class="mb-3">
+                <h3 class="fs-5">Links</h3>
+                <button type="button" class="btn btn-add mb-3" onclick="addInputLink()">Agregar Link</button>
+                <div id="inputContainerLinks">
+                </div>
+            </div>
+
+            <!-- BUTTON -->
+            <button type="submit" class="btn btn-action" onclick="enviarDatosAlServidor()">Publicar</button>
+            <button type="submit" class="btn btn-borrador" onclick="Borrador(); enviarDatosAlServidor();">Borrador</button>
+            <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-arrow-rotate-left"></i> Regresar</a>
         </div>
+        <!--SECTION HOME-->
+        <div class=" col-md-3 col-12 d-flex flex-column gap-2 me-4">
+            <div class="border-section" id="selectHomeSection">
+                <h3 class="fs-5">Sección</h3>
+                <select class="form-select select-style" id="selectHomeSectionName" asp-for="@Model.HomeSectionPost.HomeSectionId" onchange="actualizarItems()">
+                    <option selected>Ninguno</option>
+                    @foreach (var sectionHome in @Model.HomeSectionList)
+                    {
+                        <option value="@sectionHome.Id" data-items="@sectionHome.MaxItems">@sectionHome.Name</option>
+                    }
+                </select>
 
-        <!-- POST -->
-        <div class="mb-3">
-            <!-- STYLES -->
-            <partial name="_TextControl" />
-
-            <!-- TEXT -->
-            <textarea asp-for="description" class="form-control textarea-style" rows="10" placeholder="Agregar contenido de la entrada" id="post_text"></textarea>
-            <span asp-validation-for="description" class="form-error"></span>
-        </div>
-
-        <!-- IMAGEN -->
-        <div class="mb-3">
-            <h3 class="fs-5">Cover</h3>
-            <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="@Model.ImageFile" class="form-control mt-2">
-        </div>
-
-        <!-- AGREGAR CATEGORIAS -->
-        <div class="mb-3">
-            <h3 class="fs-5">Categorias</h3>
-            <select class="form-select select-style" id="selectCategory" postId="@Model.id" onchange="addCategory(this)">
-                <option disabled selected>Seleccione categorías</option>
-                @foreach (var category in Model.categories)
-                {
-                    <option value="@category.Value">@category.Text</option>
-                }
-            </select>
-
-            <div class="mb-3 d-flex" id="categoryContainer"></div>
-        </div>
-
-        <!-- AGREGAR MULTIMEDIA -->
-        <div class="mb-3">
-            <h3 class="fs-5">Multi Media</h3>
-            <button type="button" class="btn btn-add mb-3" onclick="addInputMedia()">Agregar Multimedia</button>
-            <div id="inputContainerMedia">
             </div>
         </div>
 
-        <!--LINKS-->
-        <div class="mb-3">
-            <h3 class="fs-5">Links</h3>
-            <button type="button" class="btn btn-add mb-3" onclick="addInputLink()">Agregar Link</button>
-            <div id="inputContainerLinks">
-            </div>
-        </div>
-
-        <!-- BUTTON -->
-        <button type="submit" class="btn btn-action" onclick="enviarDatosAlServidor()">Publicar</button>
-        <button type="submit" class="btn btn-borrador" onclick="Borrador(); enviarDatosAlServidor();">Borrador</button>
-        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-arrow-rotate-left"></i> Regresar</a>
     </form>
 
 </div>
@@ -93,16 +110,16 @@
 
             @if (Model?.categoryList != null)
             {
-                    @foreach (var item in Model.categoryList)
-                    {
-                            <text>
-                                            objs.push({
-                                                id: @item.Categoria.id,
-                                                postId: @Model.id,
-                                                name: "@item.Categoria.name"
-                                            });
-                            </text>
-                    }
+                                        @foreach (var item in Model.categoryList)
+                                        {
+                                                                    <text>
+                                                                                    objs.push({
+                                                                                        id: @item.Categoria.id,
+                                                                                        postId: @Model.id,
+                                                                                        name: "@item.Categoria.name"
+                                                                                    });
+                                                                    </text>
+                                        }
             }
 
             objs.forEach(x => addCategoryRefresh(x));
@@ -125,12 +142,12 @@
             // Agregamos opciones al select utilizando los SelectListItem del modelo
             @foreach (var item in Model?.mediaTypes)
             {
-                    <text>
-                            var option = document.createElement("option");
-                            option.text = "@item.Text";
-                            option.value = "@item.Value";
-                            select.add(option);
-                    </text>
+                                        <text>
+                                                var option = document.createElement("option");
+                                                option.text = "@item.Text";
+                                                option.value = "@item.Value";
+                                                select.add(option);
+                                        </text>
             }
 
             // Agregamos el select al div
@@ -178,13 +195,13 @@
             // Agregamos opciones al select utilizando los SelectListItem del modelo
             @foreach (var item in Model?.sources)
             {
-                    <text>
+                                        <text>
 
-                            var option = document.createElement("option");
-                            option.text = "@item.Text";
-                            option.value = "@item.Value";
-                            select.add(option);
-                    </text>
+                                                var option = document.createElement("option");
+                                                option.text = "@item.Text";
+                                                option.value = "@item.Value";
+                                                select.add(option);
+                                        </text>
             }
                 // Agregamos el select al div
                 div.appendChild(select);
@@ -217,5 +234,39 @@
             container.appendChild(div);
         }
 
+        // Seleccion de número de orden
+        function actualizarItems() {
+            const container = document.getElementById("selectHomeSection");
+            const oldSelect = document.getElementById("selectHomeSectionItems");
+
+            // Eliminar el select anterior si existe
+            if (oldSelect) {
+                container.removeChild(oldSelect);
+            }
+
+            const sectionSelect = document.getElementById("selectHomeSectionName");
+            const selectedOption = sectionSelect.options[sectionSelect.selectedIndex];
+            const totalItems = parseInt(selectedOption.getAttribute("data-items"), 10);
+
+            if (isNaN(totalItems) || totalItems <= 0) {
+                console.warn("Cantidad de items inválida.");
+                return;
+            }
+
+            // Crear nuevo select
+            const newSelect = document.createElement("select");
+            newSelect.id = "selectHomeSectionItems";
+            newSelect.name = "Order";
+            newSelect.className = "form-select select-style mt-3";
+
+            for (let i = 1; i <= totalItems; i++) {
+                const option = document.createElement("option");
+                option.value = i;
+                option.textContent = i;
+                newSelect.appendChild(option);
+            }
+
+            container.appendChild(newSelect);
+        }
     </script>
 }

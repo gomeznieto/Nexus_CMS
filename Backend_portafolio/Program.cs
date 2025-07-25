@@ -75,6 +75,7 @@ builder.Services.AddTransient<IApiService, ApiService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IHomeSectionService, HomeSectionService>();
+builder.Services.AddTransient<IHomeSectionPostService, HomeSectionPostService>();
 
 
 //****************************************************

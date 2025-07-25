@@ -26,6 +26,10 @@ namespace Backend_portafolio.Models
         [Display(Name = "Imagen")]
         public IFormFile ImageFile { get; set; }
 
+        //HOME SECTION
+        public List<HomeSectionModel> HomeSectionList { get; set; }
+        public HomeSectionPostModel HomeSectionPost { get; set; }
+
         // STRINGS
         public string userName { get; set; }
         public string format { get; set; }

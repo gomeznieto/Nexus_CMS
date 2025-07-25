@@ -2,45 +2,47 @@
 using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backend_portafolio.Services
 {
-    public interface IHomeSectionService
+    public interface IHomeSectionPostService
     {
         // Obtener todas las secciones del home para un usuario específico
-        Task<List<HomeSectionModel>> GetByUserAsync(int userId);
+        Task<List<HomeSectionPostModel>> GetByUserAsync(int userId);
 
         // Obtener una sección específica por Id y usuario (para editarla, validando dueño)
-        Task<HomeSectionModel?> GetByIdAsync(int id, int userId);
+        Task<HomeSectionPostModel> GetByPostIdAsync(int postId);
 
         // Crear una nueva sección
-        Task<int> CreateAsync(HomeSectionModel section);
+        Task<int> CreateAsync(HomeSectionPostModel section);
 
         // Editar una sección existente
-        Task UpdateAsync(HomeSectionModel section);
+        Task UpdateAsync(HomeSectionPostModel section);
 
         // Eliminar una sección
-        Task DeleteAsync(HomeSectionModel viewModel);
+        Task DeleteAsync(HomeSectionPostModel viewModel);
     }
 
-    public class HomeSectionService : IHomeSectionService
+    public class HomeSectionPostService : IHomeSectionPostService
     {
-        private readonly IRepositoryHomeSection _repositoryHomeSection;
+        private readonly IRepositoryHomeSectionPost _repositoryHomeSectionPost;
         private readonly IMapper _mapper;
         private readonly IUsersService _usersService;
 
-        public HomeSectionService(
-            IRepositoryHomeSection repositoryHomeSection,
+        public HomeSectionPostService(
+            IRepositoryHomeSectionPost repositoryHomeSectionPost,
             IMapper mapper,
             IUsersService usersService
             )
         {
-            _repositoryHomeSection = repositoryHomeSection;
+            _repositoryHomeSectionPost = repositoryHomeSectionPost;
             _mapper = mapper;
             _usersService = usersService;
         }
 
-        public async Task<int> CreateAsync(HomeSectionModel sectionModel)
+        // --- CREATE HOME SECTION POST ---
+        public async Task<int> CreateAsync(HomeSectionPostModel sectionModel)
         {
             try
             {
@@ -49,14 +51,14 @@ namespace Backend_portafolio.Services
                     throw new Exception("No se ha encontrado el usuario");
 
                 //Verificar que no exista con el mismo nombre otro
-                var existOrder = await _repositoryHomeSection.GetOrderAsync((int)sectionModel.Order, currenUser.id);
+                var existOrder = await _repositoryHomeSectionPost.DoesOrderExistAsync((int)sectionModel.Order, sectionModel.HomeSectionId);
 
                 if (existOrder)
                     sectionModel.Order = 0;
 
-                sectionModel.UserId = currenUser.id;
-                var section = _mapper.Map<HomeSection>(sectionModel);
-                await _repositoryHomeSection.Crear(section);
+                var section = _mapper.Map<HomeSectionPost>(sectionModel);
+
+                await _repositoryHomeSectionPost.Crear(section);
 
                 return section.Id;
             }
@@ -67,7 +69,7 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public async Task DeleteAsync(HomeSectionModel sectionModel)
+        public async Task DeleteAsync(HomeSectionPostModel sectionModel)
         {
             try
             {
@@ -77,12 +79,10 @@ namespace Backend_portafolio.Services
 
                 //Verificar que no exista con el mismo nombre otro
 
-                if(sectionModel?.Id is null)
+                if (sectionModel?.Id is null)
                     throw new Exception("No se ha encontrado la sección");
 
-                var section = _mapper.Map<HomeSection>(sectionModel);
-
-                await _repositoryHomeSection.Borrar((int)sectionModel.Id);
+                await _repositoryHomeSectionPost.Borrar((int)sectionModel.Id);
 
             }
             catch (Exception ex)
@@ -92,25 +92,42 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public Task<HomeSectionModel> GetByIdAsync(int id, int userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<List<HomeSectionModel>> GetByUserAsync(int userId)
+        public async Task<HomeSectionPostModel> GetByPostIdAsync(int postId)
         {
             try
             {
                 var currenUser = await _usersService.GetUserViewModel();
+
                 if (currenUser is null)
                     throw new Exception("No se ha encontrado el usuario");
 
-                var listHomeSection = await _repositoryHomeSection.Obtener(userId);
+                var homeSectionPostBD = await _repositoryHomeSectionPost.ObtenerPorPostId(postId);
+
+                var viewModel = _mapper.Map<HomeSectionPostModel>(homeSectionPostBD);
+
+                return viewModel;
+            }
+            catch (Exception)
+            {
+                throw new Exception("No se ha encontrado la sección del post");
+            }
+        }
+
+        public async Task<List<HomeSectionPostModel>> GetByUserAsync(int userId)
+        {
+            try
+            {
+                var currenUser = await _usersService.GetUserViewModel();
+
+                if (currenUser is null)
+                    throw new Exception("No se ha encontrado el usuario");
+
+                var listHomeSection = await _repositoryHomeSectionPost.Obtener(userId);
 
                 if (listHomeSection is null)
                     throw new Exception("No se han encontrado las secciones del Home");
 
-                var listaSectionModel = _mapper.Map<IEnumerable<HomeSectionModel>>(listHomeSection);
+                var listaSectionModel = _mapper.Map<IEnumerable<HomeSectionPostModel>>(listHomeSection);
 
                 return listaSectionModel.ToList();
             }
@@ -121,7 +138,7 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public async Task UpdateAsync(HomeSectionModel sectionModel)
+        public async Task UpdateAsync(HomeSectionPostModel sectionModel)
         {
             try
             {
@@ -130,23 +147,21 @@ namespace Backend_portafolio.Services
                 if (currentUser is null)
                     throw new Exception("No se ha encontrado el usuario");
 
-                sectionModel.UserId = currentUser.id;
-
                 //Verificar si existe la sección
-                var existSection = await _repositoryHomeSection.Obtener((int)sectionModel.Id, currentUser.id);
+                var existSection = await _repositoryHomeSectionPost.ObtenerPorId((int)sectionModel.Id);
 
-                if(existSection is null)
+                if (existSection is null)
                     throw new Exception("No se ha encontrado la sección");
 
 
                 //Verificar si el orden existe
-                var existOrder = await _repositoryHomeSection.GetOrderAsync((int)sectionModel.Order, currentUser.id);
+                var existOrder = await _repositoryHomeSectionPost.DoesOrderExistAsync((int)sectionModel.Order, sectionModel.HomeSectionId);
 
                 if (existOrder)
                     sectionModel.Order = existSection.Order;
 
-                var section = _mapper.Map<HomeSection>(sectionModel);
-                await _repositoryHomeSection.Editar(section);
+                var section = _mapper.Map<HomeSectionPost>(sectionModel);
+                await _repositoryHomeSectionPost.Editar(section);
 
             }
             catch (Exception ex)

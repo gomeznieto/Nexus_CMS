@@ -41,6 +41,9 @@ namespace Backend_portafolio.Sevices
         private readonly ILinkService _linkService;
         private readonly IEncryptionService _encryptionService;
         private readonly IImageService _imageService;
+        private readonly IRepositoryHomeSection _repositoryHomeSection;
+        private readonly IHomeSectionService _homeSectionService;
+        private readonly IHomeSectionPostService _homeSectionPostService;
         private readonly ISourceService _sourceService;
         private readonly HttpContext _httpContext;
         private readonly IMapper _mapper;
@@ -60,6 +63,9 @@ namespace Backend_portafolio.Sevices
             IHttpContextAccessor httpContextAccessor,
             IEncryptionService encryptionService,
             IImageService imageService,
+            IRepositoryHomeSection repositoryHomeSection,
+            IHomeSectionService homeSectionService,
+            IHomeSectionPostService homeSectionPostService,
             IMapper mapper)
         {
             _repositoryCategorias = repositoryCategorias;
@@ -73,6 +79,9 @@ namespace Backend_portafolio.Sevices
             _linkService = linkService;
             _encryptionService = encryptionService;
             _imageService = imageService;
+            _repositoryHomeSection = repositoryHomeSection;
+            _homeSectionService = homeSectionService;
+            _homeSectionPostService = homeSectionPostService;
             _sourceService = sourceService;
             _usersService = usersService;
             _httpContext = httpContextAccessor.HttpContext;
@@ -123,10 +132,18 @@ namespace Backend_portafolio.Sevices
                 var cantidadPorPagina = Session.GetCantidadPostsSession(_httpContext);
                 IEnumerable<PostViewModel> posts = _mapper.Map<IEnumerable<PostViewModel>>(await _repositoryPosts.ObtenerPorFormato(format, cantidadPorPagina, pagina, usuarioID));
 
-                //Obtenemos categorias para mostrar en lista
+                //Obtenemos categorias y seccion del home para mostrar en lista
                 foreach (var post in posts)
                 {
                     post.categoryList = await _repositoryCategorias.ObtenerCategoriaPostPorId(post.id);
+                    post.HomeSectionPost = await _homeSectionPostService.GetByPostIdAsync(post.id) ?? new HomeSectionPostModel
+                    {
+                        Id = null,
+                        PostId = post.id,
+                        Order = 0,
+                        HomeSectionId = 0,
+                        Name = "-"
+                    };
                 }
 
                 return posts.ToList();
@@ -227,6 +244,7 @@ namespace Backend_portafolio.Sevices
                     viewModel.user_id = usuarioID;
                 }
 
+                // FORMATOS
                 viewModel.formats = await ObtenerFormatos();
                 viewModel.format_id = int.Parse(viewModel.formats.Where(f => f.Text == format).Select(f => f.Value).FirstOrDefault());
                 viewModel.format = format;
@@ -234,7 +252,20 @@ namespace Backend_portafolio.Sevices
                 if (viewModel.format_id == 0)
                     throw new Exception("¡El formato no existe!");
 
-                //Obtenemos Categorias Select List parar mostrar en la vista
+                // HOME SECTION
+                viewModel.HomeSectionList = await _homeSectionService.GetByUserAsync(usuarioID);
+
+                // HOME SECTION POST
+                viewModel.HomeSectionPost = await _homeSectionPostService.GetByPostIdAsync(viewModel.id)
+                    ?? new HomeSectionPostModel
+                    {
+                        Id = null,
+                        PostId = viewModel.id,
+                        Order = 0,
+                        HomeSectionId = 0
+                    };
+
+                // CATEGORIAS
                 if (viewModel.id != 0)
                 {
                     viewModel.mediaList = await _mediaService.GetMediaByPost(viewModel.id);
@@ -401,6 +432,14 @@ namespace Backend_portafolio.Sevices
                     List<CategoryForm> categoriesForms = _categoriaService.SerealizarJsonCategoryForm(viewModel.categoryListString);
                     await _categoriaService.CreateCategoriesForm(viewModel.id, categoriesForms);
                 }
+
+                // Guardar Seccion
+                if (viewModel.HomeSectionPost.HomeSectionId != 0)
+                {
+                    var homeSectionModel = _mapper.Map<HomeSectionPostModel>(viewModel.HomeSectionPost);
+                    //homeSectionModel.PostId = viewModel.id;
+                    await _homeSectionPostService.CreateAsync(homeSectionModel);
+                }
             }
             catch (Exception ex)
             {
@@ -563,6 +602,42 @@ namespace Backend_portafolio.Sevices
                         }
                     }
                 }
+
+                // HOME SECTION POST
+                // PUEDE VENIR SIN ID POR TRATARSE DE UNA NUEVA SECCION
+                if (viewModel.HomeSectionPost is not null && viewModel.HomeSectionPost.HomeSectionId != 0)
+                {
+                    // Verificamos si la sección ya existe
+                    var homeSectionPost = await _homeSectionPostService.GetByPostIdAsync(viewModel.id);
+
+                    if (homeSectionPost is null)
+                    {
+                        // Creamos una nueva sección
+                        var homeSectionModel = _mapper.Map<HomeSectionPostModel>(viewModel.HomeSectionPost);
+                        await _homeSectionPostService.CreateAsync(homeSectionModel);
+                    }
+                    else
+                    {
+                        // Actualizamos la sección existente
+                        homeSectionPost.Order = viewModel.HomeSectionPost.Order;
+                        homeSectionPost.HomeSectionId = viewModel.HomeSectionPost.HomeSectionId;
+                        await _homeSectionPostService.UpdateAsync(homeSectionPost);
+                    }
+                }
+                else
+                {
+                    // Borramos la sección del post si no se ha seleccionado una sección
+                    if (viewModel.HomeSectionPost.HomeSectionId == 0)
+                    {
+                        var homeSectionPost = await _homeSectionPostService.GetByPostIdAsync(viewModel.id);
+
+                        if (homeSectionPost is not null)
+                        {
+                            await _homeSectionPostService.DeleteAsync(homeSectionPost);
+                        }
+                    }
+                }
+
 
             }
             catch (Exception ex)

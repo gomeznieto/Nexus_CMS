@@ -1,4 +1,5 @@
 ﻿using Backend_portafolio.Entities;
+using Backend_portafolio.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -17,7 +18,10 @@ namespace Backend_portafolio.Datos
         Task Borrar(int id);
         Task Crear(HomeSectionPost homeSectionPost);
         Task Editar(HomeSectionPost homeSectionPost);
+        Task<bool> DoesOrderExistAsync(int Order, int HomeSectionId);
         Task<IEnumerable<HomeSectionPost>> Obtener(int userId);
+        Task<HomeSectionPostModel> ObtenerPorPostId(int postId);
+        Task<HomeSectionPostModel> ObtenerPorId(int postId);
     }
 
     public class RepositoryHomeSectionPost : IRepositoryHomeSectionPost
@@ -41,7 +45,7 @@ namespace Backend_portafolio.Datos
         public async Task Crear(HomeSectionPost homeSectionPost)
         {
             using var connection = new SqlConnection(_connectionString);
-            var id = await connection.ExecuteScalarAsync<int>($@"INSERT INTO {HOMESECTIONPOST.TABLA} ({HOMESECTIONPOST.HOMESECTION_ID}, {HOMESECTIONPOST.POST_ID}, {HOMESECTIONPOST.ORDER}) VALUES (@{HOMESECTIONPOST.HOMESECTION_ID}, @{HOMESECTIONPOST.POST_ID}, @{HOMESECTIONPOST.ORDER}); SELECT SCOPE_IDENTITY();", homeSectionPost);
+            var id = await connection.ExecuteScalarAsync<int>($@"INSERT INTO {HOMESECTIONPOST.TABLA} ({HOMESECTIONPOST.HOMESECTION_ID}, {HOMESECTIONPOST.POST_ID}, [{HOMESECTIONPOST.ORDER}]) VALUES (@{HOMESECTIONPOST.HOMESECTION_ID}, @{HOMESECTIONPOST.POST_ID}, @{HOMESECTIONPOST.ORDER}); SELECT SCOPE_IDENTITY();", homeSectionPost);
             homeSectionPost.Id = id;
         }
 
@@ -51,7 +55,7 @@ namespace Backend_portafolio.Datos
             try
             {
                 using var connection = new SqlConnection(_connectionString);
-                await connection.ExecuteAsync($@"UPDATE {HOMESECTIONPOST.TABLA} SET {HOMESECTIONPOST.HOMESECTION_ID} = @{HOMESECTIONPOST.HOMESECTION_ID}, {HOMESECTIONPOST.POST_ID} = @{HOMESECTIONPOST.POST_ID}, {HOMESECTIONPOST.ORDER} = @{HOMESECTIONPOST.ORDER} WHERE {HOMESECTIONPOST.ID} = @{HOMESECTIONPOST.ID}", homeSectionPost);
+                await connection.ExecuteAsync($@"UPDATE {HOMESECTIONPOST.TABLA} SET {HOMESECTIONPOST.HOMESECTION_ID} = @{HOMESECTIONPOST.HOMESECTION_ID}, {HOMESECTIONPOST.POST_ID} = @{HOMESECTIONPOST.POST_ID}, [{HOMESECTIONPOST.ORDER}] = @{HOMESECTIONPOST.ORDER} WHERE {HOMESECTIONPOST.ID} = @{HOMESECTIONPOST.ID}", homeSectionPost);
             }
             catch (SqlException ex)
             {
@@ -65,6 +69,49 @@ namespace Backend_portafolio.Datos
         {
             using var connection = new SqlConnection(_connectionString);
             await connection.ExecuteAsync($@"DELETE FROM {HOMESECTIONPOST.TABLA} WHERE {HOMESECTIONPOST.ID} = @{HOMESECTIONPOST.ID}", new { id });
+        }
+
+        // --- BUSCAR SI EL NUMERO DE ORDEN ESTA SIENDO UTILIZADO ---
+        public async Task<bool> DoesOrderExistAsync(int order, int homeSectionId)
+        {
+            const string query = $@"SELECT 1 FROM {HOMESECTIONPOST.TABLA} WHERE {HOMESECTIONPOST.HOMESECTION_ID} = @{HOMESECTIONPOST.HOMESECTION_ID} AND [{HOMESECTIONPOST.ORDER}] = @{HOMESECTIONPOST.ORDER}";
+
+            using var connection = new SqlConnection(_connectionString);
+
+            var result = await connection.QueryFirstOrDefaultAsync<int?>(query, new
+            {
+                HomeSectionId = homeSectionId,
+                Order = order
+            });
+
+            return result.HasValue;
+        }
+
+        public async Task<HomeSectionPostModel> ObtenerPorPostId(int postId)
+        {
+            var query = $@"SELECT {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.ID}, {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.HOMESECTION_ID}, {HOMESECTIONPOST.TABLA}.[{HOMESECTIONPOST.ORDER}], {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.POST_ID}, {HOMESECTION.TABLA}.{HOMESECTION.NOMBRE} 
+                           FROM {HOMESECTIONPOST.TABLA} 
+                           JOIN {HOMESECTION.TABLA} ON {HOMESECTION.TABLA}.{HOMESECTION.ID} = {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.HOMESECTION_ID}
+                           WHERE {HOMESECTIONPOST.POST_ID} = @{HOMESECTIONPOST.POST_ID}";
+            using var connection = new SqlConnection(_connectionString);
+
+            var result = await connection.QueryFirstOrDefaultAsync<HomeSectionPostModel>(query, new { PostId = postId });
+
+            return result;
+
+        }
+
+        public async Task<HomeSectionPostModel> ObtenerPorId(int id)
+        {
+            var query = $@"SELECT {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.ID}, {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.HOMESECTION_ID}, {HOMESECTIONPOST.TABLA}.[{HOMESECTIONPOST.ORDER}], {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.POST_ID}, {HOMESECTION.TABLA}.{HOMESECTION.NOMBRE} 
+                           FROM {HOMESECTIONPOST.TABLA} 
+                           JOIN {HOMESECTION.TABLA} ON {HOMESECTION.TABLA}.{HOMESECTION.ID} = {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.HOMESECTION_ID}
+                           WHERE {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.ID} = @{HOMESECTIONPOST.ID}";
+            using var connection = new SqlConnection(_connectionString);
+
+            var result = await connection.QueryFirstOrDefaultAsync<HomeSectionPostModel>(query, new { Id = id });
+
+            return result;
         }
     }
 }
