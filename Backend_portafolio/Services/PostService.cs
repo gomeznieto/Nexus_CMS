@@ -25,6 +25,8 @@ namespace Backend_portafolio.Sevices
         Task<int> GetCountPostByFormat(string format);
         Task EditarBorrador(int id, bool draft);
         Task<int> GetCountPostByUser(int user_id);
+
+        Task<List<ApiHomeSectionPostViewModel>> GetPostsGroupedBySectionAsync(int homeSectionId, UserViewModel user);
     }
 
     public class PostService : IPostService
@@ -746,6 +748,49 @@ namespace Backend_portafolio.Sevices
         {
             var mediaTypes = await _sourceService.GetAllSource();
             return mediaTypes.Select(mediatype => new SelectListItem(mediatype.name, mediatype.id.ToString()));
+        }
+
+        //****************************************************
+        //************** POST POR HOME SECTION ***************
+        //****************************************************
+
+        public async Task<List<ApiHomeSectionPostViewModel>> GetPostsGroupedBySectionAsync(int homeSectionId, UserViewModel user)
+        {
+            try
+            {
+                var homeSectionPosts = await _homeSectionPostService.GetByHomeSectionIdAsync(homeSectionId);
+
+                var posts = new List<ApiHomeSectionPostViewModel>();
+                List<ApiHomeSectionPostViewModel> homeSectionPostsViewModel = new List<ApiHomeSectionPostViewModel>();
+
+                foreach (var homeSectionPost in homeSectionPosts)
+                {
+                    var post = await GetPostById(homeSectionPost.PostId, user.id);
+                    var categories = await _categoriaService.GetCategoriasByPost(post.id);
+
+                    if (post != null && homeSectionPost.HomeSectionId == homeSectionId)
+                    {
+                        var postViewModel = new ApiHomeSectionPostViewModel
+                        {
+                            Id = post.id,
+                            Title = post.title,
+                            Cover = post.cover, 
+                            CategoriesList = categories.ToList(),
+                            Slug = Utils.GenerateSlug(post.title)
+                        };
+
+                        posts.Add(postViewModel);
+                    }
+                }
+
+                return posts.ToList();
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

@@ -101,9 +101,9 @@ namespace Backend_portafolio.Services
         {
             try
             {
-                var currenUser = await _usersService.GetUserViewModel();
-                if (currenUser is null)
-                    throw new Exception("No se ha encontrado el usuario");
+                //var currenUser = await _usersService.GetUserViewModel();
+                //if (currenUser is null)
+                //    throw new Exception("No se ha encontrado el usuario");
 
                 var listHomeSection = await _repositoryHomeSection.Obtener(userId);
 

@@ -15,6 +15,7 @@ namespace Backend_portafolio.Services
         Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetAllPosts(string apiKey);
         Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetPostsPagination(string apiKey, int pageNumber, int pageSize);
         Task<ApiResponse<ApiUserViewModel>> GetUser(string apiKey);
+        Task<List<ApiHomeSectionViewModel>> GetHomeSection(string apiKey);
     }
     public class ApiService : IApiService
     {
@@ -29,6 +30,7 @@ namespace Backend_portafolio.Services
         private readonly ILinkService _linkService;
         private readonly IUsersService _usersService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IHomeSectionService _homeSectionService;
 
         public ApiService(
             IBioService bioService,
@@ -41,7 +43,8 @@ namespace Backend_portafolio.Services
             IPostService postService,
             ITokenService tokenService,
             IUsersService usersService,
-            IWebHostEnvironment webHostEnvironment
+            IWebHostEnvironment webHostEnvironment,
+            IHomeSectionService homeSectionService
         )
         {
             _bioService = bioService;
@@ -55,6 +58,7 @@ namespace Backend_portafolio.Services
             _tokenService = tokenService;
             _usersService = usersService;
             _webHostEnvironment = webHostEnvironment;
+            _homeSectionService = homeSectionService;
         }
 
         //****************************************************
@@ -182,6 +186,44 @@ namespace Backend_portafolio.Services
 
                 return result;
 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        //****************************************************
+        //*********************** HOME ***********************
+        //****************************************************
+        public async Task<List<ApiHomeSectionViewModel>> GetHomeSection(string apiKey)
+        {
+            try
+            {
+                await _tokenService.ValidateApiKey(apiKey);
+                var user = await _usersService.GetUserByApiKey(apiKey);
+
+                if(user is null)
+                {
+                    throw new Exception("No tiene autorización");
+                }
+
+                var homeSections = await _homeSectionService.GetByUserAsync(user.id);
+
+                var homeSectionViewModels = homeSections.Select(async el =>
+                {
+                    var postListBySection = await _postService.GetPostsGroupedBySectionAsync((int)el.Id, user);
+
+                    return new ApiHomeSectionViewModel()
+                    {
+                        HomeSectionId = (int)el.Id,
+                        HomeSectionName = el.Name,
+                        SectionOrder = (int)el.Order,
+                        Posts = postListBySection,
+                    };
+                });
+
+                return (await Task.WhenAll(homeSectionViewModels)).ToList();
             }
             catch (Exception ex)
             {

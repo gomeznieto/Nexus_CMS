@@ -35,7 +35,7 @@ namespace Backend_portafolio.Controllers
                 return BadRequest(new ApiResponse<string>()
                 {
                     Success = false,
-                    Message = "Ah ocurrido un error",
+                    Message = "Ha ocurrido un error",
                     Data = ex.Message,
                 });
             }
@@ -59,7 +59,7 @@ namespace Backend_portafolio.Controllers
                 return BadRequest(new ApiResponse<string>()
                 {
                     Success = false,
-                    Message = "Ah ocurrido un error",
+                    Message = "Ha ocurrido un error",
                     Data = ex.Message,
                 });
             }
@@ -84,7 +84,31 @@ namespace Backend_portafolio.Controllers
                 return BadRequest(new ApiResponse<string>()
                 {
                     Success = false,
-                    Message = "Ah ocurrido un error",
+                    Message = "Ha ocurrido un error",
+                    Data = ex.Message,
+                });
+            }
+        }
+
+        //****************************************************
+        //********************** HOME** **********************
+        //****************************************************
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> Home([FromHeader(Name = "X-Api-Key")] string apiKey)
+        {
+            try
+            {
+                var home = await _apiService.GetHomeSection(apiKey);
+                return Ok(home);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<string>()
+                {
+                    Success = false,
+                    Message = "Ha ocurrido un error",
                     Data = ex.Message,
                 });
             }
@@ -108,7 +132,7 @@ namespace Backend_portafolio.Controllers
                 return BadRequest(new ApiResponse<string>()
                 {
                     Success = false,
-                    Message = "Ah ocurrido un error",
+                    Message = "Ha ocurrido un error",
                     Data = ex.Message,
                 });
             }
@@ -129,7 +153,7 @@ namespace Backend_portafolio.Controllers
                 return BadRequest(new ApiResponse<string>()
                 {
                     Success = false,
-                    Message = "Ah ocurrido un error",
+                    Message = "Ha ocurrido un error",
                     Data = ex.Message,
                 });
             }
@@ -149,7 +173,7 @@ namespace Backend_portafolio.Controllers
                 return BadRequest(new ApiResponse<string>()
                 {
                     Success = false,
-                    Message = "Ah ocurrido un error",
+                    Message = "Ha ocurrido un error",
                     Data = ex.Message,
                 });
             }

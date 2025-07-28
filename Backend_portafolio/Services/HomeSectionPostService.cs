@@ -9,7 +9,10 @@ namespace Backend_portafolio.Services
     public interface IHomeSectionPostService
     {
         // Obtener todas las secciones del home para un usuario específico
-        Task<List<HomeSectionPostModel>> GetByUserAsync(int userId);
+        Task<List<HomeSectionPostModel>> GetByUserAsync(UserViewModel user);
+
+        // Obtener todas las secciones del home para un usuario específico y una sección específica
+        Task<List<HomeSectionPostModel>> GetByHomeSectionIdAsync( int homeSectionId);
 
         // Obtener una sección específica por Id y usuario (para editarla, validando dueño)
         Task<HomeSectionPostModel> GetByPostIdAsync(int postId);
@@ -92,6 +95,26 @@ namespace Backend_portafolio.Services
             }
         }
 
+        public async Task<List<HomeSectionPostModel>> GetByHomeSectionIdAsync( int homeSectionId)
+        {
+            try
+            {
+                var listHomeSection = await _repositoryHomeSectionPost.ObtenerPorHomeSectionId(homeSectionId);
+
+                if (listHomeSection is null)
+                    throw new Exception("No se han encontrado las secciones del Home");
+
+                var listaSectionModel = _mapper.Map<IEnumerable<HomeSectionPostModel>>(listHomeSection);
+
+                return listaSectionModel.ToList();
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<HomeSectionPostModel> GetByPostIdAsync(int postId)
         {
             try
@@ -113,16 +136,11 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public async Task<List<HomeSectionPostModel>> GetByUserAsync(int userId)
+        public async Task<List<HomeSectionPostModel>> GetByUserAsync(UserViewModel user)
         {
             try
             {
-                var currenUser = await _usersService.GetUserViewModel();
-
-                if (currenUser is null)
-                    throw new Exception("No se ha encontrado el usuario");
-
-                var listHomeSection = await _repositoryHomeSectionPost.Obtener(userId);
+                var listHomeSection = await _repositoryHomeSectionPost.Obtener(user.id);
 
                 if (listHomeSection is null)
                     throw new Exception("No se han encontrado las secciones del Home");

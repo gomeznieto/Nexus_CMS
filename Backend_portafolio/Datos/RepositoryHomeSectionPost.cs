@@ -22,6 +22,7 @@ namespace Backend_portafolio.Datos
         Task<IEnumerable<HomeSectionPost>> Obtener(int userId);
         Task<HomeSectionPostModel> ObtenerPorPostId(int postId);
         Task<HomeSectionPostModel> ObtenerPorId(int postId);
+        Task<IEnumerable<HomeSectionPostModel>> ObtenerPorHomeSectionId(int homeSectionId);
     }
 
     public class RepositoryHomeSectionPost : IRepositoryHomeSectionPost
@@ -38,7 +39,7 @@ namespace Backend_portafolio.Datos
         {
             using var connection = new SqlConnection(_connectionString);
 
-            return await connection.QueryAsync<HomeSectionPost>($@"SELECT {HOMESECTIONPOST.ID}, {HOMESECTIONPOST.HOMESECTION_ID}, {HOMESECTIONPOST.POST_ID} FROM {HOMESECTIONPOST.TABLA} WHERE {HOMESECTIONPOST.HOMESECTION_ID} = @{HOMESECTIONPOST.HOMESECTION_ID} ORDER BY {HOMESECTIONPOST.ORDER}", new { HomeSectionId });
+            return await connection.QueryAsync<HomeSectionPost>($@"SELECT {HOMESECTIONPOST.ID}, {HOMESECTIONPOST.HOMESECTION_ID}, {HOMESECTIONPOST.POST_ID} FROM {HOMESECTIONPOST.TABLA} WHERE {HOMESECTIONPOST.HOMESECTION_ID} = @{HOMESECTIONPOST.HOMESECTION_ID} ORDER BY [{HOMESECTIONPOST.ORDER}]", new { HomeSectionId });
         }
 
         // --- AGREGAR UN HOME SECTION ---
@@ -110,6 +111,19 @@ namespace Backend_portafolio.Datos
             using var connection = new SqlConnection(_connectionString);
 
             var result = await connection.QueryFirstOrDefaultAsync<HomeSectionPostModel>(query, new { Id = id });
+
+            return result;
+        }
+
+        public async Task<IEnumerable<HomeSectionPostModel>> ObtenerPorHomeSectionId(int homeSectionId)
+        {
+            var query = $@"SELECT {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.ID}, {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.HOMESECTION_ID}, {HOMESECTIONPOST.TABLA}.[{HOMESECTIONPOST.ORDER}], {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.POST_ID}, {HOMESECTION.TABLA}.{HOMESECTION.NOMBRE} 
+                           FROM {HOMESECTIONPOST.TABLA} 
+                           JOIN {HOMESECTION.TABLA} ON {HOMESECTION.TABLA}.{HOMESECTION.ID} = {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.HOMESECTION_ID}
+                           WHERE {HOMESECTIONPOST.TABLA}.{HOMESECTIONPOST.HOMESECTION_ID} = @{HOMESECTIONPOST.HOMESECTION_ID}";
+            using var connection = new SqlConnection(_connectionString);
+
+            var result = await connection.QueryAsync<HomeSectionPostModel>(query, new { HomeSectionId = homeSectionId });
 
             return result;
         }
