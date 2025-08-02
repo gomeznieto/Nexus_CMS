@@ -21,6 +21,8 @@ namespace Backend_portafolio.Models
         public string about { get; set; }
         [Display(Name = "Hobbies")]
         public string hobbies { get; set; }
+        [Display(Name = "Headline")]
+        public string headline { get; set; }
         [Display(Name = "Email")]
         [Remote(action: "VerificarExisteEmail", controller: "Users")]
         [Required(ErrorMessage = "El campo {0} es requerido")]

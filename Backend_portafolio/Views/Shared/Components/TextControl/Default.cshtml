@@ -1,0 +1,32 @@
+﻿@model TextControlModel
+
+<div class="mb-3">
+    <!-- BOTONES -->
+    <div class="d-flex flex-row align-content-center flex-lg-wrap gap-1 mb-3">
+        <a class="btn btn-add mb-1" id="btn-h1" onclick="addTextFormat('h1')"><span class="fs-6">h1</span></a>
+        <a class="btn btn-add mb-1" id="btn-h1" onclick="addTextFormat('h2')"><span class="fs-6">h2</span></a>
+        <a class="btn btn-add mb-1" id="btn-h1" onclick="addTextFormat('h3')"><span class="fs-6">h3</span></a>
+        <a class="btn btn-add mb-1" id="btn-h1" onclick="addTextFormat('bold')"><strong>Bold</strong></a>
+        <a class="btn btn-add mb-1" id="btn-h1" onclick="addTextFormat('italic')"><span class="fst-italic">Italic</span></a>
+        <a class="btn btn-add mb-1" id="btn-h1" onclick="addTextFormat('link')"><i class="fa-solid fa-link"></i></a>
+        <a class="btn btn-add mb-1" id="btn-h1" onclick="addTextFormat('image')"><i class="fa-regular fa-image"></i></a>
+        <a class="btn btn-add mb-1" onclick="addTextFormat('quote')" title="Cita"><i class="fa-solid fa-quote-left"></i></a>
+        <a class="btn btn-add mb-1" onclick="addTextFormat('hr')" title="Línea horizontal"><i class="fa-solid fa-minus"></i></a>
+        <select id="selectLanguage" class="form-select select-style-text-control">
+            <option value="-" selected>Elegir</option>
+
+            @foreach (var language in Model.Language)
+            {
+                <option value="@language" >@language</option>
+            }
+            )
+
+        </select>
+        <a class="btn btn-add mb-1" id="btn-h1" onclick="addTextFormat('code')"><i class="fa-solid fa-code"></i></a>
+    </div>
+    <!-- TEXT -->
+    <textarea name="@Model.FieldName" class="form-control textarea-style" rows="10" placeholder="Agregar contenido de la entrada" id="post_text">@Model.FieldValue</textarea>
+
+    <!-- VALIDACION -->
+    <span asp-validation-for="@Model.FieldName" class="form-error"></span>
+</div>

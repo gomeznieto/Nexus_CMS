@@ -7,6 +7,7 @@
         public string Cover { get; set; }
         public string Slug { get; set; }
         public List<Category_Post> CategoriesList { get; set; }
+        public string Format { get; set; }
 
     }
 }

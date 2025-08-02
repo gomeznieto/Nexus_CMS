@@ -9,6 +9,7 @@ namespace Backend_portafolio.Models
         public string about { get; set; }
         public string hobbies { get; set; }
         public string email { get; set; }
+        public string headline { get; set; }
         public List<Bio> Bios { get; set; }
         public List<SocialNetworkViewModel> Networks { get; set; }
 

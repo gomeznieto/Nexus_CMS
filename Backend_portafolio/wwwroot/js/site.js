@@ -419,32 +419,40 @@ function addTextFormat(style) {
 }
 
 function textFormat(format, text) {
+    let language = document.getElementById("selectLanguage").value;
+    text = text.trim();
 
     switch (format) {
         case "h1":
             return `# ${text}`;
-            break;
         case "h2":
             return `## ${text}`;
-            break;
         case "h3":
             return `### ${text}`;
-            break;
         case "bold":
             return `**${text}**`;
-            break;
         case "italic":
             return `*${text}*`;
-            break;
+        case "strike":
+            return `~~${text}~~`;
+        case "inline-code":
+            return `\`${text}\``;
         case "link":
             return `[title](${text})`;
-            break;
         case "image":
             return `![alt text](${text})`;
-            break;
+        case "code":
+            return `\`\`\`${language}\n${text}\n\`\`\``;
+        case "quote":
+            return text.split("\n").map(line => `> ${line.trim()}`).join("\n");
+        case "ul":
+            return text.split("\n").map(line => `- ${line.trim()}`).join("\n");
+        case "ol":
+            return text.split("\n").map((line, idx) => `${idx + 1}. ${line.trim()}`).join("\n");
+        case "hr":
+            return `\n---\n`;
         default:
-            return "?";
-            break;
+            return text;
     }
 }
 

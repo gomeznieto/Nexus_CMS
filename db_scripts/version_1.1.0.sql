@@ -28,6 +28,7 @@ CREATE TABLE [dbo].[users](
 	[usernameNormalizado] [varchar](100) NOT NULL,
 	[role] [int] NOT NULL,
 	[img] [varchar](255) NULL,
+	[headline] [varchar](255) NULL,
 	[cv] [varchar](255) NULL,
 	[about] [varchar](255) NULL,
 	[hobbies] [varchar](255) NULL,

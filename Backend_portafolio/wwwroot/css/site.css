@@ -321,6 +321,14 @@ form input[type="file"]::file-selector-button {
         color: var(--text-color-primary) !important;
     }
 
+.select-style-text-control {
+    background-color: var(--bg-color-primary);
+    color: var(--text-color-menu);
+    min-width: 30%;
+    max-width: 40%;
+
+}
+
 .input-style,
 .select-style,
 .textarea-style {

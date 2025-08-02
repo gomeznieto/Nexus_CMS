@@ -45,6 +45,16 @@
         </div>
         <span asp-validation-for="email" class="validate-error"></span>
         <!-- FIN MAIL-->
+        <!-- HEADLINE -->
+        <div class="d-flex  align-items-center mt-2">
+            <div class="w-25">
+                <p class="fw-bold">Headline</p>
+            </div>
+            <div class="w-75">
+                <input asp-for="@Model.headline" title="Este es el headline que se mostrará" class="form-control" />
+            </div>
+        </div>
+        <!-- FIN HEADLINE-->
         <!-- ABOUT-->
         <div class="d-flex align-items-center mt-4">
             <div class="w-25">

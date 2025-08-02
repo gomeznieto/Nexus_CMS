@@ -776,7 +776,8 @@ namespace Backend_portafolio.Sevices
                             Title = post.title,
                             Cover = post.cover, 
                             CategoriesList = categories.ToList(),
-                            Slug = Utils.GenerateSlug(post.title)
+                            Slug = Utils.GenerateSlug(post.title),
+                            Format = post.format
                         };
 
                         posts.Add(postViewModel);

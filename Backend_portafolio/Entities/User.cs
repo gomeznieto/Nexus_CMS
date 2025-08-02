@@ -8,6 +8,7 @@
         public string usernameNormalizado { get; set; }
         public int role { get; set; }
         public string img { get; set; }
+        public string headline { get; set; }
         public string cv { get; set; }
         public string about { get; set; }
         public string hobbies { get; set; }

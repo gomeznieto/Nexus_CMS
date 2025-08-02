@@ -72,7 +72,7 @@ namespace Backend_portafolio.Datos
         {
             using var connection = new SqlConnection(_connectionString);
             await connection.ExecuteAsync(@"
-            UPDATE users SET name = @name, email = @email, emailNormalizado = @emailNormalizado, cv = @cv, about = @about, hobbies = @hobbies, img = @img, role = @role, passwordHash = @passwordHash, apiKey = @apiKey
+            UPDATE users SET name = @name, email = @email, emailNormalizado = @emailNormalizado, cv = @cv, about = @about, hobbies = @hobbies, headline = @headline, img = @img, role = @role, passwordHash = @passwordHash, apiKey = @apiKey
             WHERE id = @id
             ", user);
         }

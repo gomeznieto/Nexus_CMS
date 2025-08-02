@@ -13,6 +13,7 @@
 }
 
 function textFormat(format, text) {
+    let language = document.getElementById("selectLanguage").value;
 
     switch (format) {
         case "h1":
@@ -35,6 +36,9 @@ function textFormat(format, text) {
             break;
         case "image":
             return `![alt text](${text})`;
+            break;
+        case "code":
+            return `\`\`\`${language}\n${text}\n\`\`\``;
             break;
         default:
             return "?";

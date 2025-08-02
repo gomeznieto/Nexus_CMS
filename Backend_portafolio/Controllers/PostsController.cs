@@ -3,8 +3,9 @@ using Backend_portafolio.Entities;
 using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
 using Backend_portafolio.Services;
-using Microsoft.AspNetCore.Mvc;
 using Backend_portafolio.Sevices;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Backend_portafolio.Controllers
 {
@@ -124,13 +125,20 @@ namespace Backend_portafolio.Controllers
             if (!ModelState.IsValid)
             {
                 viewModel = await _postService.PrepareViewModel(viewModel);
-                Session.CrearModalSuccess("Sección creado correctamente", "Home", HttpContext);
+                foreach (var modelState in ViewData.ModelState.Values)
+                {
+                    foreach (ModelError error in modelState.Errors)
+                    {
+                        Console.WriteLine(error.ErrorMessage);
+                    }
+                }
                 return View(viewModel);
             }
 
             try
             {
                 await _postService.CreatePost(viewModel);
+                Session.CrearModalSuccess("Entrada creada correctamente", "Home", HttpContext);
                 return RedirectToAction("Index", "Posts", new { format = viewModel.format });
             }
             catch (Exception ex)
