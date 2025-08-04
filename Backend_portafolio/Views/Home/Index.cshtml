@@ -103,15 +103,7 @@
                         </div>
 
                         <!-- POST -->
-                        @await Component.InvokeAsync("TextControl", new TextControlModel { FieldName = "description", FieldValue = Model.description })
-@*                         <div class="mb-3">
-                            <!-- STYLES -->
-                            <partial name="_TextControl" />
-
-                            <!-- TEXT -->
-                            <textarea asp-for="description" class="form-control textarea-style" rows="10" placeholder="Agregar contenido de la entrada" id="post_text"></textarea>
-                            <span asp-validation-for="description" class="form-error"></span>
-                        </div> *@
+                        @await Component.InvokeAsync("TextControl", new TextControlModel { FieldName = "description", FieldValue = Model.description, EditMode = EditMode.Simplified })
 
                         <!-- AGREGAR FORMATO -->
                         <div class="mb-3">
@@ -138,7 +130,7 @@
             <!-- FIN DE ENTRADA RAPIDA -->
             <!-- SECCION RAPIDA -->
             <div class="border-section">
-                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Secciones</p>
+                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Secciones Home Page</p>
                 <!-- LISTADO -->
                 <div class="mb-3 d-flex flex-row gap-2">
                     @if (Model.homeSectionList.Count > 0)

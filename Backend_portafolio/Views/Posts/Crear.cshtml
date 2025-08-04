@@ -32,12 +32,7 @@
 
             <!-- POST -->
             <div class="mb-3">
-                @await Component.InvokeAsync("TextControl", new TextControlModel { FieldName = "description", FieldValue = Model.description })
-                <!-- STYLES -->
-                @* <partial name="_TextControl" model="new TextControlModel { FieldName = nameof(Model.description), FieldValue = Model.description }" /> *@
-                @*<!-- TEXT -->
-                <textarea asp-for="description" class="form-control textarea-style" rows="10" placeholder="Agregar contenido de la entrada" id="post_text"></textarea>
-                <span asp-validation-for="description" class="form-error"></span> *@
+                @await Component.InvokeAsync("TextControl", new TextControlModel { FieldName = "description", FieldValue = Model.description, EditMode = EditMode.Full })
             </div>
 
             <!-- IMAGEN -->

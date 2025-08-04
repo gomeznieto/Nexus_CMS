@@ -19,8 +19,10 @@
                 <p class="fw-bold">Imagen Perfil</p>
             </div>
             <div class="w-75">
-                <img src="@(Model.img != null ? Model.img : "https://picsum.photos/id/237/200/300")" class="profile-picture-perfil rounded-2">
-                <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="@Model.ImageFile" class="form-control mt-2">
+                <img src="@(Model.img != null ? Model.img : "https://picsum.photos/id/237/200/300")"
+                    class="profile-picture-perfil rounded-2">
+                <input type="file" id="image" name="ImageFile" accept="image/*" asp-for="@Model.ImageFile"
+                    class="form-control mt-2">
             </div>
         </div>
         <!-- FIN IMAGEN -->
@@ -55,44 +57,39 @@
             </div>
         </div>
         <!-- FIN HEADLINE-->
+
         <!-- ABOUT-->
         <div class="d-flex align-items-center mt-4">
             <div class="w-25">
                 <p class="fw-bold">Acerca de</p>
             </div>
             <div class="w-75">
-
-                <!-- STYLES -->
-                <partial name="_TextControl" />
-
-                <!-- TEXT -->
-                <textarea asp-for="@Model.about" class="form-control textarea-style about" rows="10" placeholder="Agregar contenido de Acerca de..." onclick="addId(this)"></textarea>
-                <span asp-validation-for="@Model.about" class="form-error"></span>
+                @await Component.InvokeAsync("TextControl", new TextControlModel { FieldName = "about", FieldValue =
+                Model.about, EditMode = EditMode.Simplified })
             </div>
         </div>
         <!-- FIN ABOUT -->
+
         <!-- HOBBIES-->
         <div class="d-flex align-items-center mt-4">
             <div class="w-25">
                 <p class="fw-bold">Hobbies</p>
             </div>
             <div class="w-75">
-
-                <!-- STYLES -->
-                <partial name="_TextControl" />
-
-                <!-- TEXT -->
-                <textarea asp-for="@Model.hobbies" class="form-control textarea-style hobbies" rows="10" placeholder="Agregar contenido del Hobbie" onclick="addId(this)"></textarea>
-                <span asp-validation-for="@Model.hobbies" class="form-error"></span>
+                @await Component.InvokeAsync("TextControl", new TextControlModel { FieldName = "hobbies", FieldValue =
+                                Model.hobbies, EditMode = EditMode.Simplified })
             </div>
         </div> <!-- FIN BIOS -->
+
         <!-- CV -->
         <div class="d-flex align-items-center mt-2">
             <div class="w-25">
                 <p class="fw-bold">Curriculum Vitae</p>
             </div>
             <div class="w-75">
-                <input asp-for="@Model.cv" class="form-control" title="Ingrese la url en el que se encuentra subido el curriculum" placeholder="Ingreso url del archivo pdf" />
+                <input asp-for="@Model.cv" class="form-control"
+                    title="Ingrese la url en el que se encuentra subido el curriculum"
+                    placeholder="Ingreso url del archivo pdf" />
             </div>
         </div>
         <!-- FIN CV -->
@@ -101,7 +98,8 @@
         <div class="mt-4 row col-12">
             <div class="col-4"></div>
             <div class="col-8 row justify-content-center gap-2">
-                <button class="btn btn-edit col-5" onclick="successModal({msg: 'El perfil ha sifo modificado con éxito'})">Editar</button>
+                <button class="btn btn-edit col-5"
+                    onclick="successModal({msg: 'El perfil ha sifo modificado con éxito'})">Editar</button>
                 <a class="btn btn-delete col-5" asp-controller="Home" asp-action="Index">Cancelar</a>
             </div>
         </div>
@@ -112,29 +110,3 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
-
-<script>
-
-    function addId(element) {
-
-        let name = element.getAttribute("name")
-
-        if(name == "about")
-        {
-            element.setAttribute('id', "post_text")
-
-            let hobbies = document.getElementsByClassName("hobbies")[0];
-            hobbies.removeAttribute('id');
-        }
-
-        if(name == "hobbies")
-        {
-            element.setAttribute('id', "post_text")
-
-            let about = document.getElementsByClassName("about")[0];
-            about.removeAttribute('id');
-        }
-
-    }
-
-</script>

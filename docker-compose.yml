@@ -9,6 +9,8 @@ services:
     ports:
       - "8080:80"
       - "8443:443"
+    volumes:
+      - ./Backend_portafolio:/app
     depends_on:
       - sqlserver_db
 

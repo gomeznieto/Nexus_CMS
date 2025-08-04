@@ -404,22 +404,22 @@ async function borrador() {
 
 /* POST */
 
-function addTextFormat(style) {
-    let txtarea = document.getElementById("post_text");
+function addTextFormat(style, id) {
+    let txtarea = document.getElementById(`editor-${id}`);
     const startPos = txtarea.selectionStart;
     const endPos = txtarea.selectionEnd;
     const before = txtarea.value.substring(0, startPos);
     const after = txtarea.value.substring(startPos, txtarea.value.length);
     var selectedText = txtarea.value.substring(startPos, endPos);
-    let styleFormat = textFormat(style, selectedText);
+    let styleFormat = textFormat(style, selectedText, id);
 
     txtarea.value = before + `${styleFormat} ` + after.substring(selectedText.length);
     txtarea.selectionStart = txtarea.selectionEnd = startPos + styleFormat.length;
     txtarea.focus();
 }
 
-function textFormat(format, text) {
-    let language = document.getElementById("selectLanguage").value;
+function textFormat(format, text, id) {
+    let language = document.getElementById(`selectLanguage-${id}`)?.value || "";
     text = text.trim();
 
     switch (format) {
