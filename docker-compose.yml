@@ -1,13 +1,14 @@
-version: '3.9'
+version: "3.9"
 
 services:
   backend_portafolio:
-    image: ${DOCKER_REGISTRY-}backendportafolio
+    image: backendportafolio
     build:
       context: .
       dockerfile: Backend_portafolio/Dockerfile
     ports:
       - "8080:80"
+      - "8443:443"
     depends_on:
       - sqlserver_db
 
@@ -23,3 +24,5 @@ services:
 
 volumes:
   sql_data:
+    external: true
+    name: backend_portafolio_sql_data

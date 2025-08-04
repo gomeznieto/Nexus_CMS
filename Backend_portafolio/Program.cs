@@ -157,7 +157,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configuración del middleware
+// Configuraciï¿½n del middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -166,7 +166,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseCors();
 app.UseStaticFiles();
-app.UseHttpsRedirection();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
@@ -179,7 +184,7 @@ app.MapControllerRoute(
 app.Run();
 
 
-// Método para crear el usuario administrador
+// Mï¿½todo para crear el usuario administrador
 static async Task CreateAdminUserAsync(IUsersService userService, IRoleService roleService)
 {
 	try
