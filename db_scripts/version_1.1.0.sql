@@ -207,3 +207,14 @@ CREATE TABLE HomeSectionPost (
     CONSTRAINT UQ_HomeSectionPostPost UNIQUE (HomeSectionId, PostId)
 );
 
+-- Tabla de Layout Home Section
+CREATE TABLE UserLayoutSections (
+    Id INT PRIMARY KEY IDENTITY,
+    UserId INT NOT NULL,
+    SectionType NVARCHAR(50) NOT NULL,
+    SectionId INT NOT NULL,
+    DisplayOrder INT NOT NULL,
+	Title NVARCHAR(50) NOT NULL,
+	SectionConfig NVARCHAR(MAX) NULL,
+    CONSTRAINT UQ_UserSectionOrder UNIQUE (UserId, DisplayOrder)
+);

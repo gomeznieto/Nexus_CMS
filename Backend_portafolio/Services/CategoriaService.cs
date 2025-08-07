@@ -71,7 +71,7 @@ namespace Backend_portafolio.Sevices
             }
             catch (Exception e)
             {
-                throw new Exception("Ha surgido un error. ¡Intente más tarde!");
+                throw new Exception($"Ha surgido un error. ¡Intente más tarde! {e}");
             }
         }
 

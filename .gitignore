@@ -364,3 +364,8 @@ FodyWeavers.xsd
 
 # Images
 /Backend_portafolio/wwwroot/img
+
+# Ignorar archivos de entorno sensibles (en producción)
+.env.production
+.env.*
+!.env.development

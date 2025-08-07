@@ -1,6 +1,21 @@
 version: "3.9"
 
+# Primero correr SQLSERVER y crear la base de datos de db_scripts
+# docker compose --env-file .env.development up sqlserver_db
+# Luego podemos frenar servicio y correr todo con el siguiente comando
+#docker compose --env-file .env.development up
+
 services:
+  sqlserver_db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: ${SA_PASSWORD}
+      ACCEPT_EULA: ${ACCEPT_EULA}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
   backend_portafolio:
     image: backendportafolio
     build:
@@ -14,17 +29,6 @@ services:
     depends_on:
       - sqlserver_db
 
-  sqlserver_db:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    environment:
-      SA_PASSWORD: "MiClaveSegura123#"
-      ACCEPT_EULA: "Y"
-    ports:
-      - "1433:1433"
-    volumes:
-      - sql_data:/var/opt/mssql
-
 volumes:
   sql_data:
-    external: true
     name: backend_portafolio_sql_data
