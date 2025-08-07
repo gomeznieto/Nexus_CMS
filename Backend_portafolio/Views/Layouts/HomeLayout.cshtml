@@ -1,11 +1,14 @@
-@page
-@model Backend_portafolio.Views.Layouts.HomeLayout
+@model UserHomeLayoutFormModel
 @{
     ViewData["Title"] = "HomeLayout";
 }
 
 <h1>@ViewData["Title"]</h1>
-
 <div>
-    <h1>Home Layout</h1>
+   <select>
+    @foreach(var opt in Model.SectionOptions)
+    {
+        <option>@opt.Text</option>
+    }
+   </select>
 </div>

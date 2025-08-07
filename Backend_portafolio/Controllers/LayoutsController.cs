@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend_portafolio.Models;
+using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -10,8 +11,10 @@ namespace Backend_portafolio.Controllers
 {
     public class LayoutsController : Controller
     {
-        public LayoutsController()
+        private readonly ILayoutService _layoutService;
+        public LayoutsController(ILayoutService layoutService)
         {
+            _layoutService = layoutService;
 
         }
 
@@ -21,8 +24,8 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                //UserHomeLayoutFormModel model = 
-                return View();
+                UserHomeLayoutFormModel model = await _layoutService.GetLayoutForm();
+                return View(model);
             }
             catch (System.Exception)
             {

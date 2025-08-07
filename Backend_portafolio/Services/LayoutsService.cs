@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Backend_portafolio.Constants;
 using Backend_portafolio.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Backend_portafolio.Services
 {
@@ -30,22 +27,22 @@ namespace Backend_portafolio.Services
                 var currentUser = await _usersService.GetDataUser();
 
                 // Secciones del Home Creadas
-                var homeSections = await _homeSectionService.GetByUserAsync(currentUser.Id);
+                var homeSections = await _homeSectionService.GetByUserAsync(currentUser.id);
 
 
                 // Lista para el dropdown de la vista
                 var options = new List<SelectListItem>
                 {
-                    new {"About", $"{SectionTypes.UserAbout}"},
-                    new {"Social Networks", $"{SectionTypes.SocialNetworks}"},
-                    new {"Hobbies", $"{SectionTypes.UserHobbies}"},
-                    new {"Bio", $"{SectionTypes.Bio}"},
+                    new ("About", $"{SectionTypes.UserAbout}"),
+                    new ("Social Networks", $"{SectionTypes.SocialNetworks}"),
+                    new ("Hobbies", $"{SectionTypes.UserHobbies}"),
+                    new ("Bio", $"{SectionTypes.Bio}"),
                 };
 
                 // Seccion a la lista del dropdown
                 foreach (var section in homeSections)
                 {
-                    options.add(new
+                    options.Add(new SelectListItem
                     {
                         Text = $"HomeSection - {section.Name}",
                         Value = $"{section.Id}"
@@ -54,13 +51,13 @@ namespace Backend_portafolio.Services
 
                 return new UserHomeLayoutFormModel
                 {
-                    UserId = currentUser.Id,
+                    UserId = currentUser.id,
                     SectionOptions = options
                 };
             }
-            catch (System.Exception)
+            catch (Exception)
             {
-                throw new System.Exception("Error al crear la vista");
+                throw new Exception("Error al crear la vista");
             }
         }
     }
