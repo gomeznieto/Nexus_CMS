@@ -54,6 +54,7 @@ builder.Services.AddTransient<IRepositoryBio, RepositoryBio>();
 builder.Services.AddTransient<IRepositorySocialNetwork, RepositorySocialNetwork>();
 builder.Services.AddTransient<IRepositoryHomeSection, RepositoryHomeSection>();
 builder.Services.AddTransient<IRepositoryHomeSectionPost, RepositoryHomeSectionPost>();
+builder.Services.AddTransient<IRepositoryLayout, RepositoryLayout>();
 
 
 //****************************************************

@@ -246,6 +246,32 @@
                                 </li>
                             </ul>
                         </li>
+                        <!-- LAYOUT -->
+                        <li id="nav_items" path="Sources" class="cursor_pointer" collapse="true" onclick="actionBarHide(this)">
+                            <a class="nav-link nav-title" id="itemLi">
+                                <i class="iconos fa-solid fa-link"></i>
+                                <span class="ms-1 item_size" id="itemTitle">Layout</span>
+                            </a>
+                            <ul class="collapse nav flex-column ms-1" id="subMenuSources">
+                                <li class="w-100 hide" id="sub-nav-title-collapse">
+                                    <span asp-action="Index" class="nav-link item_subNav px-3">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2"></i>
+                                            <span class="ms-2">Layout</span>
+                                        </span>
+                                    </span>
+                                </li>
+                                <li class="w-100">
+                                    <a asp-action="HomeLayout" asp-controller="Layouts" class="nav-link px-3 item_subNav">
+                                        <span class="item_size">
+                                            <i class="subiconos fa-regular fa-circle ms-2">
+
+                                            </i><span class="ms-2">Home</span>
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
 
                         <!-- ADMIN -->
                         @if (MySignInManager.IsSignedIn(User) && isAdmin)

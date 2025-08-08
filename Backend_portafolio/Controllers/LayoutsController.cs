@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Backend_portafolio.Models;
 using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +8,15 @@ namespace Backend_portafolio.Controllers
     public class LayoutsController : Controller
     {
         private readonly ILayoutService _layoutService;
-        public LayoutsController(ILayoutService layoutService)
+        private readonly IUsersService _usersService;
+
+        public LayoutsController(
+            ILayoutService layoutService,
+            IUsersService usersService
+            )
         {
             _layoutService = layoutService;
-
+            _usersService = usersService;
         }
 
         // -- GET ---
@@ -24,10 +25,27 @@ namespace Backend_portafolio.Controllers
         {
             try
             {
-                UserHomeLayoutFormModel model = await _layoutService.GetLayoutForm();
+                var currentUser = await _usersService.GetDataUser();
+                UserHomeLayoutFormModel model = await _layoutService.GetLayoutForm(currentUser.id);
                 return View(model);
             }
             catch (System.Exception)
+            {
+
+                throw;
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> HomeLayout(UserHomeLayoutFormModel model)
+        {
+            try
+            {
+                var currentUser = await _usersService.GetDataUser();
+                await _layoutService.SaveLayoutForm(model, currentUser.id);
+                return RedirectToAction("HomeLayout");
+            }
+            catch (Exception)
             {
 
                 throw;

@@ -1,14 +1,93 @@
 @model UserHomeLayoutFormModel
 @{
-    ViewData["Title"] = "HomeLayout";
+    ViewData["Title"] = "Home Layout";
 }
 
 <h1>@ViewData["Title"]</h1>
-<div>
-   <select>
-    @foreach(var opt in Model.SectionOptions)
-    {
-        <option>@opt.Text</option>
-    }
-   </select>
+<p>En esta sección se coloca lo que va a aparecer en el Home</p>
+<div class="w-100 p-1 row gap-3">
+    <form asp-action="HomeLayout" asp-controller="Layouts" method="post" class="mt-2 col-6 p-2">
+        <table class="table table-borderless mb-3">
+            <thead class="table-text-color text-uppercase border-bottom table-border-row-color">
+                <tr class="table-title">
+                    <th class="col-2">Sección</th>
+                    <th class="col-6">Titulo</th>
+                    <th class="col-4">Opción</th>
+                </tr>
+            </thead>
+            <tbody id="sections-table" class="table-body">
+                @for (int i = 0; i < Model.Sections.Count; i++)
+                {
+                    <tr>
+                        <td><label>@($"{i + 1}")</label></td>
+                        <td><input name="Sections[@i].Title" value="@Model.Sections[i].Title" class="form-control" /></td>
+                        <td>
+                            <select class="form-control" name="Sections[@i].SectionId" onchange="addSectionType(this, @i)">
+                                <option>Elegir una sección</option>
+                                @foreach (var opt in Model.SectionOptions)
+                                {
+                                    <option value="@opt.Value" data-Text="@opt.Text" selected="@(opt.Text == Model.Sections[i].SectionType)">
+                                        @opt.Text
+                                    </option>
+                                }
+                            </select>
+                        </td>
+                        <td><input type="hidden" name="Sections[@i].SectionType" id="@($"{i}-sectionType")" value="@Model.Sections[i].SectionType" /></td>
+                        <td><input type="hidden" name="Sections[@i].DisplayOrder" value="@Model.Sections[i].DisplayOrder" /></td>
+                        <td><input type="hidden" name="Sections[@i].Id" value="@Model.Sections[i].Id" /></td>
+                    </tr>
+                }
+                <!-- NUEVAS TABLAS -->
+
+            </tbody>
+        </table>
+
+        <!-- FORM NUEVO -->
+
+        <button type="submit" class="btn btn-primary">Guardar todo</button>
+        <button type="button" class="btn btn-borrador" onclick="addSectionLayout()">Agregar sección</button>
+    </form>
 </div>
+
+<script>
+    let sectionIndex = @Model.Sections.Count;
+
+    function addSectionLayout() {
+        const table = document.getElementById("sections-table");
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td><label>${sectionIndex + 1}</label></td>
+            <td class="text-center"><input name="Sections[${sectionIndex}].Title" class="form-control" /></td>
+            <td>
+                <select name="Sections[${sectionIndex}].SectionId" class="form-control" onchange="addSectionType(this, ${sectionIndex})">
+                    ${getSectionOptionsHtml()}
+                </select>
+            </td>
+            <td><input type="hidden" name="Sections[${sectionIndex}].SectionType" id="${sectionIndex}-sectionType"/></td>
+            <td><input type="hidden" name="Sections[${sectionIndex}].DisplayOrder" value="${sectionIndex}"/></td>
+            <td><input type="hidden" name="Sections[${sectionIndex}].Id" /></td>
+        `;
+
+        table.appendChild(row);
+        sectionIndex++;
+    }
+
+    function getSectionOptionsHtml() {
+        return `
+            <text><option>elegir una opción</option></text>
+            @foreach (var opt in Model.SectionOptions)
+            {
+                 <text><option value="@opt.Value" data-Text="@opt.Text">@opt.Text</option></text>
+            }
+        `;
+    }
+
+    function addSectionType(section, id)
+    {
+        let option = section.options[section.selectedIndex].getAttribute("data-Text");
+        let sectionType = document.getElementById(`${id}-sectionType`);
+        sectionType.value = option;
+
+    }
+</script>
