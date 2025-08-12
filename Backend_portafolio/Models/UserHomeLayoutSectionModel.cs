@@ -8,5 +8,6 @@
         public string SectionType { get; set; }
         public int? SectionId { get; set; }
         public string Title { get; set; }
+        public string Status { get; set; } = Constants.LayoutItemStatus.Unchanged;
     }
 }

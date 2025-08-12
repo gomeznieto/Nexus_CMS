@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Backend_portafolio.Constants
 {
-    public static class SectionTypes
+    public static class SectionTypesNames
     {
         public const string HomeSection = "HomeSection"; 
         public const string Bio = "Bio"; 
@@ -13,6 +13,6 @@ namespace Backend_portafolio.Constants
 
         // Seccion user
         public const string UserHobbies = "Hobbies"; 
-        public const string UserAbout = "About"; 
+        public const string UserAbout = "About";
     }
 }

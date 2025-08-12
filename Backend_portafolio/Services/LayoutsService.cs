@@ -7,6 +7,7 @@ namespace Backend_portafolio.Services
 {
     public interface ILayoutService
     {
+        Task DeleteHomeLayoutSection(int id);
         public Task<UserHomeLayoutFormModel> GetLayoutForm(int userId);
         public Task SaveLayoutForm(UserHomeLayoutFormModel model, int userId);
     }
@@ -37,10 +38,10 @@ namespace Backend_portafolio.Services
                 // Lista para el dropdown de la vista
                 var options = new List<SelectListItem>
                 {
-                    new ($"{SectionTypes.UserAbout}", $"{userId}"),
-                    new ($"{SectionTypes.SocialNetworks}", $"{userId}"),
-                    new ( $"{SectionTypes.UserHobbies}", $"{userId}"),
-                    new ($"{SectionTypes.Bio}", $"{userId}"),
+                    new ($"{SectionTypesNames.UserAbout}", $"{SectionTypeIds.UserAbout}"),
+                    new ($"{SectionTypesNames.Bio}", $"{SectionTypeIds.Bio}"),
+                    new ( $"{SectionTypesNames.UserHobbies}", $"{SectionTypeIds.UserHobbies}"),
+                    new ($"{SectionTypesNames.SocialNetworks}", $"{SectionTypeIds.SocialNetworks}"),
                 };
 
                 // Seccion a la lista del dropdown
@@ -48,7 +49,7 @@ namespace Backend_portafolio.Services
                 {
                     options.Add(new SelectListItem
                     {
-                        Text = $"{section.Name}",
+                        Text = $"Post - {section.Name}",
                         Value = $"{section.Id}"
                     });
                 }
@@ -79,14 +80,21 @@ namespace Backend_portafolio.Services
                 foreach (var section in model.Sections)
                 {
                     section.UserId = userId;
-                    if (userSections.Any(s => s.Id == section.Id))
+
+                    if (section.SectionType.Contains("Post"))
+                    {
+                        var parts = section.SectionType.Split('-');
+                        section.SectionType = parts[1].TrimStart().Trim();
+                    }
+
+                    if (userSections.Any(s => s.Id == section.Id) && section.Status == Constants.LayoutItemStatus.Modified)
                     {
                         await _repositoryLayout.UpdateLayoutSectionAsync(section);
                     }
                     else
                     {
-
-                        await _repositoryLayout.CreateLayoutSectionAsync(section);
+                        if(section.Status == Constants.LayoutItemStatus.New)
+                            await _repositoryLayout.CreateLayoutSectionAsync(section);
                         
                     }
                 }
@@ -100,6 +108,35 @@ namespace Backend_portafolio.Services
         }
 
         // DELETE
+        public async Task DeleteHomeLayoutSection(int id)
+        {
+            try
+            {
+                var section = await _repositoryLayout.GetLayoutSectionByIdAsync(id);
 
+                if(section == null)
+                    throw new Exception("No se ha encontrado la seccion del layout");
+
+                await _repositoryLayout.DeleteLayoutSectionAsync(id);
+
+                // Modificamos el orden de las demas secciones
+                var userSections = await _repositoryLayout.GetLayoutHomeSectionsAsync(section.UserId);
+                int order = 1;
+
+                foreach (var item in userSections.OrderBy(s => s.DisplayOrder))
+                {
+                    if (item.DisplayOrder != order)
+                    {
+                        item.DisplayOrder = order;
+                        await _repositoryLayout.UpdateLayoutSectionAsync(item);
+                    }
+                    order++;
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception("Error al eliminar la seccion del layout");
+            }
+        }
     }
 }

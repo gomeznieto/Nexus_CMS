@@ -1,6 +1,7 @@
 using Backend_portafolio.Models;
 using Backend_portafolio.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 
 namespace Backend_portafolio.Controllers
@@ -48,6 +49,20 @@ namespace Backend_portafolio.Controllers
             catch (Exception)
             {
 
+                throw;
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BorrarHomeLayout (int id)
+        {
+            try
+            {
+                await _layoutService.DeleteHomeLayoutSection(id);
+                return RedirectToAction("HomeLayout");
+            }
+            catch (Exception)
+            {
                 throw;
             }
         }

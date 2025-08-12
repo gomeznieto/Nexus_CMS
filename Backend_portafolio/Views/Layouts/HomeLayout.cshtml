@@ -18,22 +18,39 @@
             <tbody id="sections-table" class="table-body">
                 @for (int i = 0; i < Model.Sections.Count; i++)
                 {
-                    <tr>
-                        <td><label>@($"{i + 1}")</label></td>
-                        <td><input name="Sections[@i].Title" value="@Model.Sections[i].Title" class="form-control" /></td>
+                    <tr id="@i" name="sectionRows">
+                        <td><label>@Model.Sections[i].DisplayOrder</label></td>
+                        <td><input name="Sections[@i].Title" value="@Model.Sections[i].Title" class="form-control input-style input-title" onchange="markAsModified(this, @i, 'text')" /></td>
                         <td>
-                            <select class="form-control" name="Sections[@i].SectionId" onchange="addSectionType(this, @i)">
+                            <select class="form-select select-style input-type" name="Sections[@i].SectionId" onchange="markAsModified(this, @i,'select')">
                                 <option>Elegir una sección</option>
                                 @foreach (var opt in Model.SectionOptions)
                                 {
-                                    <option value="@opt.Value" data-Text="@opt.Text" selected="@(opt.Text == Model.Sections[i].SectionType)">
+                                    <option value="@opt.Value" data-Text="@opt.Text" selected="@(opt.Value == Model.Sections[i].SectionId.ToString())">
                                         @opt.Text
                                     </option>
                                 }
                             </select>
                         </td>
-                        <td><input type="hidden" name="Sections[@i].SectionType" id="@($"{i}-sectionType")" value="@Model.Sections[i].SectionType" /></td>
-                        <td><input type="hidden" name="Sections[@i].DisplayOrder" value="@Model.Sections[i].DisplayOrder" /></td>
+                        <td><input type="button" class="btn btn-delete" value="Borrar" onclick="openModal({id: '@Model.Sections[i].Id', name: '@Model.Sections[i].Title'})" /></td>
+                        <td>
+                            <ul class="d-flex flex-column align-content-center justify-content-center list-unstyled subiconos">
+                                @if (Model.Sections[i].DisplayOrder > 1)
+                                {
+                                    <li><i class="fa-solid fa-chevron-up cursor_pointer" id=@("{i}-up") onclick="moveUp(@i)"></i></li>
+                                }
+
+                                @if (Model.Sections[i].DisplayOrder < Model.Sections.Count())
+                                {
+                                    <li><i class="fa-solid fa-chevron-down cursor_pointer" id=@("{i}-down") onclick="moveDown(@i)"></i></li>
+                                }
+                            </ul>
+                        </td>
+
+                        <!-- HIDDEN FIELDS -->
+                        <td><input type="hidden" name="Sections[@i].Status" id="@($"{i}-status")" value="@Model.Sections[i].Status" /></td>
+                        <td><input type="hidden" name="Sections[@i].SectionType" id="@($"{i}-sectionType")" value="@Model.Sections[i].SectionType" class="input-section"/></td>
+                        <td><input type="hidden" name="Sections[@i].DisplayOrder" value="@Model.Sections[i].DisplayOrder" /></td>                            odel.
                         <td><input type="hidden" name="Sections[@i].Id" value="@Model.Sections[i].Id" /></td>
                     </tr>
                 }
@@ -44,28 +61,35 @@
 
         <!-- FORM NUEVO -->
 
-        <button type="submit" class="btn btn-primary">Guardar todo</button>
-        <button type="button" class="btn btn-borrador" onclick="addSectionLayout()">Agregar sección</button>
+        <button type="submit" class="btn btn-action" id="btn-save" disabled>Guardar todo</button>
+        <button type="button" class="btn btn-add" onclick="addSectionLayout(@Model.Sections.Count)">Agregar sección</button>
     </form>
 </div>
+<!-- MODAL DELETE -->
+<partial name="_Modal" model='new { url = "/Layouts", action = "BorrarHomeLayout" }' />
 
 <script>
     let sectionIndex = @Model.Sections.Count;
 
-    function addSectionLayout() {
+    // Agregamos campo nuevo para guardar en base de datos
+    function addSectionLayout(displayOrder) {
         const table = document.getElementById("sections-table");
 
         const row = document.createElement("tr");
+        row.id = sectionIndex;
+
         row.innerHTML = `
             <td><label>${sectionIndex + 1}</label></td>
-            <td class="text-center"><input name="Sections[${sectionIndex}].Title" class="form-control" /></td>
+            <td class="text-center"><input name="Sections[${sectionIndex}].Title" class="form-control input-title, input-style" /></td>
             <td>
-                <select name="Sections[${sectionIndex}].SectionId" class="form-control" onchange="addSectionType(this, ${sectionIndex})">
+                <select name="Sections[${sectionIndex}].SectionId" class="form-control select-style input-type" onchange="markAsModified(this, ${sectionIndex}, 'select')">
                     ${getSectionOptionsHtml()}
                 </select>
             </td>
+            <td><input type="button" class="btn btn-delete" value="Borrar" onclick="deleteSectionFromView(${sectionIndex})"/></td>
+            <td><input type="hidden" name="Sections[${sectionIndex}].Status" id="${sectionIndex}-status" value="New"/></td>
             <td><input type="hidden" name="Sections[${sectionIndex}].SectionType" id="${sectionIndex}-sectionType"/></td>
-            <td><input type="hidden" name="Sections[${sectionIndex}].DisplayOrder" value="${sectionIndex}"/></td>
+            <td><input type="hidden" name="Sections[${sectionIndex}].DisplayOrder" value="${sectionIndex + 1}"/></td>
             <td><input type="hidden" name="Sections[${sectionIndex}].Id" /></td>
         `;
 
@@ -78,16 +102,123 @@
             <text><option>elegir una opción</option></text>
             @foreach (var opt in Model.SectionOptions)
             {
-                 <text><option value="@opt.Value" data-Text="@opt.Text">@opt.Text</option></text>
+                     <text><option value="@opt.Value" data-Text="@opt.Text">@opt.Text</option></text>
             }
         `;
     }
 
-    function addSectionType(section, id)
+    // Marcamos como modificados los campos editados
+    function markAsModified(section, id, type)
     {
-        let option = section.options[section.selectedIndex].getAttribute("data-Text");
-        let sectionType = document.getElementById(`${id}-sectionType`);
-        sectionType.value = option;
+        // Agregamos a SectionType el tipo de Bloque
+        if(type == "select")
+        {
+            let option = section?.options[section?.selectedIndex]?.getAttribute("data-Text") || false;
+            let sectionType = document.getElementById(`${id}-sectionType`);
 
+
+            sectionType.value = option;
+        }
+
+        // Agregamos el estado
+        let status = document.getElementById(`${id}-status`);
+
+        if(status && status.value != "New")
+        {
+            status.value = "Modified";
+        }
+
+        // Habilitamos botón de guardado
+        document.getElementById("btn-save").removeAttribute("disabled")
     }
+
+    // Borramos de la lista los elementos nuevos que aún no se guardan en base de datos
+    function deleteSectionFromView(id)
+    {
+        let row = document.getElementById(`${id}`);
+        const table = document.getElementById("sections-table");
+        table.removeChild(row);
+    }
+
+    // Funciones para mover el orden de las secciones
+    function moveUp(id)
+    {
+        let currentRow = document.getElementById(id)
+        let previousRow = currentRow.previousElementSibling;
+        
+        let currentTitle = currentRow.querySelector('input.input-title').value
+        let previousTitle= previousRow.querySelector('input.input-title').value
+
+        let auxTitle = currentTitle;
+        currentRow.querySelector('input.input-title').value = previousTitle;
+        previousRow.querySelector('input.input-title').value = auxTitle;
+
+        let currentSectionType = currentRow.querySelector('input.input-section').value;
+        let previousRowSectionType = previousRow.querySelector('input.input-section').value;
+
+        let auxSectionType = currentSectionType;
+        currentRow.querySelector('input.input-section').value = previousRowSectionType;
+        previousRow.querySelector('input.input-section').value = auxSectionType;
+
+        const curr = currentRow.querySelector('select.input-type');
+        const prev = previousRow.querySelector('select.input-type');
+
+        const currOption = curr.options[curr.selectedIndex];
+        const prevOption = prev.options[prev.selectedIndex];
+
+        const currClone = currOption.cloneNode(true);
+        const prevClone = prevOption.cloneNode(true);
+
+        curr.replaceChild(prevClone, currOption);
+        prev.replaceChild(currClone, prevOption);
+
+        curr.value = prevClone.value;
+        prev.value = currClone.value;
+
+        markAsModified(null, id, "");
+        markAsModified(null, id-1, "");
+    }
+
+    function moveDown(id)
+    {
+        let currentRow = document.getElementById(id)
+        let nextRown = currentRow.nextElementSibling;
+
+        let currentTitle = currentRow.querySelector('input.input-title').value
+        let nextTitle= nextRown.querySelector('input.input-title').value
+
+        let auxTitle = currentTitle;
+        currentRow.querySelector('input.input-title').value = nextTitle;
+        nextRown.querySelector('input.input-title').value = auxTitle;
+
+        let currentSectionType = currentRow.querySelector('input.input-section').value;
+        let nextSectionType = nextRown.querySelector('input.input-section').value;
+
+        let auxSectionType = currentSectionType;
+        currentRow.querySelector('input.input-section').value = nextSectionType;
+        nextRown.querySelector('input.input-section').value = auxSectionType;
+
+        const curr = currentRow.querySelector('select.input-type');
+        const next = nextRown.querySelector('select.input-type');
+
+        // Guardar copias de las opciones seleccionadas
+        const currOption = curr.options[curr.selectedIndex];
+        const nextOption = next.options[next.selectedIndex];
+
+        // Crear clones (para no perder referencia al original)
+        const currClone = currOption.cloneNode(true);
+        const nextClone = nextOption.cloneNode(true);
+
+        // Reemplazar las opciones seleccionadas
+        curr.replaceChild(nextClone, currOption);
+        next.replaceChild(currClone, nextOption);
+
+        // Seleccionar los nuevos elementos
+        curr.value = nextClone.value;
+        next.value = currClone.value;
+
+        markAsModified(null, id, "");
+        markAsModified(null, id+1, "");
+    }
+
 </script>
