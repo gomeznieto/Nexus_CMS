@@ -181,7 +181,6 @@ GO
 CREATE TABLE HomeSection (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Name NVARCHAR(100) NOT NULL,
-    [Order] INT NOT NULL,
     MaxItems INT NULL,
     UserId INT NOT NULL,
 

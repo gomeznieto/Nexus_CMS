@@ -761,7 +761,6 @@ namespace Backend_portafolio.Sevices
                 var homeSectionPosts = await _homeSectionPostService.GetByHomeSectionIdAsync(homeSectionId);
 
                 var posts = new List<ApiHomeSectionPostViewModel>();
-                List<ApiHomeSectionPostViewModel> homeSectionPostsViewModel = new List<ApiHomeSectionPostViewModel>();
 
                 foreach (var homeSectionPost in homeSectionPosts)
                 {

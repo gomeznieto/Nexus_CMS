@@ -139,7 +139,7 @@
                             <option disabled selected>Seleccione Formato</option>
                             @foreach (var sectionHome in Model.homeSectionList)
                             {
-                                <option value="@sectionHome.Id" data-order="@sectionHome.Order" data-items="@sectionHome.MaxItems" data-name="@sectionHome.Name">@sectionHome.Name [Orden: @sectionHome.Order]</option>
+                                <option value="@sectionHome.Id" data-items="@sectionHome.MaxItems" data-name="@sectionHome.Name">@sectionHome.Name</option>
                             }
                         </select>
                         <a class="btn btn-edit" id="btnEditSection" onclick="editHomeSection()" data-mode="edit" data-disable="true">Editar</a>
@@ -150,7 +150,7 @@
                 <!-- CREACION -->
                 <form method="post" asp-controller="Home" asp-action="CreateHomeSection" class="d-flex flex-row flex-lg-row justify-content-center align-items-center gap-2 hide" id="formHomeSection">
                     <input asp-for="@Model.SectionForm.Name" type="text" class="form-control input-style" placeholder="Nombre" />
-                    <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25">
+@*                     <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25">
                         <option selected>Orden</option>
                         <option value="0">0</option>
                         <option value="1">1</option>
@@ -159,7 +159,7 @@
                         <option value="4">4</option>
                         <option value="4">5</option>
                         <option value="4">6</option>
-                    </select>
+                    </select> *@
                     <select asp-for="@Model.SectionForm.MaxItems" class="form-select select-style w-25">
                         <option selected>Entradas</option>
                         <option value="6">2</option>
@@ -175,7 +175,7 @@
                 <form method="post" asp-controller="Home" asp-action="EditHomeSection" class="d-flex flex-row flex-lg-row justify-content-center align-items-center gap-2 hide" id="formHomeEditSection">
                     <input asp-for="@Model.SectionForm.Id" type="hidden" class="form-control input-style" placeholder="Nombre" id="idEditFormSection" />
                     <input asp-for="@Model.SectionForm.Name" type="text" class="form-control input-style" placeholder="Nombre" id="nameEditFormSection" />
-                    <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25" id="orderEditFormSection">
+@*                     <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25" id="orderEditFormSection">
                         <option selected>Orden</option>
                         <option value="0">0</option>
                         <option value="1">1</option>
@@ -184,7 +184,7 @@
                         <option value="4">4</option>
                         <option value="5">5</option>
                         <option value="6">6</option>
-                    </select>
+                    </select> *@
                     <select asp-for="@Model.SectionForm.MaxItems" class="form-select select-style w-25" id="itemsEditFormSection">
                         <option selected>Entradas</option>
                         <option value="2">2</option>
@@ -275,7 +275,7 @@
         if(btnEdit.getAttribute("data-disable") == "true")
             btnEdit.setAttribute("data-disable", "false")
 
-        console.log(btnEdit.getAttribute("data-disable"))
+
     }
 
     function editHomeSection()
@@ -293,13 +293,13 @@
         const optSelected = optSelect.options[optSelect.selectedIndex];
         let idOptSelected = optSelected.value;
         let nameOptSelected = optSelected.getAttribute("data-name");
-        let orderOptSelected = optSelected.getAttribute("data-order");
+        @* let orderOptSelected = optSelected.getAttribute("data-order"); *@;
         let maxItemsOptSelected = optSelected.getAttribute("data-items");
 
         //Formulario
         document.getElementById("idEditFormSection").value = idOptSelected;
         document.getElementById("nameEditFormSection").value = nameOptSelected;
-        document.getElementById("orderEditFormSection").value = orderOptSelected;
+         @* document.getElementById("orderEditFormSection").value = orderOptSelected; *@;
         document.getElementById("itemsEditFormSection").value = maxItemsOptSelected;
 
         if(action == "edit")

@@ -93,6 +93,7 @@ namespace Backend_portafolio.Controllers
         //****************************************************
         //********************** HOME** **********************
         //****************************************************
+        // TODO: ELIMINAR
 
         [AllowAnonymous]
         [HttpGet]
@@ -179,5 +180,26 @@ namespace Backend_portafolio.Controllers
             }
         }
 
+        //****************************************************
+        //********************* LAYOUT ***********************
+        //****************************************************
+       [AllowAnonymous]    
+        public async Task<IActionResult> LayoutHome([FromHeader(Name = "X-Api-Key")] string apikey)
+        {
+            try
+            {
+                var layout = await _apiService.GetHomeLayout(apikey);
+                return Ok(layout);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<string>()
+                {
+                    Success = false,
+                    Message = "Ha ocurrido un error",
+                    Data = ex.Message,
+                });
+            }
+        }
     }
 }

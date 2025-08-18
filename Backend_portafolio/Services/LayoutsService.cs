@@ -83,8 +83,9 @@ namespace Backend_portafolio.Services
 
                     if (section.SectionType.Contains("Post"))
                     {
-                        var parts = section.SectionType.Split('-');
-                        section.SectionType = parts[1].TrimStart().Trim();
+                        //var parts = section.SectionType.Split('-');
+                        //section.SectionType = parts[1].TrimStart().Trim();
+                        section.SectionType = SectionTypesNames.HomeSection;
                     }
 
                     if (userSections.Any(s => s.Id == section.Id) && section.Status == Constants.LayoutItemStatus.Modified)

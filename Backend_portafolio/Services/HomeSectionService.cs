@@ -2,6 +2,7 @@
 using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backend_portafolio.Services
 {
@@ -48,12 +49,6 @@ namespace Backend_portafolio.Services
                 if (currenUser is null)
                     throw new Exception("No se ha encontrado el usuario");
 
-                //Verificar que no exista con el mismo nombre otro
-                var existOrder = await _repositoryHomeSection.GetOrderAsync((int)sectionModel.Order, currenUser.id);
-
-                if (existOrder)
-                    sectionModel.Order = 0;
-
                 sectionModel.UserId = currenUser.id;
                 var section = _mapper.Map<HomeSection>(sectionModel);
                 await _repositoryHomeSection.Crear(section);
@@ -92,9 +87,21 @@ namespace Backend_portafolio.Services
             }
         }
 
-        public Task<HomeSectionModel> GetByIdAsync(int id, int userId)
+        public async Task<HomeSectionModel> GetByIdAsync(int id, int userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                //Verificar si existe la sección
+                var existSection = await _repositoryHomeSection.Obtener((int)id, userId);
+                var homeSectionModel = _mapper.Map<HomeSectionModel>(existSection);
+                return homeSectionModel;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<List<HomeSectionModel>> GetByUserAsync(int userId)
@@ -135,15 +142,8 @@ namespace Backend_portafolio.Services
                 //Verificar si existe la sección
                 var existSection = await _repositoryHomeSection.Obtener((int)sectionModel.Id, currentUser.id);
 
-                if(existSection is null)
+                if (existSection is null)
                     throw new Exception("No se ha encontrado la sección");
-
-
-                //Verificar si el orden existe
-                var existOrder = await _repositoryHomeSection.GetOrderAsync((int)sectionModel.Order, currentUser.id);
-
-                if (existOrder)
-                    sectionModel.Order = existSection.Order;
 
                 var section = _mapper.Map<HomeSection>(sectionModel);
                 await _repositoryHomeSection.Editar(section);

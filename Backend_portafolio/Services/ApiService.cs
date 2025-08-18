@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Backend_portafolio.Constants;
+using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backend_portafolio.Services
 {
@@ -16,6 +19,7 @@ namespace Backend_portafolio.Services
         Task<ApiResponse<ApiResponsePosts<List<ApiPostViewModel>>>> GetPostsPagination(string apiKey, int pageNumber, int pageSize);
         Task<ApiResponse<ApiUserViewModel>> GetUser(string apiKey);
         Task<List<ApiHomeSectionViewModel>> GetHomeSection(string apiKey);
+        Task<ApiResponse<List<ApiLayoutHomeModel>>> GetHomeLayout(string apiKey);
     }
     public class ApiService : IApiService
     {
@@ -31,6 +35,8 @@ namespace Backend_portafolio.Services
         private readonly IUsersService _usersService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IHomeSectionService _homeSectionService;
+        private readonly ILayoutService _layoutService;
+        private readonly IHomeSectionPostService _homeSectionPost;
 
         public ApiService(
             IBioService bioService,
@@ -44,7 +50,9 @@ namespace Backend_portafolio.Services
             ITokenService tokenService,
             IUsersService usersService,
             IWebHostEnvironment webHostEnvironment,
-            IHomeSectionService homeSectionService
+            IHomeSectionService homeSectionService,
+            ILayoutService layoutService,
+            IHomeSectionPostService homeSectionPost
         )
         {
             _bioService = bioService;
@@ -59,6 +67,8 @@ namespace Backend_portafolio.Services
             _usersService = usersService;
             _webHostEnvironment = webHostEnvironment;
             _homeSectionService = homeSectionService;
+            _layoutService = layoutService;
+            _homeSectionPost = homeSectionPost;
         }
 
         //****************************************************
@@ -83,7 +93,8 @@ namespace Backend_portafolio.Services
                 //Obtener Redes
                 var networks = await _networkService.GetSocialNetworksByUserId(user.id);
 
-                foreach (var network in networks) {
+                foreach (var network in networks)
+                {
                     string svgContent = null;
                     // Construir la ruta física del archivo SVG
                     string filePath = Path.Combine(_webHostEnvironment.WebRootPath, network.icon.TrimStart('/'));
@@ -176,7 +187,7 @@ namespace Backend_portafolio.Services
                 await _tokenService.ValidateApiKey(apiKey);
                 var user = await _usersService.GetUserByApiKey(apiKey);
                 var formats = await _formatService.GetAllFormat(user.id);
-                
+
                 var result = new ApiResponse<List<FormatViewModel>>()
                 {
                     Success = true,
@@ -203,7 +214,7 @@ namespace Backend_portafolio.Services
                 await _tokenService.ValidateApiKey(apiKey);
                 var user = await _usersService.GetUserByApiKey(apiKey);
 
-                if(user is null)
+                if (user is null)
                 {
                     throw new Exception("No tiene autorización");
                 }
@@ -218,7 +229,6 @@ namespace Backend_portafolio.Services
                     {
                         HomeSectionId = (int)el.Id,
                         HomeSectionName = el.Name,
-                        SectionOrder = (int)el.Order,
                         Posts = postListBySection,
                     };
                 });
@@ -273,7 +283,7 @@ namespace Backend_portafolio.Services
                 //Pasar SVG a HTML
                 foreach (var el in postsApiModels)
                 {
-                    foreach(var link in el.links)
+                    foreach (var link in el.links)
                     {
                         string svgContent = null;
                         // Construir la ruta física del archivo SVG
@@ -430,5 +440,124 @@ namespace Backend_portafolio.Services
             }
         }
 
+        //****************************************************
+        //*********************** LAYOOUT ********************
+        //****************************************************
+        public async Task<ApiResponse<List<ApiLayoutHomeModel>>> GetHomeLayout(string apiKey)
+        {
+            try
+            {
+                // API response model
+                var apiLayoutResponse = new List<ApiLayoutHomeModel>();
+
+                //User
+                var user = await _usersService.GetUserByApiKey(apiKey);
+
+                // Obtenemos cada una de las secciones del Layout
+                var layoutHomeSections = await _layoutService.GetLayoutForm(user.id);
+
+                foreach (var section in layoutHomeSections.Sections)
+                {
+
+                    var option = section.SectionType;
+
+                    var layoutSection = new ApiLayoutHomeModel()
+                    {
+                        Order = section.DisplayOrder,
+                        Type = section.SectionType,
+                    };
+
+                    switch (option)
+                    {
+                        case SectionTypesNames.UserAbout:
+                            layoutSection.Data = new
+                            {
+                                Name = user.name,
+                                Headline = user.headline,
+                                About = user.about,
+                                ProfileImage = user.img,
+                                Mail = user.email,
+                            };
+
+                            break;
+                        case SectionTypesNames.Bio:
+                            layoutSection.Data = new
+                            {
+                                Bios = (await _bioService.GetAllBio(user.id)).OrderBy(x => x.year).ToList(),
+                            };
+                            break;
+                        case SectionTypesNames.UserHobbies:
+                            layoutSection.Data = new
+                            {
+                                Hobbies = user.hobbies
+                            };
+
+                            break;
+                        case SectionTypesNames.SocialNetworks:
+                            var socialNetworks = await _networkService.GetSocialNetworksByUserId(user.id);
+
+                            foreach (var network in socialNetworks)
+                            {
+                                string svgContent = null;
+                                // Construir la ruta física del archivo SVG
+                                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, network.icon.TrimStart('/'));
+
+                                if (System.IO.File.Exists(filePath))
+                                {
+                                    svgContent = await System.IO.File.ReadAllTextAsync(filePath);
+                                    svgContent = svgContent.Replace("fill=\"#0F0F0F\"", "fill=\"currentColor\"");
+                                    svgContent = svgContent.Replace("fill=\"#000000\"", "fill=\"currentColor\"");
+                                    svgContent = svgContent.Replace("fill=\"#000\"", "fill=\"currentColor\"");
+                                    svgContent = svgContent.Replace("fill=\"#fff\"", "fill=\"currentColor\"");
+                                    svgContent = svgContent.Replace("width=\"800px\"", "");
+                                    svgContent = svgContent.Replace("height=\"800px\"", "");
+
+                                    if (!svgContent.Contains("fill=\"currentColor\"") && svgContent.Contains("<svg"))
+                                    {
+                                        svgContent = svgContent.Replace("<svg", "<svg fill=\"currentColor\"");
+                                    }
+                                }
+
+                                network.icon = svgContent;
+
+                            }
+
+                            layoutSection.Data = new
+                            {
+                                SocialNetwork = socialNetworks,
+                            };
+                            break;
+                        case SectionTypesNames.HomeSection:
+
+                            var homeSection = await _homeSectionService.GetByIdAsync((int)section.SectionId, user.id);
+
+                            layoutSection.Name = homeSection.Name;
+
+                            layoutSection.Data = new
+                            {
+                                posts = await _postService.GetPostsGroupedBySectionAsync((int)section.SectionId, user)
+                            };
+                            break;
+
+                    }
+
+                    apiLayoutResponse.Add(layoutSection);
+
+                }
+
+                return new ApiResponse<List<ApiLayoutHomeModel>>()
+                {
+                    Success = true,
+                    Message = "",
+                    Data = apiLayoutResponse,
+                };
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
