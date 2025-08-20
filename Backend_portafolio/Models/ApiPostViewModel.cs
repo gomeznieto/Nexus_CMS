@@ -8,6 +8,7 @@
         public string cover { get; set; }
         public string format{ get; set; }
         public DateTime created_at { get; set; }
+        public string Slug { get; set; }
         public List<ApiMediaViewModel> media { get; set; }
         public List<ApiLinkViewModel> links { get; set; }
         public List<ApiCategoryViewModel> categories { get; set; }

@@ -2,6 +2,7 @@
 using Backend_portafolio.Constants;
 using Backend_portafolio.Datos;
 using Backend_portafolio.Entities;
+using Backend_portafolio.Helper;
 using Backend_portafolio.Models;
 using Backend_portafolio.Sevices;
 using Microsoft.AspNetCore.Hosting;
@@ -93,35 +94,14 @@ namespace Backend_portafolio.Services
                 //Obtener Redes
                 var networks = await _networkService.GetSocialNetworksByUserId(user.id);
 
+                // Convertimos cadda uno de los íconos en HTML
                 foreach (var network in networks)
                 {
-                    string svgContent = null;
-                    // Construir la ruta física del archivo SVG
-                    string filePath = Path.Combine(_webHostEnvironment.WebRootPath, network.icon.TrimStart('/'));
-
-                    if (System.IO.File.Exists(filePath))
-                    {
-                        svgContent = await System.IO.File.ReadAllTextAsync(filePath);
-                        svgContent = svgContent.Replace("fill=\"#0F0F0F\"", "fill=\"currentColor\"");
-                        svgContent = svgContent.Replace("fill=\"#000000\"", "fill=\"currentColor\"");
-                        svgContent = svgContent.Replace("fill=\"#000\"", "fill=\"currentColor\"");
-                        svgContent = svgContent.Replace("fill=\"#fff\"", "fill=\"currentColor\"");
-                        svgContent = svgContent.Replace("width=\"800px\"", "");
-                        svgContent = svgContent.Replace("height=\"800px\"", "");
-
-                        if (!svgContent.Contains("fill=\"currentColor\"") && svgContent.Contains("<svg"))
-                        {
-                            svgContent = svgContent.Replace("<svg", "<svg fill=\"currentColor\"");
-                        }
-                    }
-
-                    network.icon = svgContent;
+                    network.icon = await Utils.SvgHtmlConverter(network.icon, _webHostEnvironment);
 
                 }
 
                 userApiViewModel.Networks = networks;
-
-                // Pasar iconos a SVG
 
                 var result = new ApiResponse<ApiUserViewModel>()
                 {
@@ -272,6 +252,8 @@ namespace Backend_portafolio.Services
                         ((await _categoriaService.GetCategoriasByPost(post.id))
                         .ToList()
                         .Select(c => c.Categoria)).ToList();
+
+                    post.Slug = Utils.GenerateSlug(post.title);
                 }
 
                 var data = new ApiResponsePosts<List<ApiPostViewModel>>()
@@ -285,28 +267,7 @@ namespace Backend_portafolio.Services
                 {
                     foreach (var link in el.links)
                     {
-                        string svgContent = null;
-                        // Construir la ruta física del archivo SVG
-                        string filePath = Path.Combine(_webHostEnvironment.WebRootPath, link.icon.TrimStart('/'));
-
-                        if (System.IO.File.Exists(filePath))
-                        {
-                            svgContent = await System.IO.File.ReadAllTextAsync(filePath);
-                            svgContent = svgContent.Replace("fill=\"#0F0F0F\"", "fill=\"currentColor\"");
-                            svgContent = svgContent.Replace("fill=\"none\"", "fill=\"currentColor\"");
-                            svgContent = svgContent.Replace("fill=\"#000000\"", "fill=\"currentColor\"");
-                            svgContent = svgContent.Replace("fill=\"#000\"", "fill=\"currentColor\"");
-                            svgContent = svgContent.Replace("fill=\"#fff\"", "fill=\"currentColor\"");
-                            svgContent = svgContent.Replace("width=\"800px\"", "");
-                            svgContent = svgContent.Replace("height=\"800px\"", "");
-
-                            if (!svgContent.Contains("fill=\"currentColor\"") && svgContent.Contains("<svg"))
-                            {
-                                svgContent = svgContent.Replace("<svg", "<svg fill=\"currentColor\"");
-                            }
-                        }
-
-                        link.icon = svgContent;
+                        link.icon = await Utils.SvgHtmlConverter(link.icon, _webHostEnvironment);
                     }
 
                 }
@@ -350,11 +311,19 @@ namespace Backend_portafolio.Services
                     .ToList()
                     .Select(c => c.Categoria));
 
+                postApiModel.Slug = Utils.GenerateSlug(postApiModel.title);
+
                 var data = new ApiResponsePosts<ApiPostViewModel>()
                 {
                     Items = postApiModel,
                     TotalRecords = 1
                 };
+
+                // Pasamos los SVG a HTML
+                foreach (var link in postApiModel.links)
+                {
+                    link.icon = await Utils.SvgHtmlConverter(link.icon, _webHostEnvironment);
+                }
 
                 return new ApiResponse<ApiResponsePosts<ApiPostViewModel>>()
                 {
@@ -465,6 +434,7 @@ namespace Backend_portafolio.Services
                     {
                         Order = section.DisplayOrder,
                         Type = section.SectionType,
+                        Name = section.Title
                     };
 
                     switch (option)
@@ -498,28 +468,7 @@ namespace Backend_portafolio.Services
 
                             foreach (var network in socialNetworks)
                             {
-                                string svgContent = null;
-                                // Construir la ruta física del archivo SVG
-                                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, network.icon.TrimStart('/'));
-
-                                if (System.IO.File.Exists(filePath))
-                                {
-                                    svgContent = await System.IO.File.ReadAllTextAsync(filePath);
-                                    svgContent = svgContent.Replace("fill=\"#0F0F0F\"", "fill=\"currentColor\"");
-                                    svgContent = svgContent.Replace("fill=\"#000000\"", "fill=\"currentColor\"");
-                                    svgContent = svgContent.Replace("fill=\"#000\"", "fill=\"currentColor\"");
-                                    svgContent = svgContent.Replace("fill=\"#fff\"", "fill=\"currentColor\"");
-                                    svgContent = svgContent.Replace("width=\"800px\"", "");
-                                    svgContent = svgContent.Replace("height=\"800px\"", "");
-
-                                    if (!svgContent.Contains("fill=\"currentColor\"") && svgContent.Contains("<svg"))
-                                    {
-                                        svgContent = svgContent.Replace("<svg", "<svg fill=\"currentColor\"");
-                                    }
-                                }
-
-                                network.icon = svgContent;
-
+                                network.icon = await Utils.SvgHtmlConverter(network.icon, _webHostEnvironment);
                             }
 
                             layoutSection.Data = new
@@ -531,7 +480,7 @@ namespace Backend_portafolio.Services
 
                             var homeSection = await _homeSectionService.GetByIdAsync((int)section.SectionId, user.id);
 
-                            layoutSection.Name = homeSection.Name;
+                            //layoutSection.Name = homeSection.Name;
 
                             layoutSection.Data = new
                             {
