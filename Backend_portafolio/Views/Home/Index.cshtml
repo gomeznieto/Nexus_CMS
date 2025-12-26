@@ -7,337 +7,338 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    ViewData["Title"] = "Home Page";
+ViewData["Title"] = "Home Page";
 }
 
 <!-- INICIO HTML -->
 <div>
-    <h1>Panel de Control</h1>
-    <!-- COLUMNA 1 -->
-    <div class="d-flex w-100 flex-lg-row flex-column">
-        <div class=" col-lg-6 col-12 d-flex flex-column gap-2 me-4">
+  <h1>Panel de Control</h1>
+  <!-- COLUMNA 1 -->
+  <div class="d-flex w-100 flex-lg-row flex-column">
+    <div class=" col-lg-6 col-12 d-flex flex-column gap-2 me-4">
 
-            <!-- RESUMEN -->
-            <div class="border-section">
-                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Resumen</p>
-                <ul class="list-group list-unstyled">
-                    <li><p><i class="fa-solid fa-file iconos_home me-3"></i><span class="fw-bold">Cantidad de posts: </span>@Model.ultimosPosts.Count()</p></li>
+      <!-- RESUMEN -->
+      <div class="border-section">
+        <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Resumen</p>
+        <ul class="list-group list-unstyled">
+          <li><p><i class="fa-solid fa-file iconos_home me-3"></i><span class="fw-bold">Cantidad de posts: </span>@Model.ultimosPosts.Count()</p></li>
 
-                    @foreach (var format in Model.formatList)
-                    {
-                        <li><p><i class="fa-solid fa-thumbtack iconos_home me-3"></i><span class="fw-bold">@format.name:</span> @Model.ultimosPosts.Count(x => x.format_id == format.id)</p></li>
-                    }
-                </ul>
-            </div>
-            <!-- FIN RESUMEN -->
-            <!-- ULTIMAS ENTRADAS-->
-            <div class="border-section">
-                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Último post</p>
-                <ul class="list-group list-unstyled">
-                    @foreach (var format in Model.formatList)
-                    {
-                        @if (Model.ultimosPosts.Count(x => x.format_id == format.id) == 0)
-                        {
-                            <li class="d-flex flex-column ">
-                                <p class="fw-bold fst-italic"><i class="fa-solid fa-layer-group iconos_home me-1"></i>@format.name</p>
-                                <p>
-                                    <i class="fas fa-edit iconos_home me-1">
-                                    </i>
-                                    <span class="date_home ">Sin entradas creadas</span>
-                                </p>
-                            </li>
-                        }
-                        else
-                        {
-                            var ultimoPost = Model.ultimosPosts
-                            .Where(x => x.format_id == format.id)
-                            .OrderByDescending(x => x.id)
-                            .FirstOrDefault();
-                            <li class="d-flex flex-column ">
-                                <p class="fw-bold fst-italic"><i class="fa-solid fa-layer-group iconos_home me-1"></i>@format.name</p>
-                                <p>
-                                    <i class="fas fa-edit iconos_home me-1">
-                                    </i>
-                                    <a href="/posts/Editar/@ultimoPost.id?format=@format.name" class="link_home">@(ultimoPost != null ? ultimoPost.title : "--")</a>
-                                    <span class="date_home "> (@ultimoPost.created_at.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES")) - @ultimoPost.created_at.ToShortTimeString())</span>
-                                </p>
-                            </li>
-                        }
-                    }
-                </ul>
-            </div>
-            <!-- FIN ULTIMAS ENTRADAS-->
-            <!-- BUSCADOR DE POST -->
-            <div class="border-section">
-                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Buscador</p>
-                <form method="post" asp-controller="Posts" asp-action="Index" class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">
-                    <input type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-action">Buscar</button>
-                    </div>
-                </form>
-            </div>
-            <!-- FIN BUSCADOR DE POST -->
-        </div>
-        <!-- FIN COLUMNA 1 -->
-        <!-- COLUMNA 2 -->
-        <div class="col-lg-6 col-12 d-flex flex-column gap-2">
-            <!-- ENTRADA RAPIDA -->
-            <div class="border-section">
-                @if (Model.formatList.Count() > 0)
-                {
-
-                    <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Entrada rápida</p>
-                    <form asp-action="Index" method="post" class="mt-2">
-
-                        <!-- VALIDATION -->
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
-                        <!-- HIDDEN -->
-                        <input type="hidden" asp-for="user_id" />
-
-                        <!-- CREACION DE ENTRADA -->
-                        <div class="mb-3">
-                            <input asp-for="title" class="form-control fs-2 fw-bolder" placeholder="Agregar titulo" />
-                            <span asp-validation-for="title" class="form-error"></span>
-                        </div>
-
-                        <!-- POST -->
-                        @await Component.InvokeAsync("TextControl", new TextControlModel { FieldName = "description", FieldValue = Model.description, EditMode = EditMode.Simplified })
-
-                        <!-- AGREGAR FORMATO -->
-                        <div class="mb-3">
-                            <h3 class="fs-5">Formato</h3>
-                            <select class="form-select select-style" asp-for="format_id">
-                                <option disabled selected>Seleccione Formato</option>
-                                @foreach (var formato in Model.formatList)
-                                {
-                                    <option value="@formato.id">@formato.name</option>
-                                }
-                            </select>
-                        </div>
-
-                        <!-- BUTTON -->
-                        <button type="submit" class="btn btn-action" onclick="BorradorHome();">Borrador</button>
-                        <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-trash"></i> Limpiar</a>
-                    </form>
-                }
-                else
-                {
-                    <p>Antes de comenzar a publicar entradas, primero debe crear un Formato</p>
-                }
-            </div>
-            <!-- FIN DE ENTRADA RAPIDA -->
-            <!-- SECCION RAPIDA -->
-            <div class="border-section">
-                <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Secciones Home Page</p>
-                <!-- LISTADO -->
-                <div class="mb-3 d-flex flex-row gap-2">
-                    @if (Model.homeSectionList.Count > 0)
-                    {
-                        <select class="form-select select-style" id="homeSectionSelect" name="selectListSection" onchange="disableBtnEdit()">
-                            <option disabled selected>Seleccione Formato</option>
-                            @foreach (var sectionHome in Model.homeSectionList)
-                            {
-                                <option value="@sectionHome.Id" data-items="@sectionHome.MaxItems" data-name="@sectionHome.Name">@sectionHome.Name</option>
-                            }
-                        </select>
-                        <a class="btn btn-edit" id="btnEditSection" onclick="editHomeSection()" data-mode="edit" data-disable="true">Editar</a>
-                    }
-                </div>
-                <button class="btn btn-action mb-2" id="btnAddSection" onclick="showHomeSectionForm()" data-mode="create"><i class="fa-solid fa-plus me-2 mb-2"></i>Agregar Sección</button>
-                <!-- FIN LISTADO -->
-                <!-- CREACION -->
-                <form method="post" asp-controller="Home" asp-action="CreateHomeSection" class="d-flex flex-row flex-lg-row justify-content-center align-items-center gap-2 hide" id="formHomeSection">
-                    <input asp-for="@Model.SectionForm.Name" type="text" class="form-control input-style" placeholder="Nombre" />
-@*                     <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25">
-                        <option selected>Orden</option>
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="4">5</option>
-                        <option value="4">6</option>
-                    </select> *@
-                    <select asp-for="@Model.SectionForm.MaxItems" class="form-select select-style w-25">
-                        <option selected>Entradas</option>
-                        <option value="6">2</option>
-                        <option value="4">4</option>
-                        <option value="6">6</option>
-                    </select>
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-action">Crear</button>
-                    </div>
-                </form>
-                <!-- FIN CREACION -->
-                <!-- EDICION -->
-                <form method="post" asp-controller="Home" asp-action="EditHomeSection" class="d-flex flex-row flex-lg-row justify-content-center align-items-center gap-2 hide" id="formHomeEditSection">
-                    <input asp-for="@Model.SectionForm.Id" type="hidden" class="form-control input-style" placeholder="Nombre" id="idEditFormSection" />
-                    <input asp-for="@Model.SectionForm.Name" type="text" class="form-control input-style" placeholder="Nombre" id="nameEditFormSection" />
-@*                     <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25" id="orderEditFormSection">
-                        <option selected>Orden</option>
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                    </select> *@
-                    <select asp-for="@Model.SectionForm.MaxItems" class="form-select select-style w-25" id="itemsEditFormSection">
-                        <option selected>Entradas</option>
-                        <option value="2">2</option>
-                        <option value="4">4</option>
-                        <option value="6">6</option>
-                    </select>
-                    <div class="input-group-append d-flex gap-2 justify-content-center">
-                        <button type="submit" name="action" value="edit" class="btn btn-action">Editar</button>
-                        <button type="button" class="btn btn-delete" id="btnDeleteHomeSection" data-bs-toggle="modal" data-bs-target="#modalDeleteSection">
-                            Borrar
-                        </button>
-                    </div>
-                </form>
-                <!-- FIN CREACION -->
-            </div>
-        </div>
-        <!-- FIN DE SECCION RAPIDA -->
+          @foreach (var format in Model.formatList)
+          {
+          <li><p><i class="fa-solid fa-thumbtack iconos_home me-3"></i><span class="fw-bold">@format.name:</span> @Model.ultimosPosts.Count(x => x.format_id == format.id)</p></li>
+          }
+        </ul>
+      </div>
+      <!-- FIN RESUMEN -->
+      <!-- ULTIMAS ENTRADAS-->
+      <div class="border-section">
+        <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Último post</p>
+        <ul class="list-group list-unstyled">
+          @foreach (var format in Model.formatList)
+          {
+          @if (Model.ultimosPosts.Count(x => x.format_id == format.id) == 0)
+          {
+          <li class="d-flex flex-column ">
+            <p class="fw-bold fst-italic"><i class="fa-solid fa-layer-group iconos_home me-1"></i>@format.name</p>
+            <p>
+              <i class="fas fa-edit iconos_home me-1">
+              </i>
+              <span class="date_home ">Sin entradas creadas</span>
+            </p>
+          </li>
+          }
+          else
+          {
+          var ultimoPost = Model.ultimosPosts
+          .Where(x => x.format_id == format.id)
+          .OrderByDescending(x => x.id)
+          .FirstOrDefault();
+          <li class="d-flex flex-column ">
+            <p class="fw-bold fst-italic"><i class="fa-solid fa-layer-group iconos_home me-1"></i>@format.name</p>
+            <p>
+              <i class="fas fa-edit iconos_home me-1">
+              </i>
+              <a href="/posts/Editar/@ultimoPost.id?format=@format.name" class="link_home">@(ultimoPost != null ? ultimoPost.title : "--")</a>
+              <span class="date_home "> (@ultimoPost.created_at.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES")) - @ultimoPost.created_at.ToShortTimeString())</span>
+            </p>
+          </li>
+          }
+          }
+        </ul>
+      </div>
+      <!-- FIN ULTIMAS ENTRADAS-->
+      <!-- BUSCADOR DE POST -->
+      <div class="border-section">
+        <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Buscador</p>
+        <form method="post" asp-controller="Posts" asp-action="Index" class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">
+          <input type="text" name="buscar" class="form-control input-style" placeholder="Buscar entrada..." />
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-action">Buscar</button>
+          </div>
+        </form>
+      </div>
+      <!-- FIN BUSCADOR DE POST -->
     </div>
-    <!-- FIN COLUMNA 2 -->
+    <!-- FIN COLUMNA 1 -->
+    <!-- COLUMNA 2 -->
+    <div class="col-lg-6 col-12 d-flex flex-column gap-2">
+      <!-- SECCION RAPIDA -->
+      <div class="border-section">
+        <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Crear Secciones del Home</p>
+        <!-- LISTADO -->
+        <div class="mb-3 d-flex flex-row gap-2">
+          @if (Model.homeSectionList.Count > 0)
+          {
+          <select class="form-select select-style" id="homeSectionSelect" name="selectListSection" onchange="disableBtnEdit()">
+            <option disabled selected>Seleccione Formato</option>
+            @foreach (var sectionHome in Model.homeSectionList)
+            {
+            <option value="@sectionHome.Id" data-items="@sectionHome.MaxItems" data-name="@sectionHome.Name">@sectionHome.Name</option>
+            }
+          </select>
+          <a class="btn btn-edit" id="btnEditSection" onclick="editHomeSection()" data-mode="edit" data-disable="true">Editar</a>
+          }
+        </div>
+        <button class="btn btn-action mb-2" id="btnAddSection" onclick="showHomeSectionForm()" data-mode="create"><i class="fa-solid fa-plus me-2 mb-2"></i>Agregar Sección</button>
+        <!-- FIN LISTADO -->
+        <!-- CREACION -->
+        <form method="post" asp-controller="Home" asp-action="CreateHomeSection" class="d-flex flex-row flex-lg-row justify-content-center align-items-center gap-2 hide" id="formHomeSection">
+          <input asp-for="@Model.SectionForm.Name" type="text" class="form-control input-style" placeholder="Nombre" />
+          @*                     <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25">
+            <option selected>Orden</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="4">5</option>
+            <option value="4">6</option>
+          </select> *@
+          <select asp-for="@Model.SectionForm.MaxItems" class="form-select select-style w-25">
+            <option selected>Entradas</option>
+            <option value="6">2</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+          </select>
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-action">Crear</button>
+          </div>
+        </form>
+        <!-- FIN CREACION -->
+        <!-- EDICION -->
+        <form method="post" asp-controller="Home" asp-action="EditHomeSection" class="d-flex flex-row flex-lg-row justify-content-center align-items-center gap-2 hide" id="formHomeEditSection">
+          <input asp-for="@Model.SectionForm.Id" type="hidden" class="form-control input-style" placeholder="Nombre" id="idEditFormSection" />
+          <input asp-for="@Model.SectionForm.Name" type="text" class="form-control input-style" placeholder="Nombre" id="nameEditFormSection" />
+          @*                     <select asp-for="@Model.SectionForm.Order" class="form-select select-style w-25" id="orderEditFormSection">
+            <option selected>Orden</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select> *@
+          <select asp-for="@Model.SectionForm.MaxItems" class="form-select select-style w-25" id="itemsEditFormSection">
+            <option selected>Entradas</option>
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+          </select>
+          <div class="input-group-append d-flex gap-2 justify-content-center">
+            <button type="submit" name="action" value="edit" class="btn btn-action">Editar</button>
+            <button type="button" class="btn btn-delete" id="btnDeleteHomeSection" data-bs-toggle="modal" data-bs-target="#modalDeleteSection">
+              Borrar
+            </button>
+          </div>
+        </form>
+        <!-- FIN CREACION -->
+      </div>
+      <!-- ENTRADA RAPIDA -->
+      <div class="border-section">
+        @if (Model.formatList.Count() > 0)
+        {
+
+        <p class="fs-5 border-bottom border-1 border-secondary pb-3 fw-bold">Entrada rápida</p>
+        <form asp-action="Index" method="post" class="mt-2">
+
+          <!-- VALIDATION -->
+          <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+          <!-- HIDDEN -->
+          <input type="hidden" asp-for="user_id" />
+
+          <!-- CREACION DE ENTRADA -->
+          <div class="mb-3">
+            <input asp-for="title" class="form-control fs-2 fw-bolder" placeholder="Agregar titulo" />
+            <span asp-validation-for="title" class="form-error"></span>
+          </div>
+
+          <!-- POST -->
+          @await Component.InvokeAsync("TextControl", new TextControlModel { FieldName = "description", FieldValue = Model.description, EditMode = EditMode.Simplified })
+
+          <!-- AGREGAR FORMATO -->
+          <div class="mb-3">
+            <h3 class="fs-5">Formato</h3>
+            <select class="form-select select-style" asp-for="format_id">
+              <option disabled selected>Seleccione Formato</option>
+              @foreach (var formato in Model.formatList)
+              {
+              <option value="@formato.id">@formato.name</option>
+              }
+            </select>
+          </div>
+
+          <!-- BUTTON -->
+          <button type="submit" class="btn btn-action" onclick="BorradorHome();">Borrador</button>
+          <a asp-action="Index" asp-route-format="@Model.format" class="btn btn-delete"><i class="fa-solid fa-trash"></i> Limpiar</a>
+        </form>
+        }
+        else
+        {
+        <p>Antes de comenzar a publicar entradas, primero debe crear un Formato</p>
+        }
+      </div>
+      <!-- FIN DE ENTRADA RAPIDA -->
+
+    </div>
+    <!-- FIN DE SECCION RAPIDA -->
+  </div>
+  <!-- FIN COLUMNA 2 -->
 </div>
 <!-- MODAL -->
 <!-- Modal con form de borrado -->
 <div class="modal fade" id="modalDeleteSection" tabindex="-1">
-    <div class="modal-dialog">
-        <form method="post" asp-controller="Home" asp-action="DeleteHomeSection">
-            <input type="hidden" id="idDeleteHomeSection" asp-for="@Model.SectionForm.Id" />
-            <div class="modal-content bgModalConfirm">
-                <div class="d-flex justify-content-center align-content-center"><h5 class="modal-title">Confirmar borrado</h5></div>
-                <div class="mt-4 text-center fw-normal">¿Estás seguro de eliminar esta sección?</div>
-                <div class="d-flex justify-content-between align-content-center mt-4">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Confirmar</button>
-                </div>
-            </div>
-        </form>
-    </div>
+  <div class="modal-dialog">
+    <form method="post" asp-controller="Home" asp-action="DeleteHomeSection">
+      <input type="hidden" id="idDeleteHomeSection" asp-for="@Model.SectionForm.Id" />
+      <div class="modal-content bgModalConfirm">
+        <div class="d-flex justify-content-center align-content-center"><h5 class="modal-title">Confirmar borrado</h5></div>
+        <div class="mt-4 text-center fw-normal">¿Estás seguro de eliminar esta sección?</div>
+        <div class="d-flex justify-content-between align-content-center mt-4">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Confirmar</button>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 <!-- FIN DE HTML -->
 <!-- FUNCIONES DE JS -->
 <script>
-    document.getElementById("btnDeleteHomeSection").addEventListener("click", () => {
-        document.getElementById("idDeleteHomeSection").value = document.getElementById("idEditFormSection").value;
+document.getElementById("btnDeleteHomeSection").addEventListener("click", () => {
+  document.getElementById("idDeleteHomeSection").value = document.getElementById("idEditFormSection").value;
 
-    })
+})
 
-    function showHomeSectionForm()
+function showHomeSectionForm()
     {
-        let form =document.getElementById("formHomeSection");
-        let btnAddSection = document.getElementById("btnAddSection");
-        let action = btnAddSection.getAttribute("data-mode");
+  let form =document.getElementById("formHomeSection");
+  let btnAddSection = document.getElementById("btnAddSection");
+  let action = btnAddSection.getAttribute("data-mode");
 
-        if( action == "create")
-        {
-            btnAddSection.classList.remove("btn-action");
-            btnAddSection.classList.add("btn-delete");
-            btnAddSection.setAttribute("data-mode", "cancel")
-            form.classList.remove("hide");
-            btnAddSection.innerHTML = "Cancelar";
+  if( action == "create")
+{
+    btnAddSection.classList.remove("btn-action");
+    btnAddSection.classList.add("btn-delete");
+    btnAddSection.setAttribute("data-mode", "cancel")
+    form.classList.remove("hide");
+    btnAddSection.innerHTML = "Cancelar";
 
-            candelEditHomeSection();
-        }
-        else
-        {
-            cancelCrateHomeSection();
-        }
-    }
+    candelEditHomeSection();
+  }
+  else
+{
+    cancelCrateHomeSection();
+  }
+}
 
-    function cancelCrateHomeSection()
+function cancelCrateHomeSection()
     {
-        let form =document.getElementById("formHomeSection");
-        let btnAddSection = document.getElementById("btnAddSection");
-        let action = btnAddSection.getAttribute("data-mode");
+  let form =document.getElementById("formHomeSection");
+  let btnAddSection = document.getElementById("btnAddSection");
+  let action = btnAddSection.getAttribute("data-mode");
 
-        if(action == "create")
-            return;
+  if(action == "create")
+    return;
 
-        form.classList.add("hide");
-        btnAddSection.classList.add("btn-action");
-        btnAddSection.classList.remove("btn-delete");
-        btnAddSection.setAttribute("data-mode", "create")
-        btnAddSection.innerHTML = "Agregar Sección";
-    }
+  form.classList.add("hide");
+  btnAddSection.classList.add("btn-action");
+  btnAddSection.classList.remove("btn-delete");
+  btnAddSection.setAttribute("data-mode", "create")
+  btnAddSection.innerHTML = "Agregar Sección";
+}
 
-    function disableBtnEdit()
+function disableBtnEdit()
     {
-        let btnEdit = document.getElementById("btnEditSection");
+  let btnEdit = document.getElementById("btnEditSection");
 
-        if(btnEdit.getAttribute("data-disable") == "true")
-            btnEdit.setAttribute("data-disable", "false")
+  if(btnEdit.getAttribute("data-disable") == "true")
+    btnEdit.setAttribute("data-disable", "false")
 
 
-    }
+}
 
-    function editHomeSection()
+function editHomeSection()
     {
-        let formCreate =document.getElementById("formHomeSection");
-        let btnEdit = document.getElementById("btnEditSection");
-        let action = btnEdit.getAttribute("data-mode");
-        let editForm = document.getElementById("formHomeEditSection");
+  let formCreate =document.getElementById("formHomeSection");
+  let btnEdit = document.getElementById("btnEditSection");
+  let action = btnEdit.getAttribute("data-mode");
+  let editForm = document.getElementById("formHomeEditSection");
 
-        if(btnEdit.getAttribute("data-disable") == "true")
-            return;
+  if(btnEdit.getAttribute("data-disable") == "true")
+    return;
 
-        // Valores
-        let optSelect = document.getElementById("homeSectionSelect");
-        const optSelected = optSelect.options[optSelect.selectedIndex];
-        let idOptSelected = optSelected.value;
-        let nameOptSelected = optSelected.getAttribute("data-name");
-        @* let orderOptSelected = optSelected.getAttribute("data-order"); *@;
-        let maxItemsOptSelected = optSelected.getAttribute("data-items");
+  // Valores
+  let optSelect = document.getElementById("homeSectionSelect");
+  const optSelected = optSelect.options[optSelect.selectedIndex];
+  let idOptSelected = optSelected.value;
+  let nameOptSelected = optSelected.getAttribute("data-name");
+  @* let orderOptSelected = optSelected.getAttribute("data-order"); *@;
+  let maxItemsOptSelected = optSelected.getAttribute("data-items");
 
-        //Formulario
-        document.getElementById("idEditFormSection").value = idOptSelected;
-        document.getElementById("nameEditFormSection").value = nameOptSelected;
-         @* document.getElementById("orderEditFormSection").value = orderOptSelected; *@;
-        document.getElementById("itemsEditFormSection").value = maxItemsOptSelected;
+  //Formulario
+  document.getElementById("idEditFormSection").value = idOptSelected;
+  document.getElementById("nameEditFormSection").value = nameOptSelected;
+  @* document.getElementById("orderEditFormSection").value = orderOptSelected; *@;
+  document.getElementById("itemsEditFormSection").value = maxItemsOptSelected;
 
-        if(action == "edit")
-        {
-            formCreate.classList.add("hide")
-            optSelect.disabled = true;
-            editForm.classList.remove("hide");
-            btnEdit.classList.remove("btn-action")
-            btnEdit.classList.add("btn-delete")
-            btnEdit.setAttribute("data-mode", "Cancel");
-            btnEdit.innerHTML = "Cancel";
+  if(action == "edit")
+{
+    formCreate.classList.add("hide")
+    optSelect.disabled = true;
+    editForm.classList.remove("hide");
+    btnEdit.classList.remove("btn-action")
+    btnEdit.classList.add("btn-delete")
+    btnEdit.setAttribute("data-mode", "Cancel");
+    btnEdit.innerHTML = "Cancel";
 
-            cancelCrateHomeSection();
-        }
-        else
-        {
-            candelEditHomeSection();
-        }
-    }
+    cancelCrateHomeSection();
+  }
+  else
+{
+    candelEditHomeSection();
+  }
+}
 
-    function candelEditHomeSection()
+function candelEditHomeSection()
     {
 
-        let optSelect = document.getElementById("homeSectionSelect");
-        let editForm = document.getElementById("formHomeEditSection");
-        let btnEdit = document.getElementById("btnEditSection");
-        let action = btnEdit.getAttribute("data-mode");
+  let optSelect = document.getElementById("homeSectionSelect");
+  let editForm = document.getElementById("formHomeEditSection");
+  let btnEdit = document.getElementById("btnEditSection");
+  let action = btnEdit.getAttribute("data-mode");
 
-        if(action == "edit")
-            return;
+  if(action == "edit")
+    return;
 
-        optSelect.disabled = false;
-        editForm.classList.add("hide");
-        btnEdit.setAttribute("data-mode", "edit");
-        btnEdit.innerHTML = "Editar";
-        btnEdit.classList.remove("btn-delete")
-        btnEdit.classList.add("btn-edit")
-    }
+  optSelect.disabled = false;
+  editForm.classList.add("hide");
+  btnEdit.setAttribute("data-mode", "edit");
+  btnEdit.innerHTML = "Editar";
+  btnEdit.classList.remove("btn-delete")
+  btnEdit.classList.add("btn-edit")
+}
 
 
 </script>
