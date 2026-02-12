@@ -1,24 +1,19 @@
-﻿USE [master]
-GO
+﻿USE master
 
 -- Crear base de datos
-IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'blog')
+IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'DB_Portfolio')
 BEGIN
-    ALTER DATABASE [blog] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
-    DROP DATABASE [blog]
+    ALTER DATABASE DB_Portfolio SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+    DROP DATABASE DB_Portfolio
 END
 
-CREATE DATABASE [blog]
-GO
+CREATE DATABASE DB_Portfolio
 
-USE [blog]
-GO
+USE DB_Portfolio
 
 -- Habilitar configuraciones iniciales
 SET ANSI_NULLS ON
-GO
 SET QUOTED_IDENTIFIER ON
-GO
 
 -- Crear tabla de usuarios primero (referenciada por varias tablas)
 CREATE TABLE [dbo].[users](
@@ -39,7 +34,6 @@ CREATE TABLE [dbo].[users](
 	[apiKey] [varchar](255) NULL
 	CONSTRAINT [PK_users] PRIMARY KEY CLUSTERED ([id] ASC)
 ) ON [PRIMARY]
-GO
 
 -- Crear tabla de roles
 CREATE TABLE [dbo].[role](
@@ -47,7 +41,6 @@ CREATE TABLE [dbo].[role](
 	[name] [varchar](100) NOT NULL,
 	CONSTRAINT [PK_role] PRIMARY KEY CLUSTERED ([id] ASC)
 ) ON [PRIMARY]
-GO
 
 -- Crear tabla de biografías
 CREATE TABLE [dbo].[bio](
@@ -58,7 +51,6 @@ CREATE TABLE [dbo].[bio](
 	CONSTRAINT [PK_bio] PRIMARY KEY CLUSTERED ([id] ASC),
 	CONSTRAINT [FK_bio_user] FOREIGN KEY ([user_id]) REFERENCES [dbo].[users]([id])
 ) ON [PRIMARY]
-GO
 
 -- Crear tabla de categorías
 CREATE TABLE [dbo].[category](
@@ -68,7 +60,6 @@ CREATE TABLE [dbo].[category](
 	CONSTRAINT [PK_category] PRIMARY KEY CLUSTERED ([id] ASC),
 	CONSTRAINT [FK_category_user] FOREIGN KEY ([user_id]) REFERENCES [dbo].[users]([id])
 ) ON [PRIMARY]
-GO
 
 -- Crear tabla de formatos
 CREATE TABLE [dbo].[format](
@@ -78,7 +69,6 @@ CREATE TABLE [dbo].[format](
 	CONSTRAINT [PK_format] PRIMARY KEY CLUSTERED ([id] ASC),
 	CONSTRAINT [FK_format_user] FOREIGN KEY ([user_id]) REFERENCES [dbo].[users]([id])
 ) ON [PRIMARY]
-GO
 
 -- Crear tabla de publicaciones
 CREATE TABLE [dbo].[post](
@@ -95,7 +85,6 @@ CREATE TABLE [dbo].[post](
 	CONSTRAINT [FK_post_user] FOREIGN KEY ([user_id]) REFERENCES [dbo].[users]([id]),
 	CONSTRAINT [FK_post_format] FOREIGN KEY ([format_id]) REFERENCES [dbo].[format]([id])
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
 
 -- Crear tabla de fuentes
 CREATE TABLE [dbo].[source](
@@ -106,7 +95,6 @@ CREATE TABLE [dbo].[source](
 	CONSTRAINT [PK_source] PRIMARY KEY CLUSTERED ([id] ASC),
 	CONSTRAINT [FK_source_user] FOREIGN KEY ([user_id]) REFERENCES [dbo].[users]([id])
 ) ON [PRIMARY]
-GO
 
 -- Crear tabla de enlaces
 CREATE TABLE [dbo].[link](
@@ -118,7 +106,6 @@ CREATE TABLE [dbo].[link](
 	CONSTRAINT [FK_link_post] FOREIGN KEY ([post_id]) REFERENCES [dbo].[post]([id]),
 	CONSTRAINT [FK_link_source] FOREIGN KEY ([source_id]) REFERENCES [dbo].[source]([id])
 ) ON [PRIMARY]
-GO
 
 -- Crear tabla de tipos de medios
 CREATE TABLE [dbo].[mediatype](
@@ -128,7 +115,6 @@ CREATE TABLE [dbo].[mediatype](
 	CONSTRAINT [PK_mediatype] PRIMARY KEY CLUSTERED ([id] ASC),
 	CONSTRAINT [FK_mediatype_user] FOREIGN KEY ([user_id]) REFERENCES [dbo].[users]([id])
 ) ON [PRIMARY]
-GO
 
 -- Crear tabla de medios
 CREATE TABLE [dbo].[media](
@@ -140,7 +126,6 @@ CREATE TABLE [dbo].[media](
 	CONSTRAINT [FK_media_post] FOREIGN KEY ([post_id]) REFERENCES [dbo].[post]([id]),
 	CONSTRAINT [FK_media_mediatype] FOREIGN KEY ([mediatype_id]) REFERENCES [dbo].[mediatype]([id])
 ) ON [PRIMARY]
-GO
 
 -- Crear tabla de redes sociales
 CREATE TABLE [dbo].[social_network](
@@ -153,7 +138,6 @@ CREATE TABLE [dbo].[social_network](
 	CONSTRAINT [PK_social_network] PRIMARY KEY CLUSTERED ([id] ASC),
 	CONSTRAINT [FK_social_network_user] FOREIGN KEY ([user_id]) REFERENCES [dbo].[users]([id])
 ) ON [PRIMARY]
-GO
 
 -- Crear tabla de relación entre categorías y publicaciones
 CREATE TABLE [dbo].[category_post](
@@ -164,7 +148,6 @@ CREATE TABLE [dbo].[category_post](
 	CONSTRAINT [FK_category_post_category] FOREIGN KEY ([category_id]) REFERENCES [dbo].[category]([id]),
 	CONSTRAINT [FK_category_post_post] FOREIGN KEY ([post_id]) REFERENCES [dbo].[post]([id])
 ) ON [PRIMARY]
-GO
 
 
 -- Crear tabla de relación entre usuarios y roles
@@ -175,7 +158,6 @@ CREATE TABLE [dbo].[user_role](
 	CONSTRAINT [FK_user_role_user] FOREIGN KEY ([user_id]) REFERENCES [dbo].[users]([id]), -- Clave foránea hacia users
 	CONSTRAINT [FK_user_role_role] FOREIGN KEY ([role_id]) REFERENCES [dbo].[role]([id])   -- Clave foránea hacia role
 ) ON [PRIMARY];
-GO
 
 -- Tabla de secciones del home
 CREATE TABLE HomeSection (

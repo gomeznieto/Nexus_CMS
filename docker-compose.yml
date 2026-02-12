@@ -26,6 +26,8 @@ services:
       - "8443:443"
     volumes:
       - ./Backend_portafolio:/app
+    env_file:
+      - .env
     depends_on:
       - sqlserver_db
 

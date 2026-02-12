@@ -120,9 +120,11 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddSingleton<IEncryptionService>(provider =>
 {
-    var configuration = provider.GetRequiredService<IConfiguration>();
-    var encryptionKey = configuration["Encryption:Key"];
-    var encryptionIV = configuration["Encryption:IV"];
+    // var configuration = provider.GetRequiredService<IConfiguration>();
+    // var encryptionKey = configuration["Encryption:Key"];
+    // var encryptionIV = configuration["Encryption:IV"];
+    var encryptionKey = builder.Configuration["Encryption:Key"];
+    var encryptionIV = builder.Configuration["Encryption:IV"];
 
     return new EncryptionService(encryptionKey, encryptionIV);
 });
@@ -134,7 +136,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
 	app.UseExceptionHandler("/Home/Error");
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
 
