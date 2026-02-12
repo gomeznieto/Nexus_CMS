@@ -7,8 +7,9 @@ namespace ASPUnitTesting
 		public static IConfiguration GetConfiguration()
 		{
 			return new ConfigurationBuilder()
-				.AddJsonFile("appsettings.Development.json")
-				.Build();
-		}
-	}
+                .AddJsonFile("appsettings.Development.json")
+                .AddEnvironmentVariables()
+                .Build();
+        }
+    }
 }
